@@ -1,5 +1,5 @@
-using Educar.Backend.Application.Commands;
 using Educar.Backend.Application.Commands.Contract.CreateAccountType;
+using Educar.Backend.Application.Commands.Contract.CreateContract;
 using Educar.Backend.Application.Common.Exceptions;
 using Educar.Backend.Domain.Enums;
 using NUnit.Framework;
@@ -8,7 +8,7 @@ using static Educar.Backend.Application.IntegrationTests.Testing;
 namespace Educar.Backend.Application.IntegrationTests.Contract;
 
 [TestFixture]
-public class CreateContractTests : TestBase
+public class UpdateContractTests : TestBase
 {
     [SetUp]
     public void SetUp()
@@ -17,10 +17,10 @@ public class CreateContractTests : TestBase
     }
 
     [Test]
-    public async Task GivenValidRequest_ShouldCreateContract()
+    public async Task GivenValidRequest_ShouldUpdateContract()
     {
         // Arrange
-        var command = new CreateContractCommand
+        var createCommand = new CreateContractCommand
         {
             ContractDurationInYears = 1,
             ContractSigningDate = DateTimeOffset.Now,
@@ -28,24 +28,52 @@ public class CreateContractTests : TestBase
             TotalAccounts = 10,
             Status = ContractStatus.Signed
         };
+        var createResponse = await SendAsync(createCommand);
+
+        var updateCommand = new UpdateContractCommand
+        {
+            Id = createResponse.Id,
+            ContractDurationInYears = 2,
+            ContractSigningDate = DateTimeOffset.Now,
+            ImplementationDate = DateTimeOffset.Now.AddMonths(2),
+            TotalAccounts = 15,
+            Status = ContractStatus.Signed
+        };
 
         // Act
-        var response = await SendAsync(command);
+        await SendAsync(updateCommand);
 
         // Assert
-        Assert.That(response, Is.Not.Null);
-        Assert.That(response, Is.InstanceOf<CreatedResponseDto>());
+        var updatedContract = await Context.Contracts.FindAsync(updateCommand.Id);
+        Assert.That(updatedContract, Is.Not.Null);
+        Assert.That(updatedContract.ContractDurationInYears, Is.EqualTo(2));
+        Assert.That(updatedContract.ImplementationDate, Is.EqualTo(updateCommand.ImplementationDate));
+        Assert.That(updatedContract.TotalAccounts, Is.EqualTo(15));
+        Assert.That(updatedContract.Status, Is.EqualTo(ContractStatus.Signed));
+    }
 
-        var createdContract = await Context.Contracts.FindAsync(response.Id);
-        Assert.That(createdContract, Is.Not.Null);
-        Assert.That(createdContract.Id, Is.Not.Empty);
+    [Test]
+    public void ShouldThrowValidationException_WhenIdIsEmpty()
+    {
+        var command = new UpdateContractCommand
+        {
+            Id = Guid.Empty,
+            ContractDurationInYears = 1,
+            ContractSigningDate = DateTimeOffset.Now,
+            ImplementationDate = DateTimeOffset.Now.AddMonths(1),
+            TotalAccounts = 10,
+            Status = ContractStatus.Signed
+        };
+
+        Assert.ThrowsAsync<ValidationException>(async () => await SendAsync(command));
     }
 
     [Test]
     public void ShouldThrowValidationException_WhenContractDurationInYearsIsZero()
     {
-        var command = new CreateContractCommand
+        var command = new UpdateContractCommand
         {
+            Id = Guid.NewGuid(),
             ContractDurationInYears = 0,
             ContractSigningDate = DateTimeOffset.Now,
             ImplementationDate = DateTimeOffset.Now.AddMonths(1),
@@ -59,8 +87,9 @@ public class CreateContractTests : TestBase
     [Test]
     public void ShouldThrowValidationException_WhenContractSigningDateIsEmpty()
     {
-        var command = new CreateContractCommand
+        var command = new UpdateContractCommand
         {
+            Id = Guid.NewGuid(),
             ContractDurationInYears = 1,
             ContractSigningDate = default,
             ImplementationDate = DateTimeOffset.Now.AddMonths(1),
@@ -68,15 +97,15 @@ public class CreateContractTests : TestBase
             Status = ContractStatus.Signed
         };
 
-
         Assert.ThrowsAsync<ValidationException>(async () => await SendAsync(command));
     }
 
     [Test]
     public void ShouldThrowValidationException_WhenImplementationDateIsEmpty()
     {
-        var command = new CreateContractCommand
+        var command = new UpdateContractCommand
         {
+            Id = Guid.NewGuid(),
             ContractDurationInYears = 1,
             ContractSigningDate = DateTimeOffset.Now,
             ImplementationDate = default,
@@ -90,8 +119,9 @@ public class CreateContractTests : TestBase
     [Test]
     public void ShouldThrowValidationException_WhenTotalAccountsIsZero()
     {
-        var command = new CreateContractCommand
+        var command = new UpdateContractCommand
         {
+            Id = Guid.NewGuid(),
             ContractDurationInYears = 1,
             ContractSigningDate = DateTimeOffset.Now,
             ImplementationDate = DateTimeOffset.Now.AddMonths(1),
@@ -105,8 +135,9 @@ public class CreateContractTests : TestBase
     [Test]
     public void ShouldThrowValidationException_WhenStatusIsInvalid()
     {
-        var command = new CreateContractCommand
+        var command = new UpdateContractCommand
         {
+            Id = Guid.NewGuid(),
             ContractDurationInYears = 1,
             ContractSigningDate = DateTimeOffset.Now,
             ImplementationDate = DateTimeOffset.Now.AddMonths(1),

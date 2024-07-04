@@ -22,8 +22,14 @@ public class DeleteContractTests : TestBase
     public async Task GivenValidRequest_ShouldSoftDeleteContract()
     {
         // Arrange
-        var createCommand = new CreateContractCommand(1, DateTimeOffset.Now, DateTimeOffset.Now.AddMonths(1), 10,
-            ContractStatus.Signed);
+        var createCommand = new CreateContractCommand
+        {
+            ContractDurationInYears = 1,
+            ContractSigningDate = DateTimeOffset.Now,
+            ImplementationDate = DateTimeOffset.Now.AddMonths(1),
+            TotalAccounts = 10,
+            Status = ContractStatus.Signed
+        };
         var createResponse = await SendAsync(createCommand);
 
         var deleteCommand = new DeleteContractCommand(createResponse.Id);
@@ -53,8 +59,14 @@ public class DeleteContractTests : TestBase
     public async Task GivenSoftDeletedContract_ShouldNotRetrieveIt()
     {
         // Arrange
-        var createCommand = new CreateContractCommand(1, DateTimeOffset.Now, DateTimeOffset.Now.AddMonths(1), 10,
-            ContractStatus.Signed);
+        var createCommand = new CreateContractCommand
+        {
+            ContractDurationInYears = 1,
+            ContractSigningDate = DateTimeOffset.Now,
+            ImplementationDate = DateTimeOffset.Now.AddMonths(1),
+            TotalAccounts = 10,
+            Status = ContractStatus.Signed
+        };
         var createResponse = await SendAsync(createCommand);
 
         var deleteCommand = new DeleteContractCommand(createResponse.Id);

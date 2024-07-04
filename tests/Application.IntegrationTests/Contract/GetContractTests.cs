@@ -20,8 +20,15 @@ public class GetContractTests : TestBase
     public async Task GivenValidRequest_ShouldReturnContract()
     {
         // Arrange
-        var command = new CreateContractCommand(1, DateTimeOffset.Now, DateTimeOffset.Now.AddMonths(1), 10,
-            ContractStatus.Signed);
+        var command = new CreateContractCommand
+        {
+            ContractDurationInYears = 1,
+            ContractSigningDate = DateTimeOffset.Now,
+            ImplementationDate = DateTimeOffset.Now.AddMonths(1),
+            TotalAccounts = 10,
+            Status = ContractStatus.Signed
+        };
+        
         var response = await SendAsync(command);
 
         var query = new GetContractQuery { Id = response.Id };

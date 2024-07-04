@@ -1,5 +1,6 @@
 using Educar.Backend.Application.Commands;
 using Educar.Backend.Application.Commands.Contract.CreateAccountType;
+using Educar.Backend.Application.Commands.Contract.CreateContract;
 using Educar.Backend.Application.Commands.Contract.DeleteContract;
 using Educar.Backend.Application.Queries.Contract;
 using Educar.Backend.Domain.Enums;
@@ -15,7 +16,7 @@ public class Contract : EndpointGroupBase
             .RequireAuthorization(UserRole.Admin.GetDisplayName())
             .MapPost(CreateContract)
             .MapGet(GetContract, "{id}")
-            // .MapPut(UpdateTodoList, "{id}")
+            .MapPut(UpdateContract, "{id}")
             .MapDelete(DeleteContract, "{id}");
     }
 
@@ -32,6 +33,13 @@ public class Contract : EndpointGroupBase
     public async Task<IResult> DeleteContract(ISender sender, Guid id)
     {
         await sender.Send(new DeleteContractCommand(id));
+        return Results.NoContent();
+    }
+    
+    public async Task<IResult> UpdateContract(ISender sender, Guid id, UpdateContractCommand command)
+    {
+        command.Id = id;
+        await sender.Send(command);
         return Results.NoContent();
     }
 }
