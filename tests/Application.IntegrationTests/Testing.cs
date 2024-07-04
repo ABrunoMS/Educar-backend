@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Moq;
 using NUnit.Framework;
 
 namespace Educar.Backend.Application.IntegrationTests;
@@ -16,8 +15,8 @@ namespace Educar.Backend.Application.IntegrationTests;
 public class Testing
 {
     private static ServiceProvider ServiceProvider { get; set; } = null!;
-    public static Mock<IApplicationDbContext> MockContext { get; private set; } = null!;
-
+    public static ApplicationDbContext Context { get; private set; } = null!;
+    
     [OneTimeSetUp]
     public void SetUp()
     {
@@ -32,25 +31,26 @@ public class Testing
             .AddJsonFile("appsettings.json", true, true)
             .AddEnvironmentVariables();
 
-
-        MockContext = new Mock<IApplicationDbContext>();
+        // MockContext = new Mock<IApplicationDbContext>();
         services.AddApplicationServices();
-        services.AddInfrastructureServices(builder.Build(), MockContext.Object);
+        services.AddInfrastructureServices(builder.Build());
         services.AddWebServices();
 
         ServiceProvider = services.BuildServiceProvider();
+        Context = ServiceProvider.GetRequiredService<ApplicationDbContext>();
     }
 
     [OneTimeTearDown]
     public void TearDown()
     {
         ServiceProvider.Dispose();
+        Context.Dispose();
     }
 
     public static void ResetState()
     {
-        MockContext.Reset();
         using var scope = ServiceProvider.CreateScope();
+        Context.Database.EnsureDeleted();
     }
 
     public static async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request)

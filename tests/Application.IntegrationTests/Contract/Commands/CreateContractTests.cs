@@ -2,8 +2,6 @@ using Educar.Backend.Application.Commands;
 using Educar.Backend.Application.Commands.Contract.CreateAccountType;
 using Educar.Backend.Application.Common.Exceptions;
 using Educar.Backend.Domain.Enums;
-using Microsoft.EntityFrameworkCore;
-using Moq;
 using NUnit.Framework;
 using static Educar.Backend.Application.IntegrationTests.Testing;
 
@@ -15,11 +13,8 @@ public class CreateContractTests : TestBase
     [SetUp]
     public void SetUp()
     {
-        _mockContractsDbSet = new Mock<DbSet<Domain.Entities.Contract>>();
-        MockContext.Setup(c => c.Contracts).Returns(_mockContractsDbSet.Object);
+        ResetState();
     }
-
-    private Mock<DbSet<Domain.Entities.Contract>> _mockContractsDbSet;
 
     [Test]
     public async Task GivenValidRequest_ShouldCreateContract()
@@ -32,11 +27,12 @@ public class CreateContractTests : TestBase
         var response = await SendAsync(command);
 
         // Assert
-        MockContext.Verify(m => m.Contracts.Add(It.IsAny<Domain.Entities.Contract>()), Times.Once);
-        MockContext.Verify(m => m.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-
         Assert.That(response, Is.Not.Null);
         Assert.That(response, Is.InstanceOf<CreatedResponseDto>());
+
+        var createdContract = await Context.Contracts.FindAsync(response.Id);
+        Assert.That(createdContract, Is.Not.Null);
+        Assert.That(createdContract.Id, Is.Not.Empty);
     }
 
     [Test]
