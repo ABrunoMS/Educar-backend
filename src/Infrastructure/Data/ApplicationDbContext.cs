@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using System.Reflection;
 using Educar.Backend.Application.Interfaces;
 using Educar.Backend.Domain.Entities;
@@ -30,5 +31,28 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             foreach (var property in entityType.GetProperties())
                 property.SetColumnName(property.Name.ToSnakeCase().ToLower());
         }
+
+        var softDeleteEntities = typeof(ISoftDelete).Assembly.GetTypes()
+            .Where(type => typeof(ISoftDelete)
+                               .IsAssignableFrom(type)
+                           && type.IsClass
+                           && !type.IsAbstract);
+
+        foreach (var softDeleteEntity in softDeleteEntities)
+        {
+            builder.Entity(softDeleteEntity).HasQueryFilter(
+                GenerateQueryFilterLambda(softDeleteEntity));
+        }
+    }
+
+    private LambdaExpression GenerateQueryFilterLambda(Type type)
+    {
+        var parameter = Expression.Parameter(type, "w");
+        var falseConstantValue = Expression.Constant(false);
+        var propertyAccess = Expression.PropertyOrField(parameter, nameof(ISoftDelete.IsDeleted));
+        var equalExpression = Expression.Equal(propertyAccess, falseConstantValue);
+        var lambda = Expression.Lambda(equalExpression, parameter);
+
+        return lambda;
     }
 }

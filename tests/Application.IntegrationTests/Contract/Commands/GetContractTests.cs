@@ -43,4 +43,21 @@ public class GetContractTests : TestBase
         // Act & Assert
         Assert.ThrowsAsync<NotFoundException>(async () => await SendAsync(query));
     }
+
+    [Test]
+    public async Task GivenDeletedResourceRequest_ShouldThrowNotFoundException()
+    {
+        // Arrange
+        var contract = new Domain.Entities.Contract(1, DateTimeOffset.Now, DateTimeOffset.Now.AddMonths(1), 10, ContractStatus.Signed)
+        {
+            IsDeleted = true
+        };
+        Context.Contracts.Add(contract);
+        await Context.SaveChangesAsync();
+
+        var query = new GetContractQuery { Id = contract.Id };
+
+        // Act & Assert
+        Assert.ThrowsAsync<NotFoundException>(async () => await SendAsync(query));
+    }
 }

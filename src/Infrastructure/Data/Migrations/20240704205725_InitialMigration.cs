@@ -12,6 +12,24 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Client",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Client", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "contract",
                 columns: table => new
                 {
@@ -23,6 +41,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     remaining_accounts = table.Column<int>(type: "integer", nullable: true),
                     delivery_report = table.Column<string>(type: "text", nullable: true),
                     status = table.Column<string>(type: "text", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
                     created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<string>(type: "text", nullable: true),
                     last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -39,6 +58,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
                     created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<string>(type: "text", nullable: true),
                     last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -59,6 +79,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     reminder = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     done = table.Column<bool>(type: "boolean", nullable: false),
                     list_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
                     created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<string>(type: "text", nullable: true),
                     last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -84,6 +105,9 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Client");
+
             migrationBuilder.DropTable(
                 name: "contract");
 

@@ -1,4 +1,6 @@
+using Educar.Backend.Application.Common.Exceptions;
 using Microsoft.Extensions.Logging;
+using ValidationException = FluentValidation.ValidationException;
 
 namespace Educar.Backend.Application.Common.Behaviours;
 
@@ -18,6 +20,26 @@ public class UnhandledExceptionBehaviour<TRequest, TResponse> : IPipelineBehavio
         try
         {
             return await next();
+        }
+        catch (ValidationException)
+        {
+            // Do not log ValidationException
+            throw;
+        }
+        catch (NotFoundException)
+        {
+            // Do not log NotFoundException
+            throw;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            // Do not log UnauthorizedAccessException
+            throw;
+        }
+        catch (ForbiddenAccessException)
+        {
+            // Do not log ForbiddenAccessException
+            throw;
         }
         catch (Exception ex)
         {
