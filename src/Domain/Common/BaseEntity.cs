@@ -12,6 +12,7 @@ public abstract class BaseEntity: ISoftDelete
     public Guid Id { get; set; }
     
     public bool IsDeleted { get; set; }
+    public DateTimeOffset? DeletedAt { get; set; }
 
     [NotMapped] public IReadOnlyCollection<BaseEvent> DomainEvents => _domainEvents.AsReadOnly();
 

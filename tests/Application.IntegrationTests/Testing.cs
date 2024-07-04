@@ -1,6 +1,7 @@
 using Educar.Backend.Application.Interfaces;
 using Educar.Backend.Infrastructure;
 using Educar.Backend.Infrastructure.Data;
+using Educar.Backend.Infrastructure.Data.Interceptors;
 using Educar.Backend.Web;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +17,7 @@ public class Testing
 {
     private static ServiceProvider ServiceProvider { get; set; } = null!;
     public static ApplicationDbContext Context { get; private set; } = null!;
-    
+
     [OneTimeSetUp]
     public void SetUp()
     {
@@ -24,7 +25,10 @@ public class Testing
 
         services.AddLogging(configure => configure.AddConsole());
 
-        services.AddDbContext<ApplicationDbContext>(options => { options.UseInMemoryDatabase("TestDatabase"); });
+        services.AddDbContext<ApplicationDbContext>(options =>
+        {
+            options.UseInMemoryDatabase("TestDatabase").AddInterceptors(new SoftDeleteInterceptor());
+        });
 
         var builder = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())

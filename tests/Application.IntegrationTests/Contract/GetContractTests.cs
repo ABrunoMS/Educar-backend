@@ -5,7 +5,7 @@ using Educar.Backend.Domain.Enums;
 using NUnit.Framework;
 using static Educar.Backend.Application.IntegrationTests.Testing;
 
-namespace Educar.Backend.Application.IntegrationTests.Contract.Commands;
+namespace Educar.Backend.Application.IntegrationTests.Contract;
 
 [TestFixture]
 public class GetContractTests : TestBase

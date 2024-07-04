@@ -33,10 +33,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         }
 
         var softDeleteEntities = typeof(ISoftDelete).Assembly.GetTypes()
-            .Where(type => typeof(ISoftDelete)
-                               .IsAssignableFrom(type)
-                           && type.IsClass
-                           && !type.IsAbstract);
+            .Where(type => typeof(ISoftDelete).IsAssignableFrom(type) && type.IsClass && !type.IsAbstract);
 
         foreach (var softDeleteEntity in softDeleteEntities)
         {
