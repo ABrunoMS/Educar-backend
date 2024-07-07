@@ -21,7 +21,7 @@ public class UpdateContractCommandHandler(IApplicationDbContext context) : IRequ
     {
         var entity = await context.Contracts
             .Where(a => a.Id == request.Id)
-            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
 
         Guard.Against.NotFound(request.Id, entity);
 

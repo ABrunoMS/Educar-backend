@@ -13,5 +13,6 @@ public class ContractConfiguration : IEntityTypeConfiguration<Contract>
         builder.Property(t => t.ImplementationDate).IsRequired();
         builder.Property(t => t.TotalAccounts).IsRequired();
         builder.Property(t => t.Status).IsRequired().HasConversion<string>();
+        builder.Property(t => t.ClientId).IsRequired();
     }
 }

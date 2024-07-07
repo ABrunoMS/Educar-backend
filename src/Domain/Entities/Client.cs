@@ -1,13 +1,8 @@
 namespace Educar.Backend.Domain.Entities;
 
-public class Client : BaseAuditableEntity
+public class Client(string name) : BaseAuditableEntity
 {
-    public Client(string name, string description)
-    {
-        Name = name;
-        Description = description;
-    }
-
-    public string Name { get; set; }
-    public string Description { get; set; }
+    public string Name { get; set; } = name;
+    public string? Description { get; set; }
+    public Contract? Contract { get; set; }
 }

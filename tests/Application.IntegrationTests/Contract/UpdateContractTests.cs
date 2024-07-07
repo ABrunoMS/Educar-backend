@@ -1,6 +1,7 @@
 using Educar.Backend.Application.Commands.Contract.CreateAccountType;
 using Educar.Backend.Application.Commands.Contract.CreateContract;
 using Educar.Backend.Application.Common.Exceptions;
+using Educar.Backend.Domain.Entities;
 using Educar.Backend.Domain.Enums;
 using NUnit.Framework;
 using static Educar.Backend.Application.IntegrationTests.Testing;
@@ -10,17 +11,24 @@ namespace Educar.Backend.Application.IntegrationTests.Contract;
 [TestFixture]
 public class UpdateContractTests : TestBase
 {
+    private Domain.Entities.Client _client;
+
     [SetUp]
     public void SetUp()
     {
         ResetState();
+        
+        // Create and add a client to the context
+        _client = new Domain.Entities.Client("test client");
+        Context.Clients.Add(_client);
+        Context.SaveChanges();
     }
 
     [Test]
     public async Task GivenValidRequest_ShouldUpdateContract()
     {
         // Arrange
-        var createCommand = new CreateContractCommand
+        var createCommand = new CreateContractCommand(_client.Id)
         {
             ContractDurationInYears = 1,
             ContractSigningDate = DateTimeOffset.Now,
@@ -37,6 +45,8 @@ public class UpdateContractTests : TestBase
             ContractSigningDate = DateTimeOffset.Now,
             ImplementationDate = DateTimeOffset.Now.AddMonths(2),
             TotalAccounts = 15,
+            RemainingAccounts = 5,
+            DeliveryReport = "Updated report",
             Status = ContractStatus.Signed
         };
 
@@ -49,6 +59,8 @@ public class UpdateContractTests : TestBase
         Assert.That(updatedContract.ContractDurationInYears, Is.EqualTo(2));
         Assert.That(updatedContract.ImplementationDate, Is.EqualTo(updateCommand.ImplementationDate));
         Assert.That(updatedContract.TotalAccounts, Is.EqualTo(15));
+        Assert.That(updatedContract.RemainingAccounts, Is.EqualTo(5));
+        Assert.That(updatedContract.DeliveryReport, Is.EqualTo("Updated report"));
         Assert.That(updatedContract.Status, Is.EqualTo(ContractStatus.Signed));
     }
 

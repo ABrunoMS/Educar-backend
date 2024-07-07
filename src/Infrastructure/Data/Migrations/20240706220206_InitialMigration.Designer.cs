@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Educar.Backend.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240704212339_InitialMigration")]
+    [Migration("20240706220206_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -29,37 +29,45 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<DateTimeOffset>("Created")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
 
                     b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("description");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
 
                     b.Property<DateTimeOffset>("LastModified")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
 
                     b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("name");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Client");
+                    b.ToTable("client");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Contract", b =>
@@ -68,6 +76,10 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
+
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("client_id");
 
                     b.Property<int>("ContractDurationInYears")
                         .HasColumnType("integer")
@@ -123,6 +135,9 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .HasColumnName("total_accounts");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ClientId")
+                        .IsUnique();
 
                     b.ToTable("contract");
                 });
@@ -229,6 +244,17 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.ToTable("todo_list");
                 });
 
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Contract", b =>
+                {
+                    b.HasOne("Educar.Backend.Domain.Entities.Client", "Client")
+                        .WithOne("Contract")
+                        .HasForeignKey("Educar.Backend.Domain.Entities.Contract", "ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+                });
+
             modelBuilder.Entity("Educar.Backend.Domain.Entities.TodoItem", b =>
                 {
                     b.HasOne("Educar.Backend.Domain.Entities.TodoList", "List")
@@ -238,6 +264,11 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("List");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Client", b =>
+                {
+                    b.Navigation("Contract");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.TodoList", b =>

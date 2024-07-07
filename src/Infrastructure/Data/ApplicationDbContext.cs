@@ -16,6 +16,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<TodoItem> TodoItems => Set<TodoItem>();
 
     public DbSet<Contract> Contracts => Set<Contract>();
+    public DbSet<Client> Clients => Set<Client>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -12,36 +12,12 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Client",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    CreatedBy = table.Column<string>(type: "text", nullable: true),
-                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Client", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "contract",
+                name: "client",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    contract_duration_in_years = table.Column<int>(type: "integer", nullable: false),
-                    contract_signing_date = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    implementation_date = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    total_accounts = table.Column<int>(type: "integer", nullable: false),
-                    remaining_accounts = table.Column<int>(type: "integer", nullable: true),
-                    delivery_report = table.Column<string>(type: "text", nullable: true),
-                    status = table.Column<string>(type: "text", nullable: false),
+                    name = table.Column<string>(type: "text", nullable: false),
+                    description = table.Column<string>(type: "text", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false),
                     deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -51,7 +27,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_contract", x => x.id);
+                    table.PrimaryKey("PK_client", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -70,6 +46,37 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_todo_list", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "contract",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    contract_duration_in_years = table.Column<int>(type: "integer", nullable: false),
+                    contract_signing_date = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    implementation_date = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    total_accounts = table.Column<int>(type: "integer", nullable: false),
+                    remaining_accounts = table.Column<int>(type: "integer", nullable: true),
+                    delivery_report = table.Column<string>(type: "text", nullable: true),
+                    status = table.Column<string>(type: "text", nullable: false),
+                    client_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<string>(type: "text", nullable: true),
+                    last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    last_modified_by = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_contract", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_contract_client_client_id",
+                        column: x => x.client_id,
+                        principalTable: "client",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -101,6 +108,12 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_contract_client_id",
+                table: "contract",
+                column: "client_id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_todo_item_list_id",
                 table: "todo_item",
                 column: "list_id");
@@ -110,13 +123,13 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Client");
-
-            migrationBuilder.DropTable(
                 name: "contract");
 
             migrationBuilder.DropTable(
                 name: "todo_item");
+
+            migrationBuilder.DropTable(
+                name: "client");
 
             migrationBuilder.DropTable(
                 name: "todo_list");

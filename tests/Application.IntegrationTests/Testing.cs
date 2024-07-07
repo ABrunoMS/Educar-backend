@@ -56,7 +56,7 @@ public class Testing
         using var scope = ServiceProvider.CreateScope();
         Context.Database.EnsureDeleted();
     }
-
+    
     public static async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request)
     {
         using var scope = ServiceProvider.CreateScope();

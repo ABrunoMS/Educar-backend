@@ -16,7 +16,10 @@ public class Contract(
     public int TotalAccounts { get; set; } = totalAccounts;
     public int? RemainingAccounts { get; set; }
     public string? DeliveryReport { get; set; }
-
+    
     public ContractStatus Status { get; set; } = status;
     // public Distributor Distributor { get; set; }
+    
+    public Guid ClientId { get; set; }
+    public Client Client { get; set; } = null!;
 }

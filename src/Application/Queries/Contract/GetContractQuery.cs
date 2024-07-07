@@ -22,7 +22,7 @@ public class GetContractQueryHandler : IRequestHandler<GetContractQuery, Contrac
     {
         var entity = await _context.Contracts
             .ProjectTo<ContractDto>(_mapper.ConfigurationProvider)
-            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
 
         if (entity == null) throw new NotFoundException(nameof(Domain.Entities.Contract), request.Id.ToString());
 

@@ -2,23 +2,25 @@ using Educar.Backend.Application.Interfaces;
 
 namespace Educar.Backend.Application.Commands.AccountType.CreateAccountType;
 
-public class CreateClientCommand(string name, string description) : IRequest<Guid>
+public record CreateClientCommand(string Name) : IRequest<CreatedResponseDto>
 {
-    public string Name { get; init; } = name;
-    public string Description { get; init; } = description;
+    public string? Description { get; init; }
 }
 
-public class CreateClientCommandHandler : IRequestHandler<CreateClientCommand, Guid>
+public class CreateClientCommandHandler(IApplicationDbContext context)
+    : IRequestHandler<CreateClientCommand, CreatedResponseDto>
 {
-    private readonly IApplicationDbContext _context;
-
-    public CreateClientCommandHandler(IApplicationDbContext context)
+    public async Task<CreatedResponseDto> Handle(CreateClientCommand request, CancellationToken cancellationToken)
     {
-        _context = context;
-    }
+        var entity = new Domain.Entities.Client(request.Name)
+        {
+            Description = request.Description,
+        };
 
-    public Task<Guid> Handle(CreateClientCommand request, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(Guid.NewGuid());
+        context.Clients.Add(entity);
+
+        await context.SaveChangesAsync(cancellationToken);
+
+        return new CreatedResponseDto(entity.Id);
     }
 }

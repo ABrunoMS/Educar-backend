@@ -12,6 +12,7 @@ public class ContractDto
     public int? RemainingAccounts { get; set; }
     public string? DeliveryReport { get; set; }
     public ContractStatus Status { get; set; }
+    public Guid ClientId { get; set; }
 
     private class Mapping : Profile
     {
