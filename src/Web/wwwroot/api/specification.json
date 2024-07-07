@@ -6,6 +6,148 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/Client": {
+      "post": {
+        "tags": [
+          "Client"
+        ],
+        "operationId": "CreateClient",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateClientCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Client/{id}": {
+      "get": {
+        "tags": [
+          "Client"
+        ],
+        "operationId": "GetClient",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Client"
+        ],
+        "operationId": "UpdateClient",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateClientCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Client"
+        ],
+        "operationId": "DeleteClient",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/Contract": {
       "post": {
         "tags": [
@@ -34,6 +176,111 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Contract/{id}": {
+      "get": {
+        "tags": [
+          "Contract"
+        ],
+        "operationId": "GetContract",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Contract"
+        ],
+        "operationId": "UpdateContract",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateContractCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Contract"
+        ],
+        "operationId": "DeleteContract",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
           }
         },
         "security": [
@@ -117,6 +364,117 @@
           }
         }
       },
+      "CreateClientCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ClientDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "contract": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ContractDto"
+              }
+            ]
+          }
+        }
+      },
+      "ContractDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "contractDurationInYears": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "contractSigningDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "implementationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "totalAccounts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "remainingAccounts": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "deliveryReport": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/ContractStatus"
+          },
+          "clientId": {
+            "type": "string",
+            "format": "guid"
+          }
+        }
+      },
+      "ContractStatus": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Signed",
+          "Expired",
+          "Canceled"
+        ],
+        "enum": [
+          "Signed",
+          "Expired",
+          "Canceled"
+        ]
+      },
+      "UpdateClientCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "guid"
+          }
+        }
+      },
       "CreateContractCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -148,22 +506,193 @@
           },
           "status": {
             "$ref": "#/components/schemas/ContractStatus"
+          },
+          "clientId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "client": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Client"
+              }
+            ]
           }
         }
       },
-      "ContractStatus": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "Signed",
-          "Expired",
-          "Canceled"
-        ],
-        "enum": [
-          "Signed",
-          "Expired",
-          "Canceled"
+      "Client": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseAuditableEntity"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string",
+                "nullable": true
+              },
+              "contract": {
+                "nullable": true,
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/Contract"
+                  }
+                ]
+              }
+            }
+          }
         ]
+      },
+      "Contract": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseAuditableEntity"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "contractDurationInYears": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "contractSigningDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "implementationDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "totalAccounts": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "remainingAccounts": {
+                "type": "integer",
+                "format": "int32",
+                "nullable": true
+              },
+              "deliveryReport": {
+                "type": "string",
+                "nullable": true
+              },
+              "status": {
+                "$ref": "#/components/schemas/ContractStatus"
+              },
+              "clientId": {
+                "type": "string",
+                "format": "guid"
+              },
+              "client": {
+                "$ref": "#/components/schemas/Client"
+              }
+            }
+          }
+        ]
+      },
+      "BaseAuditableEntity": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseEntity"
+          },
+          {
+            "type": "object",
+            "x-abstract": true,
+            "additionalProperties": false,
+            "properties": {
+              "created": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "createdBy": {
+                "type": "string",
+                "nullable": true
+              },
+              "lastModified": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "lastModifiedBy": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "BaseEntity": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "isDeleted": {
+            "type": "boolean"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "domainEvents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BaseEvent"
+            }
+          }
+        }
+      },
+      "BaseEvent": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false
+      },
+      "UpdateContractCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "contractDurationInYears": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "contractSigningDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "implementationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "totalAccounts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "remainingAccounts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "deliveryReport": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/ContractStatus"
+          }
+        }
       },
       "CreateTodoListCommand": {
         "type": "object",
