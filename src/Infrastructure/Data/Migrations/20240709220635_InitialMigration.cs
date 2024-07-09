@@ -49,6 +49,37 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "account",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    email = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    registration_number = table.Column<string>(type: "text", nullable: false),
+                    average_score = table.Column<decimal>(type: "numeric(5,2)", nullable: false, defaultValue: 0m),
+                    event_average_score = table.Column<decimal>(type: "numeric(5,2)", nullable: false, defaultValue: 0m),
+                    stars = table.Column<int>(type: "integer", nullable: false),
+                    client_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    role = table.Column<string>(type: "text", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<string>(type: "text", nullable: true),
+                    last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    last_modified_by = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_account", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_account_client_client_id",
+                        column: x => x.client_id,
+                        principalTable: "client",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "contract",
                 columns: table => new
                 {
@@ -108,10 +139,20 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_account_client_id",
+                table: "account",
+                column: "client_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_account_email",
+                table: "account",
+                column: "email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_contract_client_id",
                 table: "contract",
-                column: "client_id",
-                unique: true);
+                column: "client_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_todo_item_list_id",
@@ -122,6 +163,9 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "account");
+
             migrationBuilder.DropTable(
                 name: "contract");
 

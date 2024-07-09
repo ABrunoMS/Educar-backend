@@ -1,4 +1,4 @@
-using Educar.Backend.Application.Interfaces;
+using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;

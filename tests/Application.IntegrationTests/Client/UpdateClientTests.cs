@@ -1,5 +1,5 @@
 using Ardalis.GuardClauses;
-using Educar.Backend.Application.Commands.AccountType.CreateAccountType;
+using Educar.Backend.Application.Commands.Client.CreateClient;
 using Educar.Backend.Application.Commands.Client.UpdateClient;
 using Educar.Backend.Application.Common.Exceptions;
 using NUnit.Framework;

@@ -1,4 +1,3 @@
-using Educar.Backend.Application.Interfaces;
 using Educar.Backend.Domain.Events;
 using Microsoft.Extensions.Logging;
 

@@ -1,6 +1,6 @@
-using Educar.Backend.Application.Interfaces;
+using Educar.Backend.Application.Common.Interfaces;
 
-namespace Educar.Backend.Application.Commands.AccountType.CreateAccountType;
+namespace Educar.Backend.Application.Commands.Client.CreateClient;
 
 public record CreateClientCommand(string Name) : IRequest<CreatedResponseDto>
 {

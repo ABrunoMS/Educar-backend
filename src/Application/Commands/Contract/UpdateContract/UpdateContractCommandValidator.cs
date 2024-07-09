@@ -1,4 +1,4 @@
-namespace Educar.Backend.Application.Commands.Contract.CreateContract;
+namespace Educar.Backend.Application.Commands.Contract.UpdateContract;
 
 public class UpdateContractCommandValidator : AbstractValidator<UpdateContractCommand>
 {

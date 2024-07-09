@@ -1,5 +1,4 @@
-using Educar.Backend.Application.Commands.Contract.CreateContract;
-using Educar.Backend.Application.Interfaces;
+using Educar.Backend.Application.Common.Interfaces;
 
 namespace Educar.Backend.Application.Commands.Client.UpdateClient;
 

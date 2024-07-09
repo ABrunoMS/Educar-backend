@@ -1,7 +1,7 @@
-using Educar.Backend.Application.Interfaces;
+using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Domain.Enums;
 
-namespace Educar.Backend.Application.Commands.Contract.CreateContract;
+namespace Educar.Backend.Application.Commands.Contract.UpdateContract;
 
 public record UpdateContractCommand : IRequest<Unit>
 {

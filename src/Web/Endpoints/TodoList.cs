@@ -1,4 +1,4 @@
-using Educar.Backend.Application.TodoList.Commands.CreateTodoList;
+using Educar.Backend.Application.Commands.TodoList.Commands.CreateTodoList;
 
 namespace Educar.Backend.Web.Endpoints;
 

@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using AutoMapper;
-using Educar.Backend.Application.Interfaces;
+using Educar.Backend.Application.Common.Interfaces;
 using NUnit.Framework;
 
 namespace Educar.Backend.Application.UnitTests.Common.Mappings;

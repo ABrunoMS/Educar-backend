@@ -1,6 +1,6 @@
-using Educar.Backend.Application.Models;
+using Educar.Backend.Application.Common.Models;
 
-namespace Educar.Backend.Application.Mappings;
+namespace Educar.Backend.Application.Common.Mappings;
 
 public static class MappingExtensions
 {

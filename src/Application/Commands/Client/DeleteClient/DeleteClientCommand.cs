@@ -1,8 +1,7 @@
-using Educar.Backend.Application.Commands.Contract.DeleteContract;
-using Educar.Backend.Application.Interfaces;
+using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Domain.Events;
 
-namespace Educar.Backend.Application.Commands.Client;
+namespace Educar.Backend.Application.Commands.Client.DeleteClient;
 
 public record DeleteClientCommand(Guid Id) : IRequest<Unit>;
 
@@ -11,15 +10,11 @@ public class DeleteClientCommandHandler(IApplicationDbContext context) : IReques
     public async Task<Unit> Handle(DeleteClientCommand request, CancellationToken cancellationToken)
     {
         var entity = await context.Clients
-            .Include(c => c.Contract)
+            .Include(c => c.Contracts)
             .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
         Guard.Against.NotFound(request.Id, entity);
 
-        var contract = entity.Contract;
-        if (contract != null)
-        {
-            entity.AddDomainEvent(new ClientDeletedEvent(entity));
-        }
+        // entity.AddDomainEvent(new ClientDeletedEvent(entity));
 
         context.Clients.Remove(entity);
         await context.SaveChangesAsync(cancellationToken);

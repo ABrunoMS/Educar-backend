@@ -1,7 +1,4 @@
-using Educar.Backend.Application.Commands.Contract.CreateAccountType;
-using Educar.Backend.Application.Interfaces;
-
-namespace Educar.Backend.Application.Commands.AccountType.CreateAccountType;
+namespace Educar.Backend.Application.Commands.Contract.CreateContract;
 
 public class CreateContractCommandValidator : AbstractValidator<CreateContractCommand>
 {

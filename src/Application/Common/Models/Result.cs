@@ -1,4 +1,4 @@
-namespace Educar.Backend.Application.Models;
+namespace Educar.Backend.Application.Common.Models;
 
 public class Result
 {

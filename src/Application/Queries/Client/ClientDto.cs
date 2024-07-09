@@ -7,7 +7,7 @@ public class ClientDto
     public Guid Id { get; set; }
     public string? Name { get; set; }
     public string? Description { get; set; }
-    public ContractDto? Contract { get; set; }
+    public List<ContractDto>? Contracts { get; set; }
 
     private class Mapping : Profile
     {

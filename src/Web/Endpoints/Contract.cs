@@ -1,7 +1,7 @@
 using Educar.Backend.Application.Commands;
-using Educar.Backend.Application.Commands.Contract.CreateAccountType;
 using Educar.Backend.Application.Commands.Contract.CreateContract;
 using Educar.Backend.Application.Commands.Contract.DeleteContract;
+using Educar.Backend.Application.Commands.Contract.UpdateContract;
 using Educar.Backend.Application.Queries.Contract;
 using Educar.Backend.Domain.Enums;
 using Microsoft.OpenApi.Extensions;

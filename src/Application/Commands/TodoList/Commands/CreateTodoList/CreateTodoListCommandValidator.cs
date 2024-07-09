@@ -1,6 +1,6 @@
-using Educar.Backend.Application.Interfaces;
+using Educar.Backend.Application.Common.Interfaces;
 
-namespace Educar.Backend.Application.TodoList.Commands.CreateTodoList;
+namespace Educar.Backend.Application.Commands.TodoList.Commands.CreateTodoList;
 
 public class CreateTodoListCommandValidator : AbstractValidator<CreateTodoListCommand>
 {

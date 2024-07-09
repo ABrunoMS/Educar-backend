@@ -1,6 +1,6 @@
 using Educar.Backend.Application.Commands;
-using Educar.Backend.Application.Commands.AccountType.CreateAccountType;
-using Educar.Backend.Application.Commands.Client;
+using Educar.Backend.Application.Commands.Client.CreateClient;
+using Educar.Backend.Application.Commands.Client.DeleteClient;
 using Educar.Backend.Application.Commands.Client.UpdateClient;
 using Educar.Backend.Application.Queries.Client;
 using Educar.Backend.Domain.Enums;

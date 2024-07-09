@@ -1,5 +1,5 @@
 using Educar.Backend.Application.Commands;
-using Educar.Backend.Application.Commands.AccountType.CreateAccountType;
+using Educar.Backend.Application.Commands.Client.CreateClient;
 using Educar.Backend.Application.Common.Exceptions;
 using NUnit.Framework;
 using static Educar.Backend.Application.IntegrationTests.Testing;
@@ -37,7 +37,7 @@ public class CreateClientTests: TestBase
             Assert.That(createdClient, Is.Not.Null);
             Assert.That(createdClient.Name, Is.EqualTo("New Client"));
             Assert.That(createdClient.Description, Is.EqualTo("Client Description"));
-            Assert.That(createdClient.Contract, Is.Null);
+            Assert.That(createdClient.Contracts, Is.Empty);
         }
     }
 

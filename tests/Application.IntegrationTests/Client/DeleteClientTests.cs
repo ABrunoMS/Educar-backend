@@ -1,7 +1,8 @@
 using Ardalis.GuardClauses;
-using Educar.Backend.Application.Commands.AccountType.CreateAccountType;
 using Educar.Backend.Application.Commands.Client;
-using Educar.Backend.Application.Commands.Contract.CreateAccountType;
+using Educar.Backend.Application.Commands.Client.CreateClient;
+using Educar.Backend.Application.Commands.Client.DeleteClient;
+using Educar.Backend.Application.Commands.Contract.CreateContract;
 using Educar.Backend.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;

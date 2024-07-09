@@ -1,4 +1,4 @@
-namespace Educar.Backend.Application.Commands.AccountType.CreateAccountType;
+namespace Educar.Backend.Application.Commands.Client.CreateClient;
 
 public class CreateClientCommandValidator : AbstractValidator<CreateClientCommand>
 {

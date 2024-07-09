@@ -1,4 +1,4 @@
-using Educar.Backend.Application.Interfaces;
+using Educar.Backend.Application.Common.Interfaces;
 
 namespace Educar.Backend.Application.Queries.Client;
 

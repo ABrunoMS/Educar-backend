@@ -1,4 +1,3 @@
-using Educar.Backend.Application.Interfaces;
 using Educar.Backend.Infrastructure;
 using Educar.Backend.Infrastructure.Data;
 using Educar.Backend.Infrastructure.Data.Interceptors;

@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using Educar.Backend.Application.Interfaces;
+using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Domain.Enums;
 using Educar.Backend.Infrastructure.Data;
 using Educar.Backend.Web.Extensions;
@@ -53,6 +53,7 @@ public static class DependencyInjection
         services.ConfigureHttpJsonOptions(options =>
         {
             options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            options.SerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
         });
 
         services.Configure<JsonOptions>(options =>

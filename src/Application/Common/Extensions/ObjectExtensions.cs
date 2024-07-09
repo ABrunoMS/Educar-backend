@@ -1,4 +1,4 @@
-namespace Educar.Backend.Infrastructure.Extensions;
+namespace Educar.Backend.Application.Extensions;
 
 public static class ObjectExtensions
 {

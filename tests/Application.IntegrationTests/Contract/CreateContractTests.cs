@@ -1,5 +1,5 @@
 using Educar.Backend.Application.Commands;
-using Educar.Backend.Application.Commands.Contract.CreateAccountType;
+using Educar.Backend.Application.Commands.Contract.CreateContract;
 using Educar.Backend.Application.Common.Exceptions;
 using Educar.Backend.Domain.Enums;
 using Microsoft.EntityFrameworkCore;

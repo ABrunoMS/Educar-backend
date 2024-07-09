@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using Educar.Backend.Application.Interfaces;
+using Educar.Backend.Application.Common.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Educar.Backend.Application.Common.Behaviours;

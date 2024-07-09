@@ -1,8 +1,7 @@
-using Educar.Backend.Application.Interfaces;
-using Educar.Backend.Domain.Entities;
+using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Domain.Enums;
 
-namespace Educar.Backend.Application.Commands.Contract.CreateAccountType;
+namespace Educar.Backend.Application.Commands.Contract.CreateContract;
 
 public record CreateContractCommand : IRequest<CreatedResponseDto>
 {

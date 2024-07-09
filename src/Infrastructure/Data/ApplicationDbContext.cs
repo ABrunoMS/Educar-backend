@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 using System.Reflection;
-using Educar.Backend.Application.Interfaces;
+using Educar.Backend.Application.Common.Interfaces;
+using Educar.Backend.Application.Extensions;
 using Educar.Backend.Domain.Entities;
-using Educar.Backend.Infrastructure.Extensions;
 using Humanizer;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +17,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public DbSet<Contract> Contracts => Set<Contract>();
     public DbSet<Client> Clients => Set<Client>();
+    public DbSet<Account> Accounts => Set<Account>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

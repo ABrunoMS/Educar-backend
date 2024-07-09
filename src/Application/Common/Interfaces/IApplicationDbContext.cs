@@ -1,6 +1,6 @@
 using Educar.Backend.Domain.Entities;
 
-namespace Educar.Backend.Application.Interfaces;
+namespace Educar.Backend.Application.Common.Interfaces;
 
 public interface IApplicationDbContext
 {
@@ -9,6 +9,7 @@ public interface IApplicationDbContext
     DbSet<TodoItem> TodoItems { get; }
     DbSet<Contract> Contracts { get; }
     DbSet<Client> Clients { get; }
+    DbSet<Account> Accounts { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

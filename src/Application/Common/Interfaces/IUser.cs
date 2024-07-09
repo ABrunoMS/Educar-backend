@@ -1,4 +1,4 @@
-namespace Educar.Backend.Application.Interfaces;
+namespace Educar.Backend.Application.Common.Interfaces;
 
 public interface IUser
 {

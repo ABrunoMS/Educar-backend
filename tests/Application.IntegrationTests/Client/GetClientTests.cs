@@ -1,6 +1,6 @@
 using Ardalis.GuardClauses;
-using Educar.Backend.Application.Commands.AccountType.CreateAccountType;
-using Educar.Backend.Application.Commands.Contract.CreateAccountType;
+using Educar.Backend.Application.Commands.Client.CreateClient;
+using Educar.Backend.Application.Commands.Contract.CreateContract;
 using Educar.Backend.Application.Queries.Client;
 using Educar.Backend.Domain.Enums;
 using NUnit.Framework;
@@ -86,7 +86,7 @@ public class GetClientTests : TestBase
         Assert.That(clientResponse.Id, Is.EqualTo(createClientResponse.Id));
         Assert.That(clientResponse.Name, Is.EqualTo(ClientName));
         Assert.That(clientResponse.Description, Is.EqualTo(ClientDescription));
-        Assert.That(clientResponse.Contract, Is.Not.Null);
-        Assert.That(clientResponse.Contract.Id, Is.EqualTo(createContractResponse.Id));
+        Assert.That(clientResponse.Contracts, Is.Not.Empty);
+        Assert.That(clientResponse.Contracts.First().Id, Is.EqualTo(createContractResponse.Id));
     }
 }
