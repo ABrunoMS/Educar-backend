@@ -5,4 +5,5 @@ namespace Educar.Backend.Application.Common.Interfaces;
 public interface IIdentityService
 {
     public Task<Guid> CreateUser(string email, string name, UserRole role, CancellationToken cancellationToken);
+    public Task<bool> DeleteUser(Guid id, CancellationToken cancellationToken);
 }

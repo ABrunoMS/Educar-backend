@@ -2,9 +2,11 @@ using Educar.Backend.Application.Common.Interfaces;
 
 namespace Educar.Backend.Application.Commands.Client.UpdateClient;
 
-public record UpdateClientCommand(string Name, string Description) : IRequest<Unit>
+public record UpdateClientCommand : IRequest<Unit>
 {
     public Guid Id { get; set; }
+    public string? Name { get; set; }
+    public string? Description { get; set; }
 }
 
 public class UpdateClientCommandHandler(IApplicationDbContext context) : IRequestHandler<UpdateClientCommand, Unit>
@@ -16,7 +18,7 @@ public class UpdateClientCommandHandler(IApplicationDbContext context) : IReques
             .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
         Guard.Against.NotFound(request.Id, entity);
 
-        entity.Name = request.Name;
+        if (request.Name != null) entity.Name = request.Name;
         entity.Description = request.Description;
 
         await context.SaveChangesAsync(cancellationToken);

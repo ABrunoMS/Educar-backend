@@ -54,16 +54,7 @@ public class KeycloakService : IIdentityService
                 }
             });
 
-            var request = new HttpRequestMessage(HttpMethod.Post, url)
-            {
-                Content = new StringContent(payload, Encoding.UTF8, ContentType)
-            };
-            request.Headers.Accept.Clear();
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(ContentType));
-
-            var client = _httpClientFactory.CreateClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
-            var response = await client.SendAsync(request, cancellationToken);
+            var response = await SendRequest(HttpMethod.Post, url, payload, cancellationToken);
             response.EnsureSuccessStatusCode();
 
             userId = await GetUserIdByUsername(email, cancellationToken);
@@ -80,15 +71,76 @@ public class KeycloakService : IIdentityService
         return userId;
     }
 
-    private async Task<Guid> GetUserIdByUsername(string username, CancellationToken cancellationToken)
+    public async Task<bool> DeleteUser(Guid id, CancellationToken cancellationToken)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{_authOptions.AdminUrl}/users?username={username}");
+        try
+        {
+            await PopulateToken(cancellationToken);
+
+            var url = $"{_authOptions.AdminUrl}/users/{id}";
+            var response = await SendRequest(HttpMethod.Delete, url, null, cancellationToken);
+
+            response.EnsureSuccessStatusCode();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting user in Keycloak");
+            return false;
+        }
+    }
+
+    public async Task<bool> CreateRole(string roleName, CancellationToken cancellationToken)
+    {
+        await PopulateToken(cancellationToken);
+
+        var url = $"{_authOptions.AdminUrl}/roles";
+        var payload = JsonSerializer.Serialize(new { name = roleName });
+
+        var response = await SendRequest(HttpMethod.Post, url, payload, cancellationToken);
+        return response.StatusCode == HttpStatusCode.Created;
+    }
+
+    public async Task<bool> DeleteRole(string roleName, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await PopulateToken(cancellationToken);
+
+            var url = $"{_authOptions.AdminUrl}/roles/{roleName}";
+            var response = await SendRequest(HttpMethod.Delete, url, null, cancellationToken);
+
+            response.EnsureSuccessStatusCode();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting role in Keycloak");
+            return false;
+        }
+    }
+
+    private async Task<HttpResponseMessage> SendRequest(HttpMethod method, string url, string? payload,
+        CancellationToken cancellationToken)
+    {
+        var request = new HttpRequestMessage(method, url);
         request.Headers.Accept.Clear();
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(ContentType));
 
+        if (!string.IsNullOrEmpty(payload))
+        {
+            request.Content = new StringContent(payload, Encoding.UTF8, ContentType);
+        }
+
         var client = _httpClientFactory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
-        var response = await client.SendAsync(request, cancellationToken);
+        return await client.SendAsync(request, cancellationToken);
+    }
+
+    private async Task<Guid> GetUserIdByUsername(string username, CancellationToken cancellationToken)
+    {
+        var url = $"{_authOptions.AdminUrl}/users?username={username}";
+        var response = await SendRequest(HttpMethod.Get, url, null, cancellationToken);
         response.EnsureSuccessStatusCode();
 
         var userContent = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -113,89 +165,40 @@ public class KeycloakService : IIdentityService
             }
         });
 
-        var request =
-            new HttpRequestMessage(HttpMethod.Post, $"{_authOptions.AdminUrl}/users/{userId}/role-mappings/realm")
-            {
-                Content = new StringContent(roleMappingPayload, Encoding.UTF8, ContentType)
-            };
-        request.Headers.Accept.Clear();
-        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(ContentType));
-
-        var client = _httpClientFactory.CreateClient();
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
-        var response = await client.SendAsync(request, cancellationToken);
+        var url = $"{_authOptions.AdminUrl}/users/{userId}/role-mappings/realm";
+        var response = await SendRequest(HttpMethod.Post, url, roleMappingPayload, cancellationToken);
         response.EnsureSuccessStatusCode();
     }
 
     private async Task<string?> GetRoleIdByName(string roleName, CancellationToken cancellationToken)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{_authOptions.AdminUrl}/roles/{roleName}");
-        request.Headers.Accept.Clear();
-        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(ContentType));
-
-        var client = _httpClientFactory.CreateClient();
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
-        var response = await client.SendAsync(request, cancellationToken);
+        var url = $"{_authOptions.AdminUrl}/roles/{roleName}";
+        var response = await SendRequest(HttpMethod.Get, url, null, cancellationToken);
         response.EnsureSuccessStatusCode();
 
         var roleContent = await response.Content.ReadAsStringAsync(cancellationToken);
         var roleData = JsonSerializer.Deserialize<Dictionary<string, object>>(roleContent);
-        var roleId = roleData?["id"];
-        return roleId?.ToString();
-    }
-
-
-    private string GenerateRandomPassword()
-    {
-        const int passwordLength = 12;
-        const string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()";
-        var random = new Random();
-        return new string(Enumerable.Repeat(validChars, passwordLength)
-            .Select(s => s[random.Next(s.Length)]).ToArray());
-    }
-
-    public async Task<bool> CreateRole(string roleName, CancellationToken cancellationToken)
-    {
-        await PopulateToken(cancellationToken);
-
-        var rolesUrl = $"{_authOptions.AdminUrl}/roles";
-        var request = new HttpRequestMessage(HttpMethod.Post, rolesUrl);
-        request.Headers.Accept.Clear();
-        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(ContentType));
-
-        var role = new { name = roleName };
-        request.Content = new StringContent(JsonSerializer.Serialize(role), Encoding.UTF8, ContentType);
-
-        var client = _httpClientFactory.CreateClient();
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
-        var result = await client.SendAsync(request, cancellationToken);
-
-        return result.StatusCode == HttpStatusCode.Created;
-    }
-
-    public Task<bool> DeleteRole(string roleName, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
+        return roleData?["id"]?.ToString();
     }
 
     private async Task PopulateToken(CancellationToken cancellationToken)
     {
-        if (_accessToken == "")
+        if (string.IsNullOrEmpty(_accessToken))
         {
             var request = new HttpRequestMessage(HttpMethod.Post, _authOptions.TokenUrl);
             request.Headers.Clear();
-            const string contentType = "application/x-www-form-urlencoded";
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(contentType));
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/x-www-form-urlencoded"));
 
             var auth = GetBasicAuth(_authOptions.AdminClientId, _authOptions.AdminClientSecret);
             request.Headers.Authorization = new AuthenticationHeaderValue("Basic", auth);
             request.Content = new FormUrlEncodedContent(new[]
                 { new KeyValuePair<string, string>("grant_type", "client_credentials") });
 
-            var clientHttp = _httpClientFactory.CreateClient();
-            var result = clientHttp.Send(request, cancellationToken);
+            var client = _httpClientFactory.CreateClient();
+            var response = await client.SendAsync(request, cancellationToken);
+            response.EnsureSuccessStatusCode();
 
-            var content = await result.Content.ReadAsStringAsync(cancellationToken);
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
             using var document = JsonDocument.Parse(content);
             _accessToken = document.RootElement.GetProperty("access_token").GetString() ?? string.Empty;
         }
@@ -204,7 +207,15 @@ public class KeycloakService : IIdentityService
     private static string GetBasicAuth(string clientId, string clientSecret)
     {
         var userpass = $"{clientId}:{clientSecret}";
-        var encoded = Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes(userpass));
-        return $"{encoded}";
+        return Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes(userpass));
+    }
+
+    private string GenerateRandomPassword()
+    {
+        const int passwordLength = 12;
+        const string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()";
+        var random = new Random();
+        return new string(Enumerable.Repeat(validChars, passwordLength).Select(s => s[random.Next(s.Length)])
+            .ToArray());
     }
 }

@@ -1,7 +1,6 @@
 using Educar.Backend.Application.Commands.Contract.CreateContract;
 using Educar.Backend.Application.Commands.Contract.UpdateContract;
 using Educar.Backend.Application.Common.Exceptions;
-using Educar.Backend.Domain.Entities;
 using Educar.Backend.Domain.Enums;
 using NUnit.Framework;
 using static Educar.Backend.Application.IntegrationTests.Testing;

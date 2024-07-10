@@ -4,6 +4,7 @@ using Educar.Backend.Infrastructure.Data.Interceptors;
 using Educar.Backend.Web;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -26,7 +27,8 @@ public class Testing
 
         services.AddDbContext<ApplicationDbContext>(options =>
         {
-            options.UseInMemoryDatabase("TestDatabase").AddInterceptors(new SoftDeleteInterceptor());
+            options.UseInMemoryDatabase("TestDatabase")
+                .AddInterceptors(new SoftDeleteInterceptor());
         });
 
         var builder = new ConfigurationBuilder()
@@ -55,7 +57,7 @@ public class Testing
         using var scope = ServiceProvider.CreateScope();
         Context.Database.EnsureDeleted();
     }
-    
+
     public static async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request)
     {
         using var scope = ServiceProvider.CreateScope();

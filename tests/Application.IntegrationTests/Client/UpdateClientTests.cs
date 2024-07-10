@@ -31,9 +31,11 @@ public class UpdateClientTests : TestBase
         };
         var createResponse = await SendAsync(createCommand);
 
-        var updateCommand = new UpdateClientCommand(ValidUpdatedName, ValidUpdatedDescription)
+        var updateCommand = new UpdateClientCommand
         {
-            Id = createResponse.Id
+            Id = createResponse.Id,
+            Name = ValidUpdatedName,
+            Description = ValidUpdatedDescription
         };
 
         // Act
@@ -49,9 +51,11 @@ public class UpdateClientTests : TestBase
     [Test]
     public void ShouldThrowValidationException_WhenIdIsEmpty()
     {
-        var command = new UpdateClientCommand(ValidUpdatedName, ValidUpdatedDescription)
+        var command = new UpdateClientCommand
         {
-            Id = Guid.Empty
+            Id = Guid.Empty,
+            Name = ValidUpdatedName,
+            Description = ValidUpdatedDescription
         };
 
         Assert.ThrowsAsync<ValidationException>(async () => await SendAsync(command));
@@ -60,9 +64,11 @@ public class UpdateClientTests : TestBase
     [Test]
     public void ShouldThrowValidationException_WhenNameIsEmpty()
     {
-        var command = new UpdateClientCommand(string.Empty, ValidUpdatedDescription)
+        var command = new UpdateClientCommand
         {
-            Id = Guid.NewGuid()
+            Id = Guid.NewGuid(),
+            Name = string.Empty,
+            Description = ValidUpdatedDescription
         };
 
         Assert.ThrowsAsync<ValidationException>(async () => await SendAsync(command));
@@ -71,12 +77,13 @@ public class UpdateClientTests : TestBase
     [Test]
     public void GivenInvalidRequest_ShouldThrowNotFoundException()
     {
-        var command = new UpdateClientCommand(ValidUpdatedName, ValidUpdatedDescription)
+        var command = new UpdateClientCommand
         {
-            Id = Guid.NewGuid()
+            Id = Guid.NewGuid(),
+            Name = ValidUpdatedName,
+            Description = ValidUpdatedDescription
         };
 
         Assert.ThrowsAsync<NotFoundException>(async () => await SendAsync(command));
     }
 }
-
