@@ -41,7 +41,7 @@ public class AccountCreatedEventHandlerTests : TestBase
         // Assert
         _identityServiceMock.Verify(
             x => x.CreateUser(account.Email, account.Name, account.Role, It.IsAny<CancellationToken>()), Times.Once);
-        Assert.That(account.KeycloakId, Is.EqualTo(expectedUserId));
+        Assert.That(account.Id, Is.EqualTo(expectedUserId));
     }
 
     [Test]

@@ -1,5 +1,6 @@
 using Educar.Backend.Application.Commands;
 using Educar.Backend.Application.Commands.Account.CreateAccount;
+using Educar.Backend.Application.Queries.Account;
 using Educar.Backend.Domain.Enums;
 using Microsoft.OpenApi.Extensions;
 
@@ -11,8 +12,8 @@ public class Account : EndpointGroupBase
     {
         app.MapGroup(this)
             .RequireAuthorization(UserRole.Admin.GetDisplayName())
-            .MapPost(CreateAccount);
-        // .MapGet(GetClient, "{id}")
+            .MapPost(CreateAccount)
+            .MapGet(GetAccount, "{id}");
         // .MapPut(UpdateClient, "{id}")
         // .MapDelete(DeleteClient, "{id}");
     }
@@ -22,10 +23,10 @@ public class Account : EndpointGroupBase
         return sender.Send(command);
     }
 
-    // public async Task<ClientDto> GetClient(ISender sender, Guid id)
-    // {
-    //     return await sender.Send(new GetClientQuery { Id = id });
-    // }
+    public async Task<AccountDto> GetAccount(ISender sender, Guid id)
+    {
+        return await sender.Send(new GetAccountQuery { Id = id });
+    }
     //
     // public async Task<IResult> DeleteClient(ISender sender, Guid id)
     // {
