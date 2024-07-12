@@ -8,7 +8,7 @@ using Microsoft.OpenApi.Extensions;
 
 namespace Educar.Backend.Web.Endpoints;
 
-public class Contract : EndpointGroupBase
+public class Contracts : EndpointGroupBase
 {
     public override void Map(WebApplication app)
     {

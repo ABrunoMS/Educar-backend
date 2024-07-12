@@ -3,6 +3,7 @@ using Educar.Backend.Application.Commands.Client;
 using Educar.Backend.Application.Commands.Client.CreateClient;
 using Educar.Backend.Application.Commands.Client.DeleteClient;
 using Educar.Backend.Application.Commands.Contract.CreateContract;
+using Educar.Backend.Application.Commands.Game.CreateGame;
 using Educar.Backend.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
@@ -65,7 +66,10 @@ public class DeleteClientTests : TestBase
         };
         var createClientResponse = await SendAsync(createClientCommand);
 
-        var createContractCommand = new CreateContractCommand(createClientResponse.Id)
+        var gameCommand = new CreateGameCommand("test game", "test description", "lore", "test");
+        var gameResponse = await SendAsync(gameCommand);
+        
+        var createContractCommand = new CreateContractCommand(createClientResponse.Id, gameResponse.Id)
         {
             ContractDurationInYears = 1,
             ContractSigningDate = DateTimeOffset.Now,

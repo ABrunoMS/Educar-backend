@@ -4,9 +4,10 @@ public class CreateContractCommandValidator : AbstractValidator<CreateContractCo
 {
     public CreateContractCommandValidator()
     {
-
         RuleFor(v => v.ClientId).NotEmpty().WithMessage("ClientId is required.");
         
+        RuleFor(v => v.GameId).NotEmpty().WithMessage("GameId is required.");
+
         RuleFor(v => v.ContractDurationInYears)
             .GreaterThan(0).WithMessage("ContractDurationInYears must be greater than 0.");
 

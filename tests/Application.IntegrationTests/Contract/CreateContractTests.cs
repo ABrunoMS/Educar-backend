@@ -12,15 +12,19 @@ namespace Educar.Backend.Application.IntegrationTests.Contract;
 public class CreateContractTests : TestBase
 {
     private Domain.Entities.Client _client;
+    private Domain.Entities.Game _game;
 
     [SetUp]
     public void SetUp()
     {
         ResetState();
 
-        // Create and add a client to the context
         _client = new Domain.Entities.Client("test client");
         Context.Clients.Add(_client);
+        
+        _game = new Domain.Entities.Game("test game", "test description", "lore", "test");
+        Context.Games.Add(_game);
+        
         Context.SaveChanges();
     }
 
@@ -28,7 +32,7 @@ public class CreateContractTests : TestBase
     public async Task GivenValidRequest_ShouldCreateContract()
     {
         // Arrange
-        var command = new CreateContractCommand(_client.Id)
+        var command = new CreateContractCommand(_client.Id, _game.Id)
         {
             ContractDurationInYears = 1,
             ContractSigningDate = DateTimeOffset.Now,
@@ -56,7 +60,7 @@ public class CreateContractTests : TestBase
     [Test]
     public void ShouldThrowValidationException_WhenContractDurationInYearsIsZero()
     {
-        var command = new CreateContractCommand(_client.Id)
+        var command = new CreateContractCommand(_client.Id, _game.Id)
         {
             ContractDurationInYears = 0,
             ContractSigningDate = DateTimeOffset.Now,
@@ -71,7 +75,7 @@ public class CreateContractTests : TestBase
     [Test]
     public void ShouldThrowValidationException_WhenContractSigningDateIsEmpty()
     {
-        var command = new CreateContractCommand(_client.Id)
+        var command = new CreateContractCommand(_client.Id, _game.Id)
         {
             ContractDurationInYears = 1,
             ContractSigningDate = default,
@@ -86,7 +90,7 @@ public class CreateContractTests : TestBase
     [Test]
     public void ShouldThrowValidationException_WhenImplementationDateIsEmpty()
     {
-        var command = new CreateContractCommand(_client.Id)
+        var command = new CreateContractCommand(_client.Id, _game.Id)
         {
             ContractDurationInYears = 1,
             ContractSigningDate = DateTimeOffset.Now,
@@ -101,7 +105,7 @@ public class CreateContractTests : TestBase
     [Test]
     public void ShouldThrowValidationException_WhenTotalAccountsIsZero()
     {
-        var command = new CreateContractCommand(_client.Id)
+        var command = new CreateContractCommand(_client.Id, _game.Id)
         {
             ContractDurationInYears = 1,
             ContractSigningDate = DateTimeOffset.Now,
@@ -116,7 +120,7 @@ public class CreateContractTests : TestBase
     [Test]
     public void ShouldThrowValidationException_WhenStatusIsInvalid()
     {
-        var command = new CreateContractCommand(_client.Id)
+        var command = new CreateContractCommand(_client.Id, _game.Id)
         {
             ContractDurationInYears = 1,
             ContractSigningDate = DateTimeOffset.Now,

@@ -1,6 +1,7 @@
 using Ardalis.GuardClauses;
 using Educar.Backend.Application.Commands.Client.CreateClient;
 using Educar.Backend.Application.Commands.Contract.CreateContract;
+using Educar.Backend.Application.Commands.Game.CreateGame;
 using Educar.Backend.Application.Queries.Client;
 using Educar.Backend.Domain.Enums;
 using NUnit.Framework;
@@ -66,7 +67,10 @@ public class GetClientTests : TestBase
         };
         var createClientResponse = await SendAsync(createClientCommand);
 
-        var createContractCommand = new CreateContractCommand(createClientResponse.Id)
+        var gameCommand = new CreateGameCommand("Test Game", "Test Description", "Lore", "Test");
+        var gameResponse = await SendAsync(gameCommand);
+        
+        var createContractCommand = new CreateContractCommand(createClientResponse.Id, gameResponse.Id)
         {
             ContractDurationInYears = ContractDurationInYears,
             ContractSigningDate = DateTimeOffset.Now,

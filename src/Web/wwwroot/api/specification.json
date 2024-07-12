@@ -6,10 +6,152 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/Client": {
+    "/api/Account": {
       "post": {
         "tags": [
-          "Client"
+          "Account"
+        ],
+        "operationId": "CreateAccount",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAccountCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Account/{id}": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "GetAccount",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "UpdateAccount",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAccountCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "DeleteAccount",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Clients": {
+      "post": {
+        "tags": [
+          "Clients"
         ],
         "operationId": "CreateClient",
         "requestBody": {
@@ -43,10 +185,10 @@
         ]
       }
     },
-    "/api/Client/{id}": {
+    "/api/Clients/{id}": {
       "get": {
         "tags": [
-          "Client"
+          "Clients"
         ],
         "operationId": "GetClient",
         "parameters": [
@@ -81,7 +223,7 @@
       },
       "put": {
         "tags": [
-          "Client"
+          "Clients"
         ],
         "operationId": "UpdateClient",
         "parameters": [
@@ -121,7 +263,7 @@
       },
       "delete": {
         "tags": [
-          "Client"
+          "Clients"
         ],
         "operationId": "DeleteClient",
         "parameters": [
@@ -148,10 +290,10 @@
         ]
       }
     },
-    "/api/Contract": {
+    "/api/Contracts": {
       "post": {
         "tags": [
-          "Contract"
+          "Contracts"
         ],
         "operationId": "CreateContract",
         "requestBody": {
@@ -185,10 +327,10 @@
         ]
       }
     },
-    "/api/Contract/{id}": {
+    "/api/Contracts/{id}": {
       "get": {
         "tags": [
-          "Contract"
+          "Contracts"
         ],
         "operationId": "GetContract",
         "parameters": [
@@ -223,7 +365,7 @@
       },
       "put": {
         "tags": [
-          "Contract"
+          "Contracts"
         ],
         "operationId": "UpdateContract",
         "parameters": [
@@ -263,9 +405,196 @@
       },
       "delete": {
         "tags": [
-          "Contract"
+          "Contracts"
         ],
         "operationId": "DeleteContract",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Games": {
+      "post": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "CreateGame",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGameCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "GetAllGames",
+        "parameters": [
+          {
+            "name": "page_number",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedListOfGameDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Games/{id}": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "GetGame",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "UpdateGame",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateGameCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "DeleteGame",
         "parameters": [
           {
             "name": "id",
@@ -364,6 +693,128 @@
           }
         }
       },
+      "CreateAccountCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "registrationNumber": {
+            "type": "string"
+          },
+          "averageScore": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "eventAverageScore": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "stars": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "clientId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole"
+          }
+        }
+      },
+      "UserRole": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Admin",
+          "Teacher",
+          "Student"
+        ],
+        "enum": [
+          "Admin",
+          "Teacher",
+          "Student"
+        ]
+      },
+      "AccountDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "registrationNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "averageScore": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "eventAverageScore": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "stars": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "clientId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole"
+          }
+        }
+      },
+      "UpdateAccountCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "registrationNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole"
+          },
+          "averageScore": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "eventAverageScore": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "stars": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "CreateClientCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -393,13 +844,12 @@
             "type": "string",
             "nullable": true
           },
-          "contract": {
+          "contracts": {
+            "type": "array",
             "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ContractDto"
-              }
-            ]
+            "items": {
+              "$ref": "#/components/schemas/ContractDto"
+            }
           }
         }
       },
@@ -463,15 +913,17 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
           "id": {
             "type": "string",
             "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -511,151 +963,11 @@
             "type": "string",
             "format": "guid"
           },
-          "client": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/Client"
-              }
-            ]
-          }
-        }
-      },
-      "Client": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/BaseAuditableEntity"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "name": {
-                "type": "string"
-              },
-              "description": {
-                "type": "string",
-                "nullable": true
-              },
-              "contract": {
-                "nullable": true,
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/Contract"
-                  }
-                ]
-              }
-            }
-          }
-        ]
-      },
-      "Contract": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/BaseAuditableEntity"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "contractDurationInYears": {
-                "type": "integer",
-                "format": "int32"
-              },
-              "contractSigningDate": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "implementationDate": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "totalAccounts": {
-                "type": "integer",
-                "format": "int32"
-              },
-              "remainingAccounts": {
-                "type": "integer",
-                "format": "int32",
-                "nullable": true
-              },
-              "deliveryReport": {
-                "type": "string",
-                "nullable": true
-              },
-              "status": {
-                "$ref": "#/components/schemas/ContractStatus"
-              },
-              "clientId": {
-                "type": "string",
-                "format": "guid"
-              },
-              "client": {
-                "$ref": "#/components/schemas/Client"
-              }
-            }
-          }
-        ]
-      },
-      "BaseAuditableEntity": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/BaseEntity"
-          },
-          {
-            "type": "object",
-            "x-abstract": true,
-            "additionalProperties": false,
-            "properties": {
-              "created": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "createdBy": {
-                "type": "string",
-                "nullable": true
-              },
-              "lastModified": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "lastModifiedBy": {
-                "type": "string",
-                "nullable": true
-              }
-            }
-          }
-        ]
-      },
-      "BaseEntity": {
-        "type": "object",
-        "x-abstract": true,
-        "additionalProperties": false,
-        "properties": {
-          "id": {
+          "gameId": {
             "type": "string",
             "format": "guid"
-          },
-          "isDeleted": {
-            "type": "boolean"
-          },
-          "deletedAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "domainEvents": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BaseEvent"
-            }
           }
         }
-      },
-      "BaseEvent": {
-        "type": "object",
-        "x-abstract": true,
-        "additionalProperties": false
       },
       "UpdateContractCommand": {
         "type": "object",
@@ -691,6 +1003,106 @@
           },
           "status": {
             "$ref": "#/components/schemas/ContractStatus"
+          }
+        }
+      },
+      "CreateGameCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "lore": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          }
+        }
+      },
+      "PaginatedListOfGameDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameDto"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hasPreviousPage": {
+            "type": "boolean"
+          },
+          "hasNextPage": {
+            "type": "boolean"
+          }
+        }
+      },
+      "GameDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "lore": {
+            "type": "string",
+            "nullable": true
+          },
+          "purpose": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "UpdateGameCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "lore": {
+            "type": "string",
+            "nullable": true
+          },
+          "purpose": {
+            "type": "string",
+            "nullable": true
           }
         }
       },

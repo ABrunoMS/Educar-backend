@@ -10,6 +10,7 @@ public interface IApplicationDbContext
     DbSet<Contract> Contracts { get; }
     DbSet<Client> Clients { get; }
     DbSet<Account> Accounts { get; }
+    DbSet<Game> Games { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

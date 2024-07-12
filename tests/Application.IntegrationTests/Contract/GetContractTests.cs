@@ -12,23 +12,29 @@ namespace Educar.Backend.Application.IntegrationTests.Contract;
 public class GetContractTests : TestBase
 {
     private Domain.Entities.Client _client;
+    private Domain.Entities.Game _game;
 
     [SetUp]
     public void SetUp()
     {
         ResetState();
 
-        // Create and add a client to the context
         _client = new Domain.Entities.Client("test client");
         Context.Clients.Add(_client);
+
+        _game = new Domain.Entities.Game("test game", "test description", "lore", "test");
+        Context.Games.Add(_game);
+
         Context.SaveChanges();
     }
 
     [Test]
     public async Task GivenValidRequest_ShouldReturnContract()
     {
+        
+        
         // Arrange
-        var command = new CreateContractCommand(_client.Id)
+        var command = new CreateContractCommand(_client.Id, _game.Id)
         {
             ContractDurationInYears = 1,
             ContractSigningDate = DateTimeOffset.Now,

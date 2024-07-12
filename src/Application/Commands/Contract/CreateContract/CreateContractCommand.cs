@@ -5,9 +5,10 @@ namespace Educar.Backend.Application.Commands.Contract.CreateContract;
 
 public record CreateContractCommand : IRequest<CreatedResponseDto>
 {
-    public CreateContractCommand(Guid clientId)
+    public CreateContractCommand(Guid clientId, Guid gameId)
     {
         ClientId = clientId;
+        GameId = gameId;
     }
 
     public int ContractDurationInYears { get; init; }
@@ -18,7 +19,7 @@ public record CreateContractCommand : IRequest<CreatedResponseDto>
     public string? DeliveryReport { get; init; }
     public ContractStatus Status { get; init; }
     public Guid ClientId { get; init; }
-    public Domain.Entities.Client? Client { get; init; }
+    public Guid GameId { get; init; }
 }
 
 public class CreateContractCommandHandler : IRequestHandler<CreateContractCommand, CreatedResponseDto>
@@ -36,6 +37,9 @@ public class CreateContractCommandHandler : IRequestHandler<CreateContractComman
         // Guard.Against.Null(client, message: $"Client {request.ClientId} not found.");
         if (client == null) throw new NotFoundException(nameof(Client), request.ClientId.ToString());
 
+        var game = await _context.Games.FindAsync([request.GameId], cancellationToken: cancellationToken);
+        if (game == null) throw new NotFoundException(nameof(Game), request.GameId.ToString());
+
         var entity = new Domain.Entities.Contract(
             request.ContractDurationInYears,
             request.ContractSigningDate,
@@ -46,7 +50,8 @@ public class CreateContractCommandHandler : IRequestHandler<CreateContractComman
         {
             RemainingAccounts = request.RemainingAccounts ?? request.TotalAccounts,
             DeliveryReport = request.DeliveryReport,
-            Client = client
+            Client = client,
+            Game = game
         };
 
         _context.Contracts.Add(entity);
