@@ -79,4 +79,104 @@ public class GetAccountTests : TestBase
         // Act & Assert
         Assert.ThrowsAsync<NotFoundException>(async () => await SendAsync(query));
     }
+
+    [Test]
+    public async Task GivenValidPaginationRequest_ShouldReturnPaginatedAccounts()
+    {
+        // Arrange
+        for (int i = 1; i <= 20; i++)
+        {
+            var account = new Domain.Entities.Account($"Test Account {i}", $"test.account{i}@example.com", "123456",
+                UserRole.Student)
+            {
+                ClientId = _client.Id,
+                Role = UserRole.Student,
+                AverageScore = 100.50m,
+                EventAverageScore = 95.75m,
+                Stars = 4
+            };
+            Context.Accounts.Add(account);
+        }
+
+        await Context.SaveChangesAsync();
+
+        var query = new GetAccountsPaginatedQuery { PageNumber = 1, PageSize = 10 };
+
+        // Act
+        var result = await SendAsync(query);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Items.Count, Is.EqualTo(10));
+        Assert.That(result.PageNumber, Is.EqualTo(1));
+        Assert.That(result.TotalCount, Is.EqualTo(21)); // Including the initial account
+        Assert.That(result.TotalPages, Is.EqualTo(3));
+    }
+
+    [Test]
+    public async Task GivenSpecificPageRequest_ShouldReturnCorrectPage()
+    {
+        // Arrange
+        for (int i = 1; i <= 20; i++)
+        {
+            var account = new Domain.Entities.Account($"Test Account {i}", $"test.account{i}@example.com", "123456",
+                UserRole.Student)
+            {
+                ClientId = _client.Id,
+                Role = UserRole.Student,
+                AverageScore = 100.50m,
+                EventAverageScore = 95.75m,
+                Stars = 4
+            };
+            Context.Accounts.Add(account);
+        }
+
+        await Context.SaveChangesAsync();
+
+        var query = new GetAccountsPaginatedQuery { PageNumber = 2, PageSize = 10 };
+
+        // Act
+        var result = await SendAsync(query);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Items.Count, Is.EqualTo(10));
+        Assert.That(result.PageNumber, Is.EqualTo(2));
+        Assert.That(result.TotalCount, Is.EqualTo(21)); // Including the initial account
+        Assert.That(result.TotalPages, Is.EqualTo(3));
+        Assert.That(result.Items.First().Email, Is.EqualTo("test.account11@example.com"));
+    }
+
+    [Test]
+    public async Task GivenOutOfRangePageRequest_ShouldReturnEmptyPage()
+    {
+        // Arrange
+        for (int i = 1; i <= 20; i++)
+        {
+            var account = new Domain.Entities.Account($"Test Account {i}", $"test.account{i}@example.com", "123456",
+                UserRole.Student)
+            {
+                ClientId = _client.Id,
+                Role = UserRole.Student,
+                AverageScore = 100.50m,
+                EventAverageScore = 95.75m,
+                Stars = 4
+            };
+            Context.Accounts.Add(account);
+        }
+
+        await Context.SaveChangesAsync();
+
+        var query = new GetAccountsPaginatedQuery { PageNumber = 3, PageSize = 10 };
+
+        // Act
+        var result = await SendAsync(query);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Items.Count, Is.EqualTo(1)); // Only one account on the third page
+        Assert.That(result.PageNumber, Is.EqualTo(3));
+        Assert.That(result.TotalCount, Is.EqualTo(21)); // Including the initial account
+        Assert.That(result.TotalPages, Is.EqualTo(3));
+    }
 }
