@@ -5,7 +5,6 @@ using Educar.Backend.Application.Commands.Game.UpdateGame;
 using Educar.Backend.Application.Common.Models;
 using Educar.Backend.Application.Queries.Game;
 using Educar.Backend.Domain.Enums;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
 
 namespace Educar.Backend.Web.Endpoints;

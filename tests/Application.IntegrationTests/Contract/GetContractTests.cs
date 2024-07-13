@@ -31,8 +31,6 @@ public class GetContractTests : TestBase
     [Test]
     public async Task GivenValidRequest_ShouldReturnContract()
     {
-        
-        
         // Arrange
         var command = new CreateContractCommand(_client.Id, _game.Id)
         {
@@ -42,7 +40,7 @@ public class GetContractTests : TestBase
             TotalAccounts = 10,
             Status = ContractStatus.Signed
         };
-        
+
         var response = await SendAsync(command);
 
         var query = new GetContractQuery { Id = response.Id };
@@ -69,7 +67,8 @@ public class GetContractTests : TestBase
     public async Task GivenDeletedResourceRequest_ShouldThrowNotFoundException()
     {
         // Arrange
-        var contract = new Domain.Entities.Contract(1, DateTimeOffset.Now, DateTimeOffset.Now.AddMonths(1), 10, ContractStatus.Signed)
+        var contract = new Domain.Entities.Contract(1, DateTimeOffset.Now, DateTimeOffset.Now.AddMonths(1), 10,
+            ContractStatus.Signed)
         {
             Client = _client,
             IsDeleted = true
@@ -81,5 +80,96 @@ public class GetContractTests : TestBase
 
         // Act & Assert
         Assert.ThrowsAsync<NotFoundException>(async () => await SendAsync(query));
+    }
+
+    [Test]
+    public async Task GivenValidPaginationRequest_ShouldReturnPaginatedContracts()
+    {
+        // Arrange
+        for (int i = 1; i <= 20; i++)
+        {
+            var command = new CreateContractCommand(_client.Id, _game.Id)
+            {
+                ContractDurationInYears = 1,
+                ContractSigningDate = DateTimeOffset.Now,
+                ImplementationDate = DateTimeOffset.Now.AddMonths(1),
+                TotalAccounts = 10,
+                Status = ContractStatus.Signed
+            };
+            await SendAsync(command);
+        }
+
+        var query = new GetContractsPaginatedQuery { PageNumber = 1, PageSize = 10 };
+
+        // Act
+        var result = await SendAsync(query);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Items.Count, Is.EqualTo(10));
+        Assert.That(result.PageNumber, Is.EqualTo(1));
+        Assert.That(result.TotalCount, Is.EqualTo(20));
+        Assert.That(result.TotalPages, Is.EqualTo(2));
+    }
+
+    [Test]
+    public async Task GivenSpecificPageRequest_ShouldReturnCorrectPage()
+    {
+        // Arrange
+        for (int i = 1; i <= 20; i++)
+        {
+            var command = new CreateContractCommand(_client.Id, _game.Id)
+            {
+                ContractDurationInYears = 1,
+                ContractSigningDate = DateTimeOffset.Now,
+                ImplementationDate = DateTimeOffset.Now.AddMonths(1),
+                TotalAccounts = 10,
+                Status = ContractStatus.Signed
+            };
+            await SendAsync(command);
+        }
+
+        var query = new GetContractsPaginatedQuery { PageNumber = 2, PageSize = 10 };
+
+        // Act
+        var result = await SendAsync(query);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Items.Count, Is.EqualTo(10));
+        Assert.That(result.PageNumber, Is.EqualTo(2));
+        Assert.That(result.TotalCount, Is.EqualTo(20));
+        Assert.That(result.TotalPages, Is.EqualTo(2));
+        Assert.That(result.Items.First().ContractDurationInYears, Is.EqualTo(1));
+    }
+
+    [Test]
+    public async Task GivenOutOfRangePageRequest_ShouldReturnEmptyPage()
+    {
+        // Arrange
+        for (int i = 1; i <= 20; i++)
+        {
+            var command = new CreateContractCommand(_client.Id, _game.Id)
+            {
+                ContractDurationInYears = 1,
+                ContractSigningDate = DateTimeOffset.Now,
+                ImplementationDate = DateTimeOffset.Now.AddMonths(1),
+                TotalAccounts = 10,
+                Status = ContractStatus.Signed
+            };
+            await SendAsync(command);
+        }
+
+        var query = new GetContractsPaginatedQuery { PageNumber = 3, PageSize = 10 };
+
+        // Act
+        var result = await SendAsync(query);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Items.Count, Is.EqualTo(0));
+        Assert.That(result.PageNumber, Is.EqualTo(3));
+        Assert.That(result.TotalCount, Is.EqualTo(20));
+        Assert.That(result.TotalPages, Is.EqualTo(2));
     }
 }
