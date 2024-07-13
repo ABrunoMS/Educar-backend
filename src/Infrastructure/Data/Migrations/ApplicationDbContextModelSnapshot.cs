@@ -102,7 +102,81 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("account");
+                    b.ToTable("accounts", (string)null);
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Address", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("city");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("country");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<decimal?>("Lat")
+                        .HasColumnType("decimal(9,6)")
+                        .HasColumnName("lat");
+
+                    b.Property<decimal?>("Lng")
+                        .HasColumnType("decimal(9,6)")
+                        .HasColumnName("lng");
+
+                    b.Property<string>("PostalCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("postal_code");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("state");
+
+                    b.Property<string>("Street")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("street");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("addresses", (string)null);
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Client", b =>
@@ -147,7 +221,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("client");
+                    b.ToTable("clients", (string)null);
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Contract", b =>
@@ -224,7 +298,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("GameId");
 
-                    b.ToTable("contract");
+                    b.ToTable("contracts", (string)null);
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Game", b =>
@@ -285,7 +359,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("game");
+                    b.ToTable("games");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.TodoItem", b =>
@@ -345,7 +419,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("ListId");
 
-                    b.ToTable("todo_item");
+                    b.ToTable("todo_items");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.TodoList", b =>
@@ -387,7 +461,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("todo_list");
+                    b.ToTable("todo_lists");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Account", b =>

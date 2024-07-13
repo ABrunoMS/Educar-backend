@@ -19,6 +19,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Client> Clients => Set<Client>();
     public DbSet<Account> Accounts => Set<Account>();
     public DbSet<Game> Games => Set<Game>();
+    public DbSet<Address> Addresses => Set<Address>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -29,7 +30,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         foreach (var entityType in builder.Model.GetEntityTypes())
         {
             var tableName = entityType.DisplayName();
-            entityType.SetTableName(tableName.ToSnakeCase().Singularize().ToLower());
+            entityType.SetTableName(tableName.ToSnakeCase().Pluralize().ToLower());
 
             foreach (var property in entityType.GetProperties())
                 property.SetColumnName(property.Name.ToSnakeCase().ToLower());

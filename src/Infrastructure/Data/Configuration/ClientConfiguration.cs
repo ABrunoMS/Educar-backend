@@ -8,6 +8,8 @@ public class ClientConfiguration : IEntityTypeConfiguration<Client>
 {
     public void Configure(EntityTypeBuilder<Client> builder)
     {
+        builder.ToTable("clients");
+        
         builder.Property(t => t.Name).IsRequired();
     }
 }

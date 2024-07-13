@@ -12,7 +12,31 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "client",
+                name: "addresses",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    street = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    city = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    state = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    postal_code = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    country = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    lat = table.Column<decimal>(type: "numeric(9,6)", nullable: true),
+                    lng = table.Column<decimal>(type: "numeric(9,6)", nullable: true),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<string>(type: "text", nullable: true),
+                    last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    last_modified_by = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_addresses", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "clients",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -27,11 +51,32 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_client", x => x.id);
+                    table.PrimaryKey("PK_clients", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "todo_list",
+                name: "games",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    description = table.Column<string>(type: "text", nullable: false),
+                    lore = table.Column<string>(type: "text", nullable: false),
+                    purpose = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<string>(type: "text", nullable: true),
+                    last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    last_modified_by = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_games", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "todo_lists",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -45,11 +90,11 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_todo_list", x => x.id);
+                    table.PrimaryKey("PK_todo_lists", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "account",
+                name: "accounts",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -70,17 +115,17 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_account", x => x.id);
+                    table.PrimaryKey("PK_accounts", x => x.id);
                     table.ForeignKey(
-                        name: "FK_account_client_client_id",
+                        name: "FK_accounts_clients_client_id",
                         column: x => x.client_id,
-                        principalTable: "client",
+                        principalTable: "clients",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "contract",
+                name: "contracts",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -92,6 +137,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     delivery_report = table.Column<string>(type: "text", nullable: true),
                     status = table.Column<string>(type: "text", nullable: false),
                     client_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    game_id = table.Column<Guid>(type: "uuid", nullable: false),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false),
                     deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -101,17 +147,23 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_contract", x => x.id);
+                    table.PrimaryKey("PK_contracts", x => x.id);
                     table.ForeignKey(
-                        name: "FK_contract_client_client_id",
+                        name: "FK_contracts_clients_client_id",
                         column: x => x.client_id,
-                        principalTable: "client",
+                        principalTable: "clients",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_contracts_games_game_id",
+                        column: x => x.game_id,
+                        principalTable: "games",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "todo_item",
+                name: "todo_items",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -129,34 +181,45 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_todo_item", x => x.id);
+                    table.PrimaryKey("PK_todo_items", x => x.id);
                     table.ForeignKey(
-                        name: "FK_todo_item_todo_list_list_id",
+                        name: "FK_todo_items_todo_lists_list_id",
                         column: x => x.list_id,
-                        principalTable: "todo_list",
+                        principalTable: "todo_lists",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_account_client_id",
-                table: "account",
+                name: "IX_accounts_client_id",
+                table: "accounts",
                 column: "client_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_account_email",
-                table: "account",
+                name: "IX_accounts_email",
+                table: "accounts",
                 column: "email",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_contract_client_id",
-                table: "contract",
+                name: "IX_contracts_client_id",
+                table: "contracts",
                 column: "client_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_todo_item_list_id",
-                table: "todo_item",
+                name: "IX_contracts_game_id",
+                table: "contracts",
+                column: "game_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_games_name",
+                table: "games",
+                column: "name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_todo_items_list_id",
+                table: "todo_items",
                 column: "list_id");
         }
 
@@ -164,19 +227,25 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "account");
+                name: "accounts");
 
             migrationBuilder.DropTable(
-                name: "contract");
+                name: "addresses");
 
             migrationBuilder.DropTable(
-                name: "todo_item");
+                name: "contracts");
 
             migrationBuilder.DropTable(
-                name: "client");
+                name: "todo_items");
 
             migrationBuilder.DropTable(
-                name: "todo_list");
+                name: "clients");
+
+            migrationBuilder.DropTable(
+                name: "games");
+
+            migrationBuilder.DropTable(
+                name: "todo_lists");
         }
     }
 }

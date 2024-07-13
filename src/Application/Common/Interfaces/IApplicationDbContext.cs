@@ -11,6 +11,7 @@ public interface IApplicationDbContext
     DbSet<Client> Clients { get; }
     DbSet<Account> Accounts { get; }
     DbSet<Game> Games { get; }
+    DbSet<Address> Addresses { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

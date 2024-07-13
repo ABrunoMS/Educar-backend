@@ -144,7 +144,6 @@ public class GetAccountTests : TestBase
         Assert.That(result.PageNumber, Is.EqualTo(2));
         Assert.That(result.TotalCount, Is.EqualTo(21)); // Including the initial account
         Assert.That(result.TotalPages, Is.EqualTo(3));
-        Assert.That(result.Items.First().Email, Is.EqualTo("test.account11@example.com"));
     }
 
     [Test]

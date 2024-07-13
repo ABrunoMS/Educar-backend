@@ -8,6 +8,8 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
 {
     public void Configure(EntityTypeBuilder<Account> builder)
     {
+        builder.ToTable("accounts");
+        
         builder.Property(t => t.Name).IsRequired().HasMaxLength(100);
         builder.Property(t => t.Email).IsRequired().HasMaxLength(100);
         builder.HasIndex(t => t.Email).IsUnique();
