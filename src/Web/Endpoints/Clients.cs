@@ -2,6 +2,7 @@ using Educar.Backend.Application.Commands;
 using Educar.Backend.Application.Commands.Client.CreateClient;
 using Educar.Backend.Application.Commands.Client.DeleteClient;
 using Educar.Backend.Application.Commands.Client.UpdateClient;
+using Educar.Backend.Application.Common.Models;
 using Educar.Backend.Application.Queries.Client;
 using Educar.Backend.Domain.Enums;
 using Microsoft.OpenApi.Extensions;
@@ -16,6 +17,7 @@ public class Clients : EndpointGroupBase
             .RequireAuthorization(UserRole.Admin.GetDisplayName())
             .MapPost(CreateClient)
             .MapGet(GetClient, "{id}")
+            .MapGet(GetAllClients)
             .MapPut(UpdateClient, "{id}")
             .MapDelete(DeleteClient, "{id}");
     }
@@ -28,6 +30,17 @@ public class Clients : EndpointGroupBase
     public async Task<ClientDto> GetClient(ISender sender, Guid id)
     {
         return await sender.Send(new GetClientQuery { Id = id });
+    }
+
+    public Task<PaginatedList<ClientDto>> GetAllClients(ISender sender, [AsParameters] PaginatedQuery paginatedQuery)
+    {
+        var query = new GetClientsPaginatedQuery
+        {
+            PageNumber = paginatedQuery.PageNumber,
+            PageSize = paginatedQuery.PageSize
+        };
+
+        return sender.Send(query);
     }
 
     public async Task<IResult> DeleteClient(ISender sender, Guid id)

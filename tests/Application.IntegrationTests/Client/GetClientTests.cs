@@ -69,7 +69,7 @@ public class GetClientTests : TestBase
 
         var gameCommand = new CreateGameCommand("Test Game", "Test Description", "Lore", "Test");
         var gameResponse = await SendAsync(gameCommand);
-        
+
         var createContractCommand = new CreateContractCommand(createClientResponse.Id, gameResponse.Id)
         {
             ContractDurationInYears = ContractDurationInYears,
@@ -92,5 +92,83 @@ public class GetClientTests : TestBase
         Assert.That(clientResponse.Description, Is.EqualTo(ClientDescription));
         Assert.That(clientResponse.Contracts, Is.Not.Empty);
         Assert.That(clientResponse.Contracts.First().Id, Is.EqualTo(createContractResponse.Id));
+    }
+
+    [Test]
+    public async Task GivenValidPaginationRequest_ShouldReturnPaginatedClients()
+    {
+        // Arrange
+        for (var i = 1; i <= 20; i++)
+        {
+            var command = new CreateClientCommand($"Test Client {i}")
+            {
+                Description = ClientDescription
+            };
+            await SendAsync(command);
+        }
+
+        var query = new GetClientsPaginatedQuery { PageNumber = 1, PageSize = 10 };
+
+        // Act
+        var result = await SendAsync(query);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Items.Count, Is.EqualTo(10));
+        Assert.That(result.PageNumber, Is.EqualTo(1));
+        Assert.That(result.TotalCount, Is.EqualTo(20));
+        Assert.That(result.TotalPages, Is.EqualTo(2));
+    }
+
+    [Test]
+    public async Task GivenSpecificPageRequest_ShouldReturnCorrectPage()
+    {
+        // Arrange
+        for (var i = 1; i <= 20; i++)
+        {
+            var command = new CreateClientCommand($"Test Client {i}")
+            {
+                Description = ClientDescription
+            };
+            await SendAsync(command);
+        }
+
+        var query = new GetClientsPaginatedQuery { PageNumber = 2, PageSize = 10 };
+
+        // Act
+        var result = await SendAsync(query);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Items.Count, Is.EqualTo(10));
+        Assert.That(result.PageNumber, Is.EqualTo(2));
+        Assert.That(result.TotalCount, Is.EqualTo(20));
+        Assert.That(result.TotalPages, Is.EqualTo(2));
+    }
+
+    [Test]
+    public async Task GivenOutOfRangePageRequest_ShouldReturnEmptyPage()
+    {
+        // Arrange
+        for (var i = 1; i <= 20; i++)
+        {
+            var command = new CreateClientCommand($"Test Client {i}")
+            {
+                Description = ClientDescription
+            };
+            await SendAsync(command);
+        }
+
+        var query = new GetClientsPaginatedQuery { PageNumber = 3, PageSize = 10 };
+
+        // Act
+        var result = await SendAsync(query);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Items.Count, Is.EqualTo(0));
+        Assert.That(result.PageNumber, Is.EqualTo(3));
+        Assert.That(result.TotalCount, Is.EqualTo(20));
+        Assert.That(result.TotalPages, Is.EqualTo(2));
     }
 }
