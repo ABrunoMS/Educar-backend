@@ -1,4 +1,5 @@
 using Educar.Backend.Application.Common.Interfaces;
+using Educar.Backend.Domain.Enums;
 
 namespace Educar.Backend.Application.Commands.Account.UpdateAccount;
 
@@ -28,9 +29,5 @@ public class UpdateAccountCommandValidator : AbstractValidator<UpdateAccountComm
 
         RuleFor(v => v.Stars)
             .InclusiveBetween(0, 5).WithMessage("Stars must be between 0 and 5.");
-
-        RuleFor(v => v.Role)
-            .NotEmpty().WithMessage("Role is required.")
-            .IsInEnum().WithMessage("Role must be a valid enum value.");
     }
 }

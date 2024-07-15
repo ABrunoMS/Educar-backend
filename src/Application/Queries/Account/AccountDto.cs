@@ -1,4 +1,5 @@
 using Educar.Backend.Application.Queries.Client;
+using Educar.Backend.Application.Queries.School;
 using Educar.Backend.Domain.Enums;
 
 namespace Educar.Backend.Application.Queries.Account;
@@ -14,6 +15,8 @@ public class AccountDto
     public int Stars { get; set; }
     public Guid ClientId { get; set; }
     public UserRole Role { get; set; }
+    
+    public SchoolDto? School { get; set; }
 
     private class Mapping : Profile
     {

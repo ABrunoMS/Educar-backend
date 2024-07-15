@@ -23,10 +23,10 @@ public class DeleteAccountTests : TestBase
         Context.SaveChanges();
     }
 
-    private async Task<Guid> CreateAccount()
+    private async Task<Guid> CreateAccount(UserRole role = UserRole.Student)
     {
         var command = new CreateAccountCommand("Existing Account", "existing.account@example.com", "123456",
-            _client.Id, UserRole.Student)
+            _client.Id, role)
         {
             AverageScore = 100.50m,
             EventAverageScore = 95.75m,
@@ -41,7 +41,7 @@ public class DeleteAccountTests : TestBase
     [Test]
     public async Task GivenValidRequest_ShouldDeleteAccount()
     {
-        var accountId = await CreateAccount();
+        var accountId = await CreateAccount(UserRole.Admin);
         // Arrange
         var command = new DeleteAccountCommand(accountId);
 

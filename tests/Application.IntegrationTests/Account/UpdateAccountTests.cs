@@ -1,8 +1,10 @@
 using Ardalis.GuardClauses;
 using Educar.Backend.Application.Commands.Account.CreateAccount;
 using Educar.Backend.Application.Commands.Account.UpdateAccount;
+using Educar.Backend.Application.Commands.School.CreateSchool;
 using Educar.Backend.Application.Common.Exceptions;
 using Educar.Backend.Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using static Educar.Backend.Application.IntegrationTests.Testing;
 
@@ -23,15 +25,19 @@ public class UpdateAccountTests : TestBase
         Context.SaveChanges();
     }
 
-    private async Task<Guid> CreateAccount()
+    private async Task<Guid> CreateAccount(UserRole role = UserRole.Admin, Guid? SchoolId = null)
     {
         var command = new CreateAccountCommand("Existing Account", "existing.account@example.com", "123456",
-            _client.Id, UserRole.Student)
+            _client.Id, role)
         {
             AverageScore = 100.50m,
             EventAverageScore = 95.75m,
             Stars = 4
         };
+        if (SchoolId != null)
+        {
+            command.SchoolId = SchoolId;
+        }
 
         var response = await SendAsync(command);
 
@@ -44,7 +50,7 @@ public class UpdateAccountTests : TestBase
         const string newName = "Updated Account";
         const string newRegistrationNumber = "654321";
 
-        var accountId = await CreateAccount();
+        var accountId = await CreateAccount(UserRole.Admin);
 
         // Arrange
         var command = new UpdateAccountCommand
@@ -52,7 +58,6 @@ public class UpdateAccountTests : TestBase
             Id = accountId,
             Name = newName,
             RegistrationNumber = newRegistrationNumber,
-            Role = UserRole.Teacher,
             AverageScore = 200.75m,
             EventAverageScore = 150.50m,
             Stars = 5
@@ -65,7 +70,7 @@ public class UpdateAccountTests : TestBase
         Assert.That(updatedAccount, Is.Not.Null);
         Assert.That(updatedAccount.Name, Is.EqualTo(newName));
         Assert.That(updatedAccount.RegistrationNumber, Is.EqualTo(newRegistrationNumber));
-        Assert.That(updatedAccount.Role, Is.EqualTo(UserRole.Teacher));
+        Assert.That(updatedAccount.Role, Is.EqualTo(UserRole.Admin));
         Assert.That(updatedAccount.AverageScore, Is.EqualTo(200.75m));
         Assert.That(updatedAccount.EventAverageScore, Is.EqualTo(150.50m));
         Assert.That(updatedAccount.Stars, Is.EqualTo(5));
@@ -81,7 +86,6 @@ public class UpdateAccountTests : TestBase
             Id = accountId,
             Name = string.Empty,
             RegistrationNumber = "654321",
-            Role = UserRole.Teacher,
             AverageScore = 200.75m,
             EventAverageScore = 150.50m,
             Stars = 5
@@ -100,26 +104,6 @@ public class UpdateAccountTests : TestBase
             Id = accountId,
             Name = "Updated Account",
             RegistrationNumber = string.Empty,
-            Role = UserRole.Teacher,
-            AverageScore = 200.75m,
-            EventAverageScore = 150.50m,
-            Stars = 5
-        };
-
-        Assert.ThrowsAsync<ValidationException>(async () => await SendAsync(command));
-    }
-
-    [Test]
-    public async Task ShouldThrowValidationException_WhenRoleIsInvalid()
-    {
-        var accountId = await CreateAccount();
-
-        var command = new UpdateAccountCommand
-        {
-            Id = accountId,
-            Name = "Updated Account",
-            RegistrationNumber = "654321",
-            Role = (UserRole)999, // Invalid Role
             AverageScore = 200.75m,
             EventAverageScore = 150.50m,
             Stars = 5
@@ -138,7 +122,6 @@ public class UpdateAccountTests : TestBase
             Id = accountId,
             Name = "Updated Account",
             RegistrationNumber = "654321",
-            Role = UserRole.Teacher,
             AverageScore = 1000m, // Invalid Average Score
             EventAverageScore = 150.50m,
             Stars = 5
@@ -157,7 +140,6 @@ public class UpdateAccountTests : TestBase
             Id = accountId,
             Name = "Updated Account",
             RegistrationNumber = "654321",
-            Role = UserRole.Teacher,
             AverageScore = 200.75m,
             EventAverageScore = 1000m, // Invalid Event Average Score
             Stars = 5
@@ -176,7 +158,6 @@ public class UpdateAccountTests : TestBase
             Id = accountId,
             Name = "Updated Account",
             RegistrationNumber = "654321",
-            Role = UserRole.Teacher,
             AverageScore = 200.75m,
             EventAverageScore = 150.50m,
             Stars = 10 // Invalid Stars
@@ -193,12 +174,76 @@ public class UpdateAccountTests : TestBase
             Id = Guid.NewGuid(), // Invalid Id
             Name = "Updated Account",
             RegistrationNumber = "654321",
-            Role = UserRole.Teacher,
             AverageScore = 200.75m,
             EventAverageScore = 150.50m,
             Stars = 5
         };
 
         Assert.ThrowsAsync<NotFoundException>(async () => await SendAsync(command));
+    }
+
+    [Test]
+    public async Task ShouldThrowValidationException_WhenSchoolIdIsRequiredAndMissing()
+    {
+        var schoolCommand = new CreateSchoolCommand("school", _client.Id);
+        var schoolResponse = await SendAsync(schoolCommand);
+        var accountId = await CreateAccount(UserRole.Student, schoolResponse.Id);
+
+        var command = new UpdateAccountCommand
+        {
+            Id = accountId,
+            Name = "Updated Account",
+            RegistrationNumber = "654321",
+            AverageScore = 200.75m,
+            EventAverageScore = 150.50m,
+            Stars = 5
+        };
+
+        Assert.ThrowsAsync<ValidationException>(async () => await SendAsync(command));
+    }
+
+    [Test]
+    public async Task ShouldNotThrowValidationException_WhenSchoolIdIsRequiredAndPresent()
+    {
+        var schoolCommand = new CreateSchoolCommand("school", _client.Id);
+        var schoolResponse = await SendAsync(schoolCommand);
+
+        var accountId = await CreateAccount(UserRole.Student, schoolResponse.Id);
+
+        var command = new UpdateAccountCommand
+        {
+            Id = accountId,
+            Name = "Updated Account",
+            RegistrationNumber = "654321",
+            AverageScore = 200.75m,
+            EventAverageScore = 150.50m,
+            Stars = 5,
+            SchoolId = schoolResponse.Id
+        };
+
+        await SendAsync(command);
+
+        var updatedAccount = await Context.Accounts.Include(a => a.School).FirstOrDefaultAsync(a => a.Id == accountId);
+        Assert.That(updatedAccount, Is.Not.Null);
+        Assert.That(updatedAccount.School, Is.Not.Null);
+        Assert.That(updatedAccount.School.Id, Is.EqualTo(schoolResponse.Id));
+    }
+
+    [Test]
+    public async Task ShouldNotThrowValidationException_WhenSchoolIdIsNotRequired()
+    {
+        var accountId = await CreateAccount(UserRole.Admin);
+
+        var command = new UpdateAccountCommand
+        {
+            Id = accountId,
+            Name = "Updated Admin Account",
+            RegistrationNumber = "654321",
+            AverageScore = 200.75m,
+            EventAverageScore = 150.50m,
+            Stars = 5
+        };
+
+        Assert.DoesNotThrowAsync(async () => await SendAsync(command));
     }
 }

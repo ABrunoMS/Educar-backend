@@ -12,7 +12,7 @@ public class UpdateContractCommandValidator : AbstractValidator<UpdateContractCo
 
         RuleFor(v => v.ImplementationDate)
             .NotEmpty().WithMessage("ImplementationDate is required.");
-        
+
         RuleFor(v => v.ContractDurationInYears)
             .GreaterThan(0).WithMessage("ContractDurationInYears must be greater than 0.");
 

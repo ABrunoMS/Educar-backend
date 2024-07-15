@@ -1,4 +1,5 @@
 using Educar.Backend.Application.Common.Interfaces;
+using Educar.Backend.Domain.Enums;
 
 namespace Educar.Backend.Application.Commands.Account.CreateAccount;
 
@@ -40,8 +41,12 @@ public class CreateAccountCommandValidator : AbstractValidator<CreateAccountComm
             .NotEmpty().WithMessage("Client ID is required.");
 
         RuleFor(v => v.Role)
-            .NotEmpty().WithMessage("Role is required.")
+            .NotNull().WithMessage("Role is required.")
             .IsInEnum().WithMessage("Role must be a valid enum value.");
+        
+        RuleFor(v => v.SchoolId)
+            .NotEmpty().WithMessage("School ID is required.")
+            .When(v => v.Role != UserRole.Admin).WithMessage("School ID is required for non-admin roles.");
     }
 
     public async Task<bool> BeUniqueTitle(string email, CancellationToken cancellationToken)
