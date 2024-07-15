@@ -107,10 +107,13 @@ public class GetAccountTests : TestBase
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Items.Count, Is.EqualTo(10));
-        Assert.That(result.PageNumber, Is.EqualTo(1));
-        Assert.That(result.TotalCount, Is.EqualTo(21)); // Including the initial account
-        Assert.That(result.TotalPages, Is.EqualTo(3));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Items, Has.Count.EqualTo(10));
+            Assert.That(result.PageNumber, Is.EqualTo(1));
+            Assert.That(result.TotalCount, Is.EqualTo(21)); // Including the initial account
+            Assert.That(result.TotalPages, Is.EqualTo(3));
+        });
     }
 
     [Test]
