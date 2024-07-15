@@ -20,6 +20,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Account> Accounts => Set<Account>();
     public DbSet<Game> Games => Set<Game>();
     public DbSet<Address> Addresses => Set<Address>();
+    public DbSet<School> Schools => Set<School>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -8,8 +8,6 @@ public class ContractConfiguration : IEntityTypeConfiguration<Contract>
 {
     public void Configure(EntityTypeBuilder<Contract> builder)
     {
-        builder.ToTable("contracts");
-        
         builder.Property(t => t.ContractDurationInYears).IsRequired();
         builder.Property(t => t.ContractSigningDate).IsRequired();
         builder.Property(t => t.ImplementationDate).IsRequired();

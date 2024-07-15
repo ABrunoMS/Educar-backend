@@ -15,6 +15,7 @@ public record CreateAccountCommand(string Name, string Email, string Registratio
     public int Stars { get; set; }
     public Guid ClientId { get; set; } = ClientId;
     public UserRole Role { get; set; } = Role;
+    public Guid? SchoolId { get; set; }
 }
 
 public class CreateAccountCommandHandler(IApplicationDbContext context)
@@ -25,13 +26,22 @@ public class CreateAccountCommandHandler(IApplicationDbContext context)
         var client = await context.Clients.FindAsync([request.ClientId], cancellationToken: cancellationToken);
         if (client == null) throw new NotFoundException(nameof(Client), request.ClientId.ToString());
 
+        Domain.Entities.School? school = null;
+        if (request.SchoolId != null && request.SchoolId != Guid.Empty)
+        {
+            school = await context.Schools.FindAsync([request.SchoolId], cancellationToken: cancellationToken);
+            if (school == null) throw new NotFoundException(nameof(School), request.SchoolId.ToString()!);
+        }
+
         var entity = new Domain.Entities.Account(request.Name, request.Email, request.RegistrationNumber, request.Role)
         {
             AverageScore = request.AverageScore,
             EventAverageScore = request.EventAverageScore,
             Stars = request.Stars,
-            Client = client
+            Client = client,
         };
+
+        if (school != null) entity.School = school;
 
         entity.AddDomainEvent(new AccountCreatedEvent(entity));
         context.Accounts.Add(entity);
