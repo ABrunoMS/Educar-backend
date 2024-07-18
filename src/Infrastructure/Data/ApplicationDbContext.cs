@@ -21,6 +21,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Game> Games => Set<Game>();
     public DbSet<Address> Addresses => Set<Address>();
     public DbSet<School> Schools => Set<School>();
+    public DbSet<Media> Medias => Set<Media>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

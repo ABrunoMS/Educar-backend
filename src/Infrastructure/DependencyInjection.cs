@@ -24,6 +24,7 @@ public static class DependencyInjection
         services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
         services.AddScoped<ISaveChangesInterceptor, SoftDeleteInterceptor>();
         services.AddScoped<IIdentityService, KeycloakService>();
+        services.AddSingleton<IObjectStorage, OciObjectStorageService>();
 
 
         if (context != null)

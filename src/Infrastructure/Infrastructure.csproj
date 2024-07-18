@@ -11,6 +11,7 @@
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools"/>
+        <PackageReference Include="OCI.DotNetSDK.Objectstorage" />
     </ItemGroup>
 
     <ItemGroup>

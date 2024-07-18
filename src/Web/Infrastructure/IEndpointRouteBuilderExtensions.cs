@@ -26,6 +26,20 @@ public static class IEndpointRouteBuilderExtensions
         return builder;
     }
 
+    public static IEndpointRouteBuilder MapPostWithAccepts<TContentType>(this IEndpointRouteBuilder builder,
+        Delegate handler, [StringSyntax("Route")] string pattern = "", string mediaType = "multipart/form-data")
+        where TContentType : notnull
+    {
+        Guard.Against.AnonymousMethod(handler);
+
+        builder.MapPost(pattern, handler)
+            .WithName(handler.Method.Name)
+            .Accepts<TContentType>(mediaType)
+            .DisableAntiforgery();
+
+        return builder;
+    }
+
     public static IEndpointRouteBuilder MapPut(this IEndpointRouteBuilder builder, Delegate handler,
         [StringSyntax("Route")] string pattern)
     {

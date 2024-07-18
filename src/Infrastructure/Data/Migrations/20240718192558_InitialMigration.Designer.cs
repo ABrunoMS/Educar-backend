@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Educar.Backend.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240713214807_InitialMigration")]
+    [Migration("20240718192558_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -94,6 +94,10 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("role");
 
+                    b.Property<Guid?>("SchoolId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("school_id");
+
                     b.Property<int>("Stars")
                         .HasColumnType("integer")
                         .HasColumnName("stars");
@@ -104,6 +108,8 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("Email")
                         .IsUnique();
+
+                    b.HasIndex("SchoolId");
 
                     b.ToTable("accounts", (string)null);
                 });
@@ -301,7 +307,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("GameId");
 
-                    b.ToTable("contracts", (string)null);
+                    b.ToTable("contracts");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Game", b =>
@@ -363,6 +369,138 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("games");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Media", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("Agreement")
+                        .HasColumnType("boolean")
+                        .HasColumnName("agreement");
+
+                    b.Property<string>("Author")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("author");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("ObjectName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("object_name");
+
+                    b.Property<string>("Purpose")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("purpose");
+
+                    b.Property<string>("References")
+                        .HasColumnType("text")
+                        .HasColumnName("references");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("url");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("medias");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.School", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AddressId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("address_id");
+
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("client_id");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AddressId");
+
+                    b.HasIndex("ClientId");
+
+                    b.ToTable("schools");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.TodoItem", b =>
@@ -475,7 +613,13 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Educar.Backend.Domain.Entities.School", "School")
+                        .WithMany("Accounts")
+                        .HasForeignKey("SchoolId");
+
                     b.Navigation("Client");
+
+                    b.Navigation("School");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Contract", b =>
@@ -497,6 +641,23 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("Game");
                 });
 
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.School", b =>
+                {
+                    b.HasOne("Educar.Backend.Domain.Entities.Address", "Address")
+                        .WithMany()
+                        .HasForeignKey("AddressId");
+
+                    b.HasOne("Educar.Backend.Domain.Entities.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Address");
+
+                    b.Navigation("Client");
+                });
+
             modelBuilder.Entity("Educar.Backend.Domain.Entities.TodoItem", b =>
                 {
                     b.HasOne("Educar.Backend.Domain.Entities.TodoList", "List")
@@ -513,6 +674,11 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("Accounts");
 
                     b.Navigation("Contracts");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.School", b =>
+                {
+                    b.Navigation("Accounts");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.TodoList", b =>
