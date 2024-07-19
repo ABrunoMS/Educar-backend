@@ -500,108 +500,6 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.ToTable("schools");
                 });
 
-            modelBuilder.Entity("Educar.Backend.Domain.Entities.TodoItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTimeOffset>("Created")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<bool>("Done")
-                        .HasColumnType("boolean")
-                        .HasColumnName("done");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
-
-                    b.Property<DateTimeOffset>("LastModified")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_modified");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("last_modified_by");
-
-                    b.Property<Guid>("ListId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("list_id");
-
-                    b.Property<string>("Note")
-                        .HasColumnType("text")
-                        .HasColumnName("note");
-
-                    b.Property<DateTime?>("Reminder")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("reminder");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("title");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ListId");
-
-                    b.ToTable("todo_items");
-                });
-
-            modelBuilder.Entity("Educar.Backend.Domain.Entities.TodoList", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTimeOffset>("Created")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
-
-                    b.Property<DateTimeOffset>("LastModified")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_modified");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("last_modified_by");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("title");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("todo_lists");
-                });
-
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Account", b =>
                 {
                     b.HasOne("Educar.Backend.Domain.Entities.Client", "Client")
@@ -655,17 +553,6 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("Client");
                 });
 
-            modelBuilder.Entity("Educar.Backend.Domain.Entities.TodoItem", b =>
-                {
-                    b.HasOne("Educar.Backend.Domain.Entities.TodoList", "List")
-                        .WithMany("Items")
-                        .HasForeignKey("ListId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("List");
-                });
-
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Client", b =>
                 {
                     b.Navigation("Accounts");
@@ -676,11 +563,6 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
             modelBuilder.Entity("Educar.Backend.Domain.Entities.School", b =>
                 {
                     b.Navigation("Accounts");
-                });
-
-            modelBuilder.Entity("Educar.Backend.Domain.Entities.TodoList", b =>
-                {
-                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

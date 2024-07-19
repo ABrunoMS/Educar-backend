@@ -1,3 +1,4 @@
+using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Infrastructure;
 using Educar.Backend.Infrastructure.Data;
 using Educar.Backend.Infrastructure.Data.Interceptors;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 
 namespace Educar.Backend.Application.IntegrationTests;
@@ -17,6 +19,7 @@ public class Testing
 {
     private static ServiceProvider ServiceProvider { get; set; } = null!;
     public static ApplicationDbContext Context { get; private set; } = null!;
+    public static Mock<IObjectStorage> MockObjectStorage { get; private set; } = null!;
 
     [OneTimeSetUp]
     public void SetUp()
@@ -40,6 +43,10 @@ public class Testing
         services.AddApplicationServices();
         services.AddInfrastructureServices(builder.Build());
         services.AddWebServices();
+        
+        // Mock the IObjectStorage
+        MockObjectStorage = new Mock<IObjectStorage>();
+        services.AddSingleton(MockObjectStorage.Object);
 
         ServiceProvider = services.BuildServiceProvider();
         Context = ServiceProvider.GetRequiredService<ApplicationDbContext>();

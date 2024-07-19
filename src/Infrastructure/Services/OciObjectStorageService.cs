@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text;
 using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Infrastructure.Options;
@@ -62,5 +63,44 @@ public class OciObjectStorageService : IObjectStorage
         }
 
         return url;
+    }
+
+    public async Task<bool> DeleteObjectAsync(string objectName, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _objectStorageClient.DeleteObject(new DeleteObjectRequest
+            {
+                BucketName = _oracleCloudOptions.BucketName,
+                NamespaceName = _oracleCloudOptions.BucketNamespace,
+                ObjectName = objectName
+            }, cancellationToken: cancellationToken);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Failed at DeleteObject: {e}", e);
+            return false;
+        }
+
+        return true;
+    }
+
+    public async Task<bool> CheckObjectExistsAsync(string objectName, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _objectStorageClient.HeadObject(new HeadObjectRequest
+            {
+                BucketName = _oracleCloudOptions.BucketName,
+                NamespaceName = _oracleCloudOptions.BucketNamespace,
+                ObjectName = objectName
+            }, cancellationToken: cancellationToken);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+
+        return true;
     }
 }

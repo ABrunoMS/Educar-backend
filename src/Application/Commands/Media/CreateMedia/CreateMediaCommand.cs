@@ -10,12 +10,10 @@ public record CreateMediaCommand(
     string Url,
     MediaPurpose Purpose,
     MediaType Type,
-    bool Agreement)
-    : IRequest<CreatedResponseDto>
-{
-    public string? References;
-    public string? Author;
-}
+    bool Agreement,
+    string? References = null,
+    string? Author = null)
+    : IRequest<CreatedResponseDto>;
 
 public class CreateMediaCommandHandler(IApplicationDbContext context)
     : IRequestHandler<CreateMediaCommand, CreatedResponseDto>

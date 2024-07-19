@@ -4,9 +4,6 @@ namespace Educar.Backend.Application.Common.Interfaces;
 
 public interface IApplicationDbContext
 {
-    DbSet<Domain.Entities.TodoList> TodoLists { get; }
-
-    DbSet<TodoItem> TodoItems { get; }
     DbSet<Contract> Contracts { get; }
     DbSet<Client> Clients { get; }
     DbSet<Account> Accounts { get; }

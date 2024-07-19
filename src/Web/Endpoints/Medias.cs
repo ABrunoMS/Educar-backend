@@ -1,6 +1,8 @@
 using Educar.Backend.Application.Commands;
 using Educar.Backend.Application.Commands.Media.CreateMedia;
+using Educar.Backend.Application.Commands.Media.UpdateMedia;
 using Educar.Backend.Application.Commands.Media.UploadFileCommand;
+using Educar.Backend.Application.Queries.Media;
 using Educar.Backend.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
@@ -14,11 +16,12 @@ public class Medias : EndpointGroupBase
         app.MapGroup(this)
             .RequireAuthorization(UserRole.Teacher.GetDisplayName())
             .MapPostWithAccepts<IFormFile>(UploadMedia, "upload")
-            .MapPost(CreateMedia);
-        // .MapGet(GetAccount, "{id}")
+            .MapPost(CreateMedia)
+            .MapPut(UpdateMedia, "{id}")
+            .MapGet(GetMedia, "{id}");
         // .MapGet(GetAllAccountsBySchool, "school/{clientId}")
         // .MapGet(GetAllAccounts)
-        // .MapPut(UpdateAccount, "{id}")
+
         // .MapDelete(DeleteAccount, "{id}");
     }
 
@@ -34,10 +37,11 @@ public class Medias : EndpointGroupBase
         return sender.Send(command);
     }
 
-    // public async Task<AccountDto> GetAccount(ISender sender, Guid id)
-    // {
-    //     return await sender.Send(new GetAccountQuery { Id = id });
-    // }
+    public async Task<MediaDto> GetMedia(ISender sender, Guid id)
+    {
+        return await sender.Send(new GetMediaQuery { Id = id });
+    }
+
     //
     // public Task<PaginatedList<AccountDto>> GetAllAccounts(ISender sender, [AsParameters] PaginatedQuery paginatedQuery)
     // {
@@ -68,10 +72,10 @@ public class Medias : EndpointGroupBase
     //     return Results.NoContent();
     // }
     //
-    // public async Task<IResult> UpdateAccount(ISender sender, Guid id, UpdateAccountCommand command)
-    // {
-    //     command.Id = id;
-    //     await sender.Send(command);
-    //     return Results.NoContent();
-    // }
+    public async Task<IResult> UpdateMedia(ISender sender, Guid id, UpdateMediaCommand command)
+    {
+        command.Id = id;
+        await sender.Send(command);
+        return Results.NoContent();
+    }
 }
