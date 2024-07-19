@@ -1,3 +1,5 @@
+using Educar.Backend.Domain.Enums;
+
 namespace Educar.Backend.Application.Commands.Media.CreateMedia;
 
 public class CreateMediaCommandValidator : AbstractValidator<CreateMediaCommand>
@@ -11,8 +13,8 @@ public class CreateMediaCommandValidator : AbstractValidator<CreateMediaCommand>
         RuleFor(x => x.Url)
             .NotEmpty().WithMessage("Url is required.")
             .Must(BeAValidUrl).WithMessage("Url is not a valid URL.");
-        RuleFor(x => x.Purpose).NotEmpty().WithMessage("Purpose is required.");
-        RuleFor(x => x.Type).NotEmpty().WithMessage("Type is required.");
+        RuleFor(x => x.Purpose).NotEqual(MediaPurpose.None).WithMessage("Purpose is required.");
+        RuleFor(x => x.Type).NotEqual(MediaType.None).WithMessage("Type is required.");
         RuleFor(x => x.Agreement).Equal(true).WithMessage("Agreement must be accepted.");
         RuleFor(x => x.Author).MaximumLength(100).WithMessage("Author must be at most 100 characters.");
     }

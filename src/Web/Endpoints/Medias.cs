@@ -3,6 +3,7 @@ using Educar.Backend.Application.Commands.Media.CreateMedia;
 using Educar.Backend.Application.Commands.Media.DeleteMedia;
 using Educar.Backend.Application.Commands.Media.UpdateMedia;
 using Educar.Backend.Application.Commands.Media.UploadFileCommand;
+using Educar.Backend.Application.Common.Models;
 using Educar.Backend.Application.Queries.Media;
 using Educar.Backend.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -19,10 +20,9 @@ public class Medias : EndpointGroupBase
             .MapPostWithAccepts<IFormFile>(UploadMedia, "upload")
             .MapPost(CreateMedia)
             .MapPut(UpdateMedia, "{id}")
+            .MapGet(GetMediasByTypeAndPurpose)
             .MapGet(GetMedia, "{id}")
             .MapDelete(DeleteMedia, "{id}");
-        // .MapGet(GetAllAccountsBySchool, "school/{clientId}")
-        // .MapGet(GetAllAccounts)
     }
 
     public Task<UploadResponseDto> UploadMedia(ISender sender, [FromForm] IFormFile file)
@@ -42,30 +42,21 @@ public class Medias : EndpointGroupBase
         return await sender.Send(new GetMediaQuery { Id = id });
     }
 
-    //
-    // public Task<PaginatedList<AccountDto>> GetAllAccounts(ISender sender, [AsParameters] PaginatedQuery paginatedQuery)
-    // {
-    //     var query = new GetAccountsPaginatedQuery
-    //     {
-    //         PageNumber = paginatedQuery.PageNumber,
-    //         PageSize = paginatedQuery.PageSize
-    //     };
-    //
-    //     return sender.Send(query);
-    // }
-    //
-    // public Task<PaginatedList<AccountDto>> GetAllAccountsBySchool(ISender sender,
-    //     Guid clientId, [AsParameters] PaginatedQuery paginatedQuery)
-    // {
-    //     var query = new GetAccountsBySchoolPaginatedQuery(clientId)
-    //     {
-    //         PageNumber = paginatedQuery.PageNumber,
-    //         PageSize = paginatedQuery.PageSize
-    //     };
-    //
-    //     return sender.Send(query);
-    // }
-    //
+    public Task<PaginatedList<MediaDto>> GetMediasByTypeAndPurpose(ISender sender,
+        [FromQuery(Name = "purpose")] MediaPurpose? purpose,
+        [FromQuery(Name = "type")] MediaType? type, [AsParameters] PaginatedQuery paginatedQuery)
+    {
+        var query = new GetMediaByPurposeAndTypePaginatedQuery
+        {
+            PageNumber = paginatedQuery.PageNumber,
+            PageSize = paginatedQuery.PageSize,
+            Purpose = purpose,
+            Type = type
+        };
+
+        return sender.Send(query);
+    }
+
     public async Task<IResult> DeleteMedia(ISender sender, Guid id)
     {
         await sender.Send(new DeleteMediaCommand(id));

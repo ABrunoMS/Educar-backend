@@ -52,4 +52,124 @@ public class GetMediaTests : TestBase
 
         Assert.ThrowsAsync<NotFoundException>(async () => await SendAsync(query));
     }
+
+    [Test]
+    public async Task GivenBothPurposeAndType_ShouldReturnFilteredMedia()
+    {
+        // Arrange
+        var command1 = new CreateMediaCommand("Media 1", "ObjectName1", "https://example.com/media1", MediaPurpose.Game,
+            MediaType.Image, true);
+        var command2 = new CreateMediaCommand("Media 2", "ObjectName2", "https://example.com/media2", MediaPurpose.Game,
+            MediaType.Video, true);
+        var command3 = new CreateMediaCommand("Media 3", "ObjectName3", "https://example.com/media3",
+            MediaPurpose.Quest, MediaType.Image, true);
+        await SendAsync(command1);
+        await SendAsync(command2);
+        await SendAsync(command3);
+
+        var query = new GetMediaByPurposeAndTypePaginatedQuery
+        {
+            Purpose = MediaPurpose.Game,
+            Type = MediaType.Image,
+            PageNumber = 1,
+            PageSize = 10
+        };
+
+        // Act
+        var result = await SendAsync(query);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Items, Has.Count.EqualTo(1));
+        Assert.That(result.Items.First().Name, Is.EqualTo("Media 1"));
+    }
+
+    [Test]
+    public async Task GivenOnlyPurpose_ShouldReturnFilteredMedia()
+    {
+        // Arrange
+        var command1 = new CreateMediaCommand("Media 1", "ObjectName1", "https://example.com/media1", MediaPurpose.Game,
+            MediaType.Image, true);
+        var command2 = new CreateMediaCommand("Media 2", "ObjectName2", "https://example.com/media2", MediaPurpose.Game,
+            MediaType.Video, true);
+        var command3 = new CreateMediaCommand("Media 3", "ObjectName3", "https://example.com/media3",
+            MediaPurpose.Quest,
+            MediaType.Image, true);
+        await SendAsync(command1);
+        await SendAsync(command2);
+        await SendAsync(command3);
+
+        var query = new GetMediaByPurposeAndTypePaginatedQuery
+        {
+            Purpose = MediaPurpose.Game,
+            PageNumber = 1,
+            PageSize = 10
+        };
+
+        // Act
+        var result = await SendAsync(query);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Items, Has.Count.EqualTo(2));
+    }
+
+    [Test]
+    public async Task GivenOnlyType_ShouldReturnFilteredMedia()
+    {
+        // Arrange
+        var command1 = new CreateMediaCommand("Media 1", "ObjectName1", "https://example.com/media1", MediaPurpose.Game,
+            MediaType.Image, true);
+        var command2 = new CreateMediaCommand("Media 2", "ObjectName2", "https://example.com/media2", MediaPurpose.Game,
+            MediaType.Video, true);
+        var command3 = new CreateMediaCommand("Media 3", "ObjectName3", "https://example.com/media3",
+            MediaPurpose.Quest,
+            MediaType.Image, true);
+        await SendAsync(command1);
+        await SendAsync(command2);
+        await SendAsync(command3);
+
+        var query = new GetMediaByPurposeAndTypePaginatedQuery
+        {
+            Type = MediaType.Image,
+            PageNumber = 1,
+            PageSize = 10
+        };
+
+        // Act
+        var result = await SendAsync(query);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Items, Has.Count.EqualTo(2));
+    }
+
+    [Test]
+    public async Task GivenNeitherPurposeNorType_ShouldReturnAllMedia()
+    {
+        // Arrange
+        var command1 = new CreateMediaCommand("Media 1", "ObjectName1", "https://example.com/media1", MediaPurpose.Game,
+            MediaType.Image, true);
+        var command2 = new CreateMediaCommand("Media 2", "ObjectName2", "https://example.com/media2", MediaPurpose.Game,
+            MediaType.Video, true);
+        var command3 = new CreateMediaCommand("Media 3", "ObjectName3", "https://example.com/media3",
+            MediaPurpose.Quest,
+            MediaType.Image, true);
+        await SendAsync(command1);
+        await SendAsync(command2);
+        await SendAsync(command3);
+
+        var query = new GetMediaByPurposeAndTypePaginatedQuery
+        {
+            PageNumber = 1,
+            PageSize = 10
+        };
+
+        // Act
+        var result = await SendAsync(query);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Items, Has.Count.EqualTo(3));
+    }
 }

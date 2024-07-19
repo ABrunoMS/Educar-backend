@@ -1,3 +1,5 @@
+using Educar.Backend.Domain.Enums;
+
 namespace Educar.Backend.Application.Commands.Contract.CreateContract;
 
 public class CreateContractCommandValidator : AbstractValidator<CreateContractCommand>
@@ -21,6 +23,7 @@ public class CreateContractCommandValidator : AbstractValidator<CreateContractCo
             .GreaterThan(0).WithMessage("TotalAccounts must be greater than 0.");
 
         RuleFor(v => v.Status)
-            .IsInEnum().WithMessage("Status must be a valid ContractStatus.");
+            .IsInEnum().WithMessage("Status must be a valid ContractStatus.")
+            .NotEqual(ContractStatus.None).WithMessage("Status is required.");
     }
 }

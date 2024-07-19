@@ -106,7 +106,7 @@ public class CreateMediaTests : TestBase
     }
 
     [Test]
-    public void ShouldThrowValidationException_WhenPurposeIsEmpty()
+    public void ShouldThrowValidationException_WhenPurposeIsNull()
     {
         var command = new CreateMediaCommand("Media Name", "ObjectName", "https://example.com/media",
             default(MediaPurpose), MediaType.Image, true);
