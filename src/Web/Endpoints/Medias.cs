@@ -1,5 +1,6 @@
 using Educar.Backend.Application.Commands;
 using Educar.Backend.Application.Commands.Media.CreateMedia;
+using Educar.Backend.Application.Commands.Media.DeleteMedia;
 using Educar.Backend.Application.Commands.Media.UpdateMedia;
 using Educar.Backend.Application.Commands.Media.UploadFileCommand;
 using Educar.Backend.Application.Queries.Media;
@@ -18,11 +19,10 @@ public class Medias : EndpointGroupBase
             .MapPostWithAccepts<IFormFile>(UploadMedia, "upload")
             .MapPost(CreateMedia)
             .MapPut(UpdateMedia, "{id}")
-            .MapGet(GetMedia, "{id}");
+            .MapGet(GetMedia, "{id}")
+            .MapDelete(DeleteMedia, "{id}");
         // .MapGet(GetAllAccountsBySchool, "school/{clientId}")
         // .MapGet(GetAllAccounts)
-
-        // .MapDelete(DeleteAccount, "{id}");
     }
 
     public Task<UploadResponseDto> UploadMedia(ISender sender, [FromForm] IFormFile file)
@@ -66,12 +66,12 @@ public class Medias : EndpointGroupBase
     //     return sender.Send(query);
     // }
     //
-    // public async Task<IResult> DeleteAccount(ISender sender, Guid id)
-    // {
-    //     await sender.Send(new DeleteAccountCommand(id));
-    //     return Results.NoContent();
-    // }
-    //
+    public async Task<IResult> DeleteMedia(ISender sender, Guid id)
+    {
+        await sender.Send(new DeleteMediaCommand(id));
+        return Results.NoContent();
+    }
+
     public async Task<IResult> UpdateMedia(ISender sender, Guid id, UpdateMediaCommand command)
     {
         command.Id = id;
