@@ -35,6 +35,9 @@ public class CreateMediaTests : TestBase
             References = references,
             Author = author
         };
+        
+        // Mock the current user
+        MockCurrentUser.Setup(user => user.Id).Returns(Guid.NewGuid().ToString());
 
         // Act
         var response = await SendAsync(command);

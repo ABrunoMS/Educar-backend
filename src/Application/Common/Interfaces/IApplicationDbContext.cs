@@ -11,6 +11,7 @@ public interface IApplicationDbContext
     DbSet<Address> Addresses { get; }
     DbSet<School> Schools { get; }
     DbSet<Media> Medias { get; }
+    DbSet<MediaLog> MediaLogs { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

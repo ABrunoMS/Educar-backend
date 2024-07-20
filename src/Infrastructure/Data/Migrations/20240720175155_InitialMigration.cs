@@ -207,6 +207,40 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         principalColumn: "id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "media_logs",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    account_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    media_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    action = table.Column<string>(type: "text", nullable: false),
+                    current_state = table.Column<string>(type: "jsonb", nullable: false),
+                    previous_state = table.Column<string>(type: "jsonb", nullable: true),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<string>(type: "text", nullable: true),
+                    last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    last_modified_by = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_media_logs", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_media_logs_accounts_account_id",
+                        column: x => x.account_id,
+                        principalTable: "accounts",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_media_logs_medias_media_id",
+                        column: x => x.media_id,
+                        principalTable: "medias",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_accounts_client_id",
                 table: "accounts",
@@ -240,6 +274,16 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_media_logs_account_id",
+                table: "media_logs",
+                column: "account_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_media_logs_media_id",
+                table: "media_logs",
+                column: "media_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_schools_address_id",
                 table: "schools",
                 column: "address_id");
@@ -254,19 +298,22 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "accounts");
+                name: "contracts");
 
             migrationBuilder.DropTable(
-                name: "contracts");
+                name: "media_logs");
+
+            migrationBuilder.DropTable(
+                name: "games");
+
+            migrationBuilder.DropTable(
+                name: "accounts");
 
             migrationBuilder.DropTable(
                 name: "medias");
 
             migrationBuilder.DropTable(
                 name: "schools");
-
-            migrationBuilder.DropTable(
-                name: "games");
 
             migrationBuilder.DropTable(
                 name: "addresses");

@@ -3,6 +3,7 @@ using System.Reflection;
 using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Application.Extensions;
 using Educar.Backend.Domain.Entities;
+using Educar.Backend.Infrastructure.Data.Extensions;
 using Humanizer;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,10 +19,13 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Address> Addresses => Set<Address>();
     public DbSet<School> Schools => Set<School>();
     public DbSet<Media> Medias => Set<Media>();
+    public DbSet<MediaLog> MediaLogs => Set<MediaLog>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        builder.ApplyCustomConfigurationsFromAssembly(Assembly.GetExecutingAssembly(), Database);
+        
+        // builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
         base.OnModelCreating(builder);
 

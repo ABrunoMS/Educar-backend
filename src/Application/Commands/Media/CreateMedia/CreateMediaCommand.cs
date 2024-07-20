@@ -15,7 +15,7 @@ public record CreateMediaCommand(
     string? Author = null)
     : IRequest<CreatedResponseDto>;
 
-public class CreateMediaCommandHandler(IApplicationDbContext context)
+public class CreateMediaCommandHandler(IApplicationDbContext context, IUser currentUser)
     : IRequestHandler<CreateMediaCommand, CreatedResponseDto>
 {
     public async Task<CreatedResponseDto> Handle(CreateMediaCommand request, CancellationToken cancellationToken)
@@ -27,7 +27,9 @@ public class CreateMediaCommandHandler(IApplicationDbContext context)
             Author = request.Author
         };
 
-        entity.AddDomainEvent(new MediaCreatedEvent(entity));
+        if (currentUser.Id == null) throw new Exception("Couldn't get current user Id");
+
+        entity.AddDomainEvent(new MediaCreatedEvent(entity, Guid.Parse(currentUser.Id)));
         context.Medias.Add(entity);
         await context.SaveChangesAsync(cancellationToken);
 

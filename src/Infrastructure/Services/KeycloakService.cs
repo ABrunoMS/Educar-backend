@@ -15,6 +15,7 @@ public class KeycloakService : IIdentityService
     private const string ContentType = "application/json";
     private string _accessToken = "";
     private readonly AuthOptions _authOptions;
+    private readonly InitDataOptions _initDataOptions;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<KeycloakService> _logger;
 
@@ -24,9 +25,10 @@ public class KeycloakService : IIdentityService
         _httpClientFactory = httpClientFactory;
         _logger = logger;
         _authOptions = configuration.GetAuthOptions();
+        _initDataOptions = configuration.GetInitDataOptions();
     }
 
-    public async Task<Guid> CreateUser(string email, string name, UserRole role, CancellationToken cancellationToken)
+    public async Task<Guid> CreateUser(string kcEmail, string name, UserRole role, CancellationToken cancellationToken)
     {
         await PopulateToken(cancellationToken);
 
@@ -36,28 +38,41 @@ public class KeycloakService : IIdentityService
         {
             var url = $"{_authOptions.AdminUrl}/users";
             var randomPassword = GenerateRandomPassword();
+            var creds = new[]
+            {
+                new
+                {
+                    temporary = true,
+                    type = "password",
+                    value = randomPassword
+                }
+            };
+            if (role.Equals(UserRole.Admin))
+            {
+                creds =
+                [
+                    new
+                    {
+                        temporary = false,
+                        type = "password",
+                        value = _initDataOptions.DefaultAdminPassword
+                    }
+                ];
+            }
 
             var payload = JsonSerializer.Serialize(new
             {
-                username = email,
-                firstName = name,
-                lastName = string.Empty,
+                username = kcEmail,
+                email = kcEmail,
                 enabled = true,
-                credentials = new[]
-                {
-                    new
-                    {
-                        temporary = true,
-                        type = "password",
-                        value = randomPassword
-                    }
-                }
+                emailVerified = true,
+                credentials = creds
             });
 
             var response = await SendRequest(HttpMethod.Post, url, payload, cancellationToken);
             response.EnsureSuccessStatusCode();
 
-            userId = await GetUserIdByUsername(email, cancellationToken);
+            userId = await GetUserIdByUsername(kcEmail, cancellationToken);
 
             // Assign role to user
             await AssignRoleToUser(userId, role.ToString(), cancellationToken);

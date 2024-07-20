@@ -1,3 +1,5 @@
+using System.Text.Json;
+using Educar.Backend.Application.Common.Extensions;
 using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Domain.Enums;
 using Educar.Backend.Domain.Events;
@@ -17,15 +19,20 @@ public class UpdateMediaCommand : IRequest<Unit>
     public string? ObjectName { get; set; }
 }
 
-public class UpdateMediaCommandHandler(IApplicationDbContext context, IObjectStorage objectStorage)
+public class UpdateMediaCommandHandler(IApplicationDbContext context, IObjectStorage objectStorage, IUser currentUser)
     : IRequestHandler<UpdateMediaCommand, Unit>
 {
     public async Task<Unit> Handle(UpdateMediaCommand request, CancellationToken cancellationToken)
     {
+        if (currentUser.Id == null) throw new Exception("Couldn't get current user Id");
+
         var entity = await context.Medias
             .Where(a => a.Id == request.Id)
             .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
         Guard.Against.NotFound(request.Id, entity);
+
+        //get the state before any changes
+        var previousState = entity.ToJsonObject();
 
         if (request.ObjectName != null && !request.ObjectName.Equals(entity.ObjectName))
         {
@@ -42,7 +49,7 @@ public class UpdateMediaCommandHandler(IApplicationDbContext context, IObjectSto
         entity.Url = request.Url ?? entity.Url;
         entity.ObjectName = request.ObjectName ?? entity.ObjectName;
 
-        entity.AddDomainEvent(new MediaUpdatedEvent(entity));
+        entity.AddDomainEvent(new MediaUpdatedEvent(entity, Guid.Parse(currentUser.Id), previousState));
         await context.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;

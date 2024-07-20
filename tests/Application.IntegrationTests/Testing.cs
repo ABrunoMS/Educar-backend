@@ -5,7 +5,6 @@ using Educar.Backend.Infrastructure.Data.Interceptors;
 using Educar.Backend.Web;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -20,6 +19,7 @@ public class Testing
     private static ServiceProvider ServiceProvider { get; set; } = null!;
     public static ApplicationDbContext Context { get; private set; } = null!;
     public static Mock<IObjectStorage> MockObjectStorage { get; private set; } = null!;
+    public static Mock<IUser> MockCurrentUser { get; private set; } = null!;
 
     [OneTimeSetUp]
     public void SetUp()
@@ -47,6 +47,10 @@ public class Testing
         // Mock the IObjectStorage
         MockObjectStorage = new Mock<IObjectStorage>();
         services.AddSingleton(MockObjectStorage.Object);
+        
+        // Mock the IUser
+        MockCurrentUser = new Mock<IUser>();
+        services.AddSingleton(MockCurrentUser.Object);
 
         ServiceProvider = services.BuildServiceProvider();
         Context = ServiceProvider.GetRequiredService<ApplicationDbContext>();

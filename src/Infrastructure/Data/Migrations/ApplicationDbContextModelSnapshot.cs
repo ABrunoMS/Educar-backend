@@ -108,7 +108,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("SchoolId");
 
-                    b.ToTable("accounts", (string)null);
+                    b.ToTable("accounts");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Address", b =>
@@ -182,7 +182,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("addresses", (string)null);
+                    b.ToTable("addresses");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Client", b =>
@@ -227,7 +227,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("clients", (string)null);
+                    b.ToTable("clients");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Contract", b =>
@@ -443,6 +443,68 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.ToTable("medias");
                 });
 
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.MediaLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("account_id");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("action");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<string>("CurrentState")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("current_state");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<Guid>("MediaId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("media_id");
+
+                    b.Property<string>("PreviousState")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("previous_state");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("MediaId");
+
+                    b.ToTable("media_logs");
+                });
+
             modelBuilder.Entity("Educar.Backend.Domain.Entities.School", b =>
                 {
                     b.Property<Guid>("Id")
@@ -534,6 +596,25 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("Client");
 
                     b.Navigation("Game");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.MediaLog", b =>
+                {
+                    b.HasOne("Educar.Backend.Domain.Entities.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Educar.Backend.Domain.Entities.Media", "Media")
+                        .WithMany()
+                        .HasForeignKey("MediaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("Media");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.School", b =>

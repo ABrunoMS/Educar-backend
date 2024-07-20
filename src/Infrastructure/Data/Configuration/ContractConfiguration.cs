@@ -1,11 +1,14 @@
 using Educar.Backend.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Educar.Backend.Infrastructure.Data.Configuration;
 
-public class ContractConfiguration : IEntityTypeConfiguration<Contract>
+public class ContractConfiguration(DatabaseFacade database) : IEntityTypeConfiguration<Contract>
 {
+    private readonly DatabaseFacade _database = database;
+    
     public void Configure(EntityTypeBuilder<Contract> builder)
     {
         builder.Property(t => t.ContractDurationInYears).IsRequired();
