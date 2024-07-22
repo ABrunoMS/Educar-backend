@@ -918,6 +918,63 @@
         ]
       }
     },
+    "/api/MediaLogs/media/{mediaId}": {
+      "get": {
+        "tags": [
+          "MediaLogs"
+        ],
+        "operationId": "GetAllMediaLogsByMedia",
+        "parameters": [
+          {
+            "name": "mediaId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "page_number",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedListOfMediaLogDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/Medias/upload": {
       "post": {
         "tags": [
@@ -984,6 +1041,77 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CreatedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Medias"
+        ],
+        "operationId": "GetMediasByTypeAndPurpose",
+        "parameters": [
+          {
+            "name": "purpose",
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaPurpose"
+                }
+              ]
+            },
+            "x-position": 1
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaType"
+                }
+              ]
+            },
+            "x-position": 2
+          },
+          {
+            "name": "page_number",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 3
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedListOfMediaDto"
                 }
               }
             }
@@ -1064,6 +1192,34 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Medias"
+        ],
+        "operationId": "DeleteMedia",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
           }
         },
         "security": [
@@ -1744,11 +1900,13 @@
         "type": "string",
         "description": "",
         "x-enumNames": [
+          "None",
           "Signed",
           "Expired",
           "Canceled"
         ],
         "enum": [
+          "None",
           "Signed",
           "Expired",
           "Canceled"
@@ -2011,6 +2169,141 @@
           }
         }
       },
+      "PaginatedListOfMediaLogDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaLogDto"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hasPreviousPage": {
+            "type": "boolean"
+          },
+          "hasNextPage": {
+            "type": "boolean"
+          }
+        }
+      },
+      "MediaLogDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "account": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AccountDto"
+              }
+            ]
+          },
+          "action": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AuditableAction"
+              }
+            ]
+          },
+          "currentState": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/KeyValuePairOfStringAndJsonNode"
+            }
+          },
+          "previousState": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/KeyValuePairOfStringAndJsonNode"
+            }
+          }
+        }
+      },
+      "AuditableAction": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "None",
+          "Create",
+          "Update",
+          "Delete"
+        ],
+        "enum": [
+          "None",
+          "Create",
+          "Update",
+          "Delete"
+        ]
+      },
+      "KeyValuePairOfStringAndJsonNode": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "type": "string",
+            "nullable": true
+          },
+          "value": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            ]
+          }
+        }
+      },
+      "JsonNode": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "options": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/JsonNodeOptions"
+              }
+            ]
+          },
+          "parent": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            ]
+          },
+          "root": {
+            "$ref": "#/components/schemas/JsonNode"
+          }
+        }
+      },
+      "JsonNodeOptions": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "propertyNameCaseInsensitive": {
+            "type": "boolean"
+          }
+        }
+      },
       "UploadResponseDto": {
         "type": "object",
         "additionalProperties": false,
@@ -2059,12 +2352,14 @@
         "type": "string",
         "description": "",
         "x-enumNames": [
+          "None",
           "Quest",
           "Map",
           "Game",
           "ClientAdvertisement"
         ],
         "enum": [
+          "None",
           "Quest",
           "Map",
           "Game",
@@ -2075,12 +2370,14 @@
         "type": "string",
         "description": "",
         "x-enumNames": [
+          "None",
           "Document",
           "Image",
           "Video",
           "Audio"
         ],
         "enum": [
+          "None",
           "Document",
           "Image",
           "Video",
@@ -2134,6 +2431,36 @@
           "objectName": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "PaginatedListOfMediaDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaDto"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hasPreviousPage": {
+            "type": "boolean"
+          },
+          "hasNextPage": {
+            "type": "boolean"
           }
         }
       },

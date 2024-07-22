@@ -154,7 +154,8 @@ public class KeycloakService : IIdentityService
 
     private async Task<Guid> GetUserIdByUsername(string username, CancellationToken cancellationToken)
     {
-        var url = $"{_authOptions.AdminUrl}/users?username={username}";
+        var encodedUsername = WebUtility.UrlEncode(username);
+        var url = $"{_authOptions.AdminUrl}/users?username={encodedUsername}";
         var response = await SendRequest(HttpMethod.Get, url, null, cancellationToken);
         response.EnsureSuccessStatusCode();
 
@@ -223,6 +224,55 @@ public class KeycloakService : IIdentityService
     {
         var userpass = $"{clientId}:{clientSecret}";
         return Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes(userpass));
+    }
+
+    private async Task<bool> SetActions(string userId, IList<string> actions, CancellationToken cancellationToken)
+    {
+        await PopulateToken(cancellationToken);
+
+        try
+        {
+            var url = $"{_authOptions.AdminUrl}/users/{userId}";
+            var payload = JsonSerializer.Serialize(new
+            {
+                requiredActions = actions
+            });
+
+            var response = await SendRequest(HttpMethod.Put, url, payload, cancellationToken);
+            response.EnsureSuccessStatusCode();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error setting required actions in Keycloak");
+            return false;
+        }
+    }
+
+    public async Task<bool> TriggerPasswordReset(string username, CancellationToken cancellationToken)
+    {
+        await PopulateToken(cancellationToken);
+
+        try
+        {
+            var userId = await GetUserIdByUsername(username, cancellationToken);
+            if (userId == Guid.Empty) return false;
+
+            var actions = new[] { "UPDATE_PASSWORD" };
+            // await SetActions(userId.ToString(), actions, cancellationToken);
+
+            var url = $"{_authOptions.AdminUrl}/users/{userId}/execute-actions-email";
+            var payload = JsonSerializer.Serialize(actions);
+
+            var response = await SendRequest(HttpMethod.Put, url, payload, cancellationToken);
+            response.EnsureSuccessStatusCode();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error triggering password reset email in Keycloak");
+            return false;
+        }
     }
 
     private string GenerateRandomPassword()

@@ -1,6 +1,7 @@
 using Educar.Backend.Application.Commands;
 using Educar.Backend.Application.Commands.Account.CreateAccount;
 using Educar.Backend.Application.Commands.Account.DeleteAccount;
+using Educar.Backend.Application.Commands.Account.ResetPassword;
 using Educar.Backend.Application.Commands.Account.UpdateAccount;
 using Educar.Backend.Application.Common.Models;
 using Educar.Backend.Application.Queries.Account;
@@ -17,10 +18,14 @@ public class Accounts : EndpointGroupBase
             .RequireAuthorization(UserRole.Admin.GetDisplayName())
             .MapPost(CreateAccount)
             .MapGet(GetAccount, "{id}")
-            .MapGet(GetAllAccountsBySchool, "school/{clientId}")
+            .MapGet(GetAllAccountsBySchool, "school/{schoolId}")
             .MapGet(GetAllAccounts)
             .MapPut(UpdateAccount, "{id}")
             .MapDelete(DeleteAccount, "{id}");
+
+        app.MapGroup(this)
+            .RequireAuthorization(UserRole.Student.GetDisplayName())
+            .MapPut(ForgotPassword, "forgot-password/{email}");
     }
 
     public Task<CreatedResponseDto> CreateAccount(ISender sender, CreateAccountCommand command)
@@ -45,9 +50,9 @@ public class Accounts : EndpointGroupBase
     }
 
     public Task<PaginatedList<AccountDto>> GetAllAccountsBySchool(ISender sender,
-        Guid clientId, [AsParameters] PaginatedQuery paginatedQuery)
+        Guid schoolId, [AsParameters] PaginatedQuery paginatedQuery)
     {
-        var query = new GetAccountsBySchoolPaginatedQuery(clientId)
+        var query = new GetAccountsBySchoolPaginatedQuery(schoolId)
         {
             PageNumber = paginatedQuery.PageNumber,
             PageSize = paginatedQuery.PageSize
@@ -66,6 +71,12 @@ public class Accounts : EndpointGroupBase
     {
         command.Id = id;
         await sender.Send(command);
+        return Results.NoContent();
+    }
+
+    public async Task<IResult> ForgotPassword(ISender sender, string email)
+    {
+        await sender.Send(new ForgotPasswordCommand(email));
         return Results.NoContent();
     }
 }

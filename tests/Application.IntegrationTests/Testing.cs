@@ -20,6 +20,7 @@ public class Testing
     public static ApplicationDbContext Context { get; private set; } = null!;
     public static Mock<IObjectStorage> MockObjectStorage { get; private set; } = null!;
     public static Mock<IUser> MockCurrentUser { get; private set; } = null!;
+    public static Mock<IIdentityService> MockIdentityServer { get; private set; } = null!;
 
     [OneTimeSetUp]
     public void SetUp()
@@ -51,6 +52,9 @@ public class Testing
         // Mock the IUser
         MockCurrentUser = new Mock<IUser>();
         services.AddSingleton(MockCurrentUser.Object);
+        
+        MockIdentityServer = new Mock<IIdentityService>();
+        services.AddSingleton(MockIdentityServer.Object);
 
         ServiceProvider = services.BuildServiceProvider();
         Context = ServiceProvider.GetRequiredService<ApplicationDbContext>();
