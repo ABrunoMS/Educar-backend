@@ -43,15 +43,32 @@ public class CreateAccountCommandValidator : AbstractValidator<CreateAccountComm
         RuleFor(v => v.Role)
             .NotNull().WithMessage("Role is required.")
             .IsInEnum().WithMessage("Role must be a valid enum value.");
-        
+
         RuleFor(v => v.SchoolId)
             .NotEmpty().WithMessage("School ID is required.")
             .When(v => v.Role != UserRole.Admin).WithMessage("School ID is required for non-admin roles.");
+
+        RuleFor(v => v.ClassIds)
+            .NotEmpty().WithMessage("Class IDs are required.")
+            .When(v => v.Role != UserRole.Admin).WithMessage("Class IDs are required for non-admin roles.")
+            .MustAsync(BeValidClassIds).WithMessage("One or more Class IDs are invalid.");
     }
 
     public async Task<bool> BeUniqueTitle(string email, CancellationToken cancellationToken)
     {
         return await _context.Accounts
             .AllAsync(l => l.Email != email, cancellationToken);
+    }
+
+    private async Task<bool> BeValidClassIds(List<Guid>? classIds, CancellationToken cancellationToken)
+    {
+        if (classIds == null || classIds.Count == 0) return true;
+
+        var validClassIds = await _context.Classes
+            .Where(c => classIds.Contains(c.Id))
+            .Select(c => c.Id)
+            .ToListAsync(cancellationToken);
+
+        return classIds.All(id => validClassIds.Contains(id));
     }
 }

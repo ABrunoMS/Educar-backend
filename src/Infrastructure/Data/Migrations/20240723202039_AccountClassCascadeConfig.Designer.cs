@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Educar.Backend.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240720175155_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20240723202039_AccountClassCascadeConfig")]
+    partial class AccountClassCascadeConfig
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -114,6 +114,31 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.ToTable("accounts");
                 });
 
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.AccountClass", b =>
+                {
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("account_id");
+
+                    b.Property<Guid>("ClassId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("class_id");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.HasKey("AccountId", "ClassId");
+
+                    b.HasIndex("ClassId");
+
+                    b.ToTable("account_classes");
+                });
+
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Address", b =>
                 {
                     b.Property<Guid>("Id")
@@ -186,6 +211,64 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("addresses");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Class", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Purpose")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("purpose");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("school_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SchoolId");
+
+                    b.ToTable("classes");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Client", b =>
@@ -582,6 +665,36 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("School");
                 });
 
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.AccountClass", b =>
+                {
+                    b.HasOne("Educar.Backend.Domain.Entities.Account", "Account")
+                        .WithMany("AccountClasses")
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Educar.Backend.Domain.Entities.Class", "Class")
+                        .WithMany("AccountClasses")
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("Class");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Class", b =>
+                {
+                    b.HasOne("Educar.Backend.Domain.Entities.School", "School")
+                        .WithMany()
+                        .HasForeignKey("SchoolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("School");
+                });
+
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Contract", b =>
                 {
                     b.HasOne("Educar.Backend.Domain.Entities.Client", "Client")
@@ -635,6 +748,16 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("Address");
 
                     b.Navigation("Client");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Account", b =>
+                {
+                    b.Navigation("AccountClasses");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Class", b =>
+                {
+                    b.Navigation("AccountClasses");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Client", b =>

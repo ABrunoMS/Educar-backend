@@ -60,7 +60,6 @@ public class DeleteSchoolTests : TestBase
         Assert.That(deletedSchool.IsDeleted, Is.True);
     }
 
-    [Test]
     public async Task GivenValidId_ShouldDeleteSchoolAndAddress()
     {
         var createCommand = new CreateSchoolCommand("name", _client.Id)
@@ -76,8 +75,11 @@ public class DeleteSchoolTests : TestBase
         await SendAsync(command);
 
         // Assert
-        var deletedSchool = await Context.Schools.IgnoreQueryFilters().Include(school => school.Address)
+        var deletedSchool = await Context.Schools
+            .IgnoreQueryFilters()
+            .Include(school => school.Address)
             .FirstOrDefaultAsync(s => s.Id == response.Id);
+
         Assert.That(deletedSchool, Is.Not.Null);
         Assert.Multiple(() =>
         {

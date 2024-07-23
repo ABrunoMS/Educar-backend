@@ -14,6 +14,9 @@ namespace Educar.Backend.Application.IntegrationTests.Account;
 public class CreateAccountTests : TestBase
 {
     private Domain.Entities.Client _client;
+    private Domain.Entities.School _school;
+    private Domain.Entities.Class _class1;
+    private Domain.Entities.Class _class2;
 
     [SetUp]
     public void SetUp()
@@ -22,6 +25,20 @@ public class CreateAccountTests : TestBase
 
         _client = new Domain.Entities.Client("Existing Client");
         Context.Clients.Add(_client);
+
+        _school = new Domain.Entities.School("Test School");
+        Context.Schools.Add(_school);
+
+        _class1 = new Domain.Entities.Class("Class 1", "Description 1", ClassPurpose.Default)
+        {
+            School = _school
+        };
+        _class2 = new Domain.Entities.Class("Class 2", "Description 2", ClassPurpose.Reinforcement)
+        {
+            School = _school
+        };
+        Context.Classes.AddRange(_class1, _class2);
+
         Context.SaveChanges();
     }
 
@@ -29,7 +46,6 @@ public class CreateAccountTests : TestBase
     public async Task GivenValidRequest_ShouldCreateAccount()
     {
         // Arrange
-
         var command = new CreateAccountCommand(
             Name: "New Account",
             Email: "new.account@example.com",
@@ -40,7 +56,9 @@ public class CreateAccountTests : TestBase
         {
             AverageScore = 100.50m,
             EventAverageScore = 95.75m,
-            Stars = 4
+            Stars = 4,
+            SchoolId = _school.Id,
+            ClassIds = new List<Guid> { _class1.Id, _class2.Id }
         };
 
         // Act
@@ -50,19 +68,25 @@ public class CreateAccountTests : TestBase
         Assert.That(response, Is.Not.Null);
         Assert.That(response, Is.InstanceOf<CreatedResponseDto>());
 
-        if (Context.Accounts != null)
-        {
-            var createdAccount = await Context.Accounts.FindAsync(response.Id);
-            Assert.That(createdAccount, Is.Not.Null);
-            Assert.That(createdAccount.Name, Is.EqualTo("New Account"));
-            Assert.That(createdAccount.Email, Is.EqualTo("new.account@example.com"));
-            Assert.That(createdAccount.RegistrationNumber, Is.EqualTo("123456"));
-            Assert.That(createdAccount.AverageScore, Is.EqualTo(100.50m));
-            Assert.That(createdAccount.EventAverageScore, Is.EqualTo(95.75m));
-            Assert.That(createdAccount.Stars, Is.EqualTo(4));
-            Assert.That(createdAccount.ClientId, Is.EqualTo(_client.Id));
-            Assert.That(createdAccount.Role, Is.EqualTo(UserRole.Admin));
-        }
+        var createdAccount = await Context.Accounts
+            .Include(a => a.School)
+            .Include(a => a.AccountClasses).ThenInclude(ac => ac.Class)
+            .FirstOrDefaultAsync(a => a.Id == response.Id);
+
+        Assert.That(createdAccount, Is.Not.Null);
+        Assert.That(createdAccount.Name, Is.EqualTo("New Account"));
+        Assert.That(createdAccount.Email, Is.EqualTo("new.account@example.com"));
+        Assert.That(createdAccount.RegistrationNumber, Is.EqualTo("123456"));
+        Assert.That(createdAccount.AverageScore, Is.EqualTo(100.50m));
+        Assert.That(createdAccount.EventAverageScore, Is.EqualTo(95.75m));
+        Assert.That(createdAccount.Stars, Is.EqualTo(4));
+        Assert.That(createdAccount.ClientId, Is.EqualTo(_client.Id));
+        Assert.That(createdAccount.Role, Is.EqualTo(UserRole.Admin));
+        Assert.That(createdAccount.School, Is.Not.Null);
+        Assert.That(createdAccount.School.Id, Is.EqualTo(_school.Id));
+        Assert.That(createdAccount.AccountClasses.Count, Is.EqualTo(2));
+        Assert.That(createdAccount.AccountClasses.Select(ac => ac.ClassId).ToList(),
+            Is.EquivalentTo(new List<Guid> { _class1.Id, _class2.Id }));
     }
 
     [Test]
@@ -72,7 +96,7 @@ public class CreateAccountTests : TestBase
             Name: string.Empty,
             Email: "new.account@example.com",
             RegistrationNumber: "123456",
-            ClientId: Guid.NewGuid(),
+            ClientId: _client.Id,
             Role: UserRole.Student
         );
 
@@ -86,7 +110,7 @@ public class CreateAccountTests : TestBase
             Name: "New Account",
             Email: "invalid-email",
             RegistrationNumber: "123456",
-            ClientId: Guid.NewGuid(),
+            ClientId: _client.Id,
             Role: UserRole.Student
         );
 
@@ -100,7 +124,7 @@ public class CreateAccountTests : TestBase
             Name: "New Account",
             Email: "new.account@example.com",
             RegistrationNumber: string.Empty,
-            ClientId: Guid.NewGuid(),
+            ClientId: _client.Id,
             Role: UserRole.Student
         );
 
@@ -108,21 +132,15 @@ public class CreateAccountTests : TestBase
     }
 
     [Test]
-    public async Task ShouldThrowNotFoundException_WhenClientIdIsInvalid()
+    public void ShouldThrowNotFoundException_WhenClientIdIsInvalid()
     {
-        var schoolCommand = new CreateSchoolCommand("school", _client.Id);
-        var schoolResponse = await SendAsync(schoolCommand);
-
         var command = new CreateAccountCommand(
             Name: "New Account",
             Email: "new.account@example.com",
             RegistrationNumber: "123456",
             ClientId: Guid.NewGuid(), // Invalid ClientId
-            Role: UserRole.Student
-        )
-        {
-            SchoolId = schoolResponse.Id
-        };
+            Role: UserRole.Admin
+        );
 
         Assert.ThrowsAsync<NotFoundException>(async () => await SendAsync(command));
     }
@@ -134,7 +152,7 @@ public class CreateAccountTests : TestBase
             Name: "New Account",
             Email: "new.account@example.com",
             RegistrationNumber: "123456",
-            ClientId: Guid.NewGuid(),
+            ClientId: _client.Id,
             Role: (UserRole)999 // Invalid Role
         );
 
@@ -144,24 +162,21 @@ public class CreateAccountTests : TestBase
     [Test]
     public async Task ShouldThrowValidationException_WhenEmailIsNotUnique()
     {
-        var schoolCommand = new CreateSchoolCommand("school", _client.Id);
-        var schoolResponse = await SendAsync(schoolCommand);
-
-        var oldAccountCommand = new CreateAccountCommand(
+        var existingCommand = new CreateAccountCommand(
             Name: "Existing Account",
             Email: "existing.account@example.com",
             RegistrationNumber: "123456",
             ClientId: _client.Id,
-            Role: UserRole.Student)
+            Role: UserRole.Admin
+        )
         {
             AverageScore = 100.50m,
             EventAverageScore = 95.75m,
             Stars = 4,
-            SchoolId = schoolResponse.Id
+            SchoolId = _school.Id
         };
 
-        // Act
-        await SendAsync(oldAccountCommand);
+        await SendAsync(existingCommand);
 
         var command = new CreateAccountCommand(
             Name: "New Account",
@@ -171,10 +186,9 @@ public class CreateAccountTests : TestBase
             Role: UserRole.Student
         )
         {
-            SchoolId = schoolResponse.Id
+            SchoolId = _school.Id
         };
 
-        // Act & Assert
         Assert.ThrowsAsync<ValidationException>(async () => await SendAsync(command));
     }
 
@@ -195,9 +209,6 @@ public class CreateAccountTests : TestBase
     [Test]
     public async Task ShouldNotThrowValidationException_WhenSchoolIdIsRequiredAndPresent()
     {
-        var schoolCommand = new CreateSchoolCommand("school", _client.Id);
-        var schoolResponse = await SendAsync(schoolCommand);
-
         var command = new CreateAccountCommand(
             Name: "New Account",
             Email: "new.account@example.com",
@@ -206,16 +217,23 @@ public class CreateAccountTests : TestBase
             Role: UserRole.Student // Non-admin role
         )
         {
-            SchoolId = schoolResponse.Id
+            SchoolId = _school.Id,
+            ClassIds = new List<Guid> { _class1.Id, _class2.Id }
         };
 
         var response = await SendAsync(command);
 
-        var createdAccount =
-            await Context.Accounts.Include(a => a.School).FirstOrDefaultAsync(a => a.Id == response.Id);
+        var createdAccount = await Context.Accounts
+            .Include(a => a.School)
+            .Include(a => a.AccountClasses).ThenInclude(ac => ac.Class)
+            .FirstOrDefaultAsync(a => a.Id == response.Id);
+
         Assert.That(createdAccount, Is.Not.Null);
         Assert.That(createdAccount.School, Is.Not.Null);
-        Assert.That(createdAccount.School.Id, Is.EqualTo(schoolResponse.Id));
+        Assert.That(createdAccount.School.Id, Is.EqualTo(_school.Id));
+        Assert.That(createdAccount.AccountClasses, Has.Count.EqualTo(2));
+        Assert.That(createdAccount.AccountClasses.Select(ac => ac.ClassId).ToList(),
+            Is.EquivalentTo(new List<Guid> { _class1.Id, _class2.Id }));
     }
 
     [Test]
@@ -230,5 +248,23 @@ public class CreateAccountTests : TestBase
         );
 
         Assert.DoesNotThrowAsync(async () => await SendAsync(command));
+    }
+
+    [Test]
+    public void ShouldThrowValidationException_WhenOneOrMoreClassIdsAreInvalid()
+    {
+        var command = new CreateAccountCommand(
+            Name: "New Account",
+            Email: "new.account@example.com",
+            RegistrationNumber: "123456",
+            ClientId: _client.Id,
+            Role: UserRole.Student
+        )
+        {
+            SchoolId = _school.Id,
+            ClassIds = new List<Guid> { _class1.Id, Guid.NewGuid() } // One valid and one invalid ClassId
+        };
+
+        Assert.ThrowsAsync<ValidationException>(async () => await SendAsync(command));
     }
 }

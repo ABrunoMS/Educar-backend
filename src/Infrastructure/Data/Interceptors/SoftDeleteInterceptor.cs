@@ -48,18 +48,23 @@ public class SoftDeleteInterceptor : SaveChangesInterceptor
         // Handle child entities
         foreach (var navigationEntry in entry.Navigations)
         {
+            if (!IsParent(entry, navigationEntry)) continue;
+            
             switch (navigationEntry)
             {
                 case CollectionEntry collectionEntry:
                 {
                     if (collectionEntry.CurrentValue != null)
+                    {
                         foreach (var dependentEntity in collectionEntry.CurrentValue)
                         {
                             if (dependentEntity is not ISoftDelete dependentSoftDelete ||
                                 processedEntities.Contains(dependentEntity)) continue;
+
                             var dependentEntryEntity = entry.Context.Entry(dependentSoftDelete);
                             SoftDeleteEntity(dependentEntryEntity, processedEntities);
                         }
+                    }
 
                     break;
                 }
@@ -76,5 +81,16 @@ public class SoftDeleteInterceptor : SaveChangesInterceptor
                 }
             }
         }
+    }
+
+    private bool IsParent(EntityEntry entry, NavigationEntry navigationEntry)
+    {
+        // Use EF Core metadata to determine if the current entity is the principal (parent) in the relationship
+        var entityType = entry.Metadata;
+        var navigation = entityType.FindNavigation(navigationEntry.Metadata.Name);
+        var inverseNavigation = navigation?.Inverse;
+
+        // Check if the current entity type is the principal in the relationship
+        return inverseNavigation != null && inverseNavigation.DeclaringEntityType == entityType;
     }
 }

@@ -20,11 +20,13 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<School> Schools => Set<School>();
     public DbSet<Media> Medias => Set<Media>();
     public DbSet<MediaLog> MediaLogs => Set<MediaLog>();
+    public DbSet<Class> Classes => Set<Class>();
+    public DbSet<AccountClass> AccountClasses => Set<AccountClass>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyCustomConfigurationsFromAssembly(Assembly.GetExecutingAssembly(), Database);
-        
+
         // builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
         base.OnModelCreating(builder);

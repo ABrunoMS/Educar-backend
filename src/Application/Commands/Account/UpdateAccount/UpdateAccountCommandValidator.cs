@@ -29,5 +29,6 @@ public class UpdateAccountCommandValidator : AbstractValidator<UpdateAccountComm
 
         RuleFor(v => v.Stars)
             .InclusiveBetween(0, 5).WithMessage("Stars must be between 0 and 5.");
+        
     }
 }

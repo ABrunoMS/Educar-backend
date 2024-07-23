@@ -20,5 +20,11 @@ public class AccountConfiguration(DatabaseFacade database) : IEntityTypeConfigur
         builder.Property(t => t.Stars).IsRequired();
         builder.Property(t => t.ClientId).IsRequired();
         builder.Property(t => t.Role).IsRequired().HasConversion<string>();
+
+        builder
+            .HasMany(a => a.AccountClasses)
+            .WithOne(ac => ac.Account)
+            .HasForeignKey(ac => ac.AccountId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

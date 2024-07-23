@@ -13,6 +13,8 @@ public class DeleteSchoolCommandHandler(IApplicationDbContext context) : IReques
             .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
         Guard.Against.NotFound(request.Id, entity);
 
+        if (entity.Address != null) context.Addresses.Remove(entity.Address);
+
         context.Schools.Remove(entity);
         await context.SaveChangesAsync(cancellationToken);
 

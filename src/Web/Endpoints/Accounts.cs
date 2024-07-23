@@ -38,7 +38,8 @@ public class Accounts : EndpointGroupBase
         return await sender.Send(new GetAccountQuery { Id = id });
     }
 
-    public Task<PaginatedList<AccountDto>> GetAllAccounts(ISender sender, [AsParameters] PaginatedQuery paginatedQuery)
+    public Task<PaginatedList<CleanAccountDto>> GetAllAccounts(ISender sender,
+        [AsParameters] PaginatedQuery paginatedQuery)
     {
         var query = new GetAccountsPaginatedQuery
         {
@@ -49,7 +50,7 @@ public class Accounts : EndpointGroupBase
         return sender.Send(query);
     }
 
-    public Task<PaginatedList<AccountDto>> GetAllAccountsBySchool(ISender sender,
+    public Task<PaginatedList<CleanAccountDto>> GetAllAccountsBySchool(ISender sender,
         Guid schoolId, [AsParameters] PaginatedQuery paginatedQuery)
     {
         var query = new GetAccountsBySchoolPaginatedQuery(schoolId)

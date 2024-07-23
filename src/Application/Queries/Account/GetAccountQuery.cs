@@ -21,6 +21,9 @@ public class GetAccountQueryHandler : IRequestHandler<GetAccountQuery, AccountDt
     public async Task<AccountDto> Handle(GetAccountQuery request, CancellationToken cancellationToken)
     {
         var entity = await _context.Accounts
+            .Include(a => a.School)
+            .Include(a => a.AccountClasses)
+            .ThenInclude(ac => ac.Class)
             .ProjectTo<AccountDto>(_mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
 

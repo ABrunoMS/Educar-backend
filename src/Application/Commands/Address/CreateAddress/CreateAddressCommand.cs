@@ -13,6 +13,7 @@ public record CreateAddressCommand(string Street, string City, string State, str
     public string Country { get; set; } = Country;
     public decimal? Lat { get; set; }
     public decimal? Lng { get; set; }
+    
 }
 
 public class CreateAddressCommandHandler(IApplicationDbContext context)

@@ -1,6 +1,7 @@
 using Ardalis.GuardClauses;
 using Educar.Backend.Application.Commands.Account.CreateAccount;
 using Educar.Backend.Application.Commands.Account.UpdateAccount;
+using Educar.Backend.Application.Commands.Class.CreateClass;
 using Educar.Backend.Application.Commands.School.CreateSchool;
 using Educar.Backend.Application.Common.Exceptions;
 using Educar.Backend.Domain.Enums;
@@ -25,7 +26,8 @@ public class UpdateAccountTests : TestBase
         Context.SaveChanges();
     }
 
-    private async Task<Guid> CreateAccount(UserRole role = UserRole.Admin, Guid? SchoolId = null)
+    private async Task<Guid> CreateAccount(UserRole role = UserRole.Admin, Guid? SchoolId = null,
+        List<Guid>? ClassIds = null)
     {
         var command = new CreateAccountCommand("Existing Account", "existing.account@example.com", "123456",
             _client.Id, role)
@@ -37,6 +39,11 @@ public class UpdateAccountTests : TestBase
         if (SchoolId != null)
         {
             command.SchoolId = SchoolId;
+        }
+
+        if (ClassIds != null)
+        {
+            command.ClassIds = ClassIds;
         }
 
         var response = await SendAsync(command);
@@ -60,13 +67,16 @@ public class UpdateAccountTests : TestBase
             RegistrationNumber = newRegistrationNumber,
             AverageScore = 200.75m,
             EventAverageScore = 150.50m,
-            Stars = 5
+            Stars = 5,
+            ClassIds = new List<Guid> { Guid.NewGuid() } // Add test class IDs
         };
 
         // Act
         await SendAsync(command);
+
         // Assert
-        var updatedAccount = await Context.Accounts.FindAsync(command.Id);
+        var updatedAccount = await Context.Accounts.Include(a => a.AccountClasses)
+            .FirstOrDefaultAsync(a => a.Id == command.Id);
         Assert.That(updatedAccount, Is.Not.Null);
         Assert.That(updatedAccount.Name, Is.EqualTo(newName));
         Assert.That(updatedAccount.RegistrationNumber, Is.EqualTo(newRegistrationNumber));
@@ -74,6 +84,7 @@ public class UpdateAccountTests : TestBase
         Assert.That(updatedAccount.AverageScore, Is.EqualTo(200.75m));
         Assert.That(updatedAccount.EventAverageScore, Is.EqualTo(150.50m));
         Assert.That(updatedAccount.Stars, Is.EqualTo(5));
+        Assert.That(updatedAccount.AccountClasses.Select(ac => ac.ClassId), Is.EquivalentTo(command.ClassIds));
     }
 
     [Test]
@@ -187,7 +198,9 @@ public class UpdateAccountTests : TestBase
     {
         var schoolCommand = new CreateSchoolCommand("school", _client.Id);
         var schoolResponse = await SendAsync(schoolCommand);
-        var accountId = await CreateAccount(UserRole.Student, schoolResponse.Id);
+        var classCommand = new CreateClassCommand("class", "description", ClassPurpose.Default, schoolResponse.Id);
+        var classResponse = await SendAsync(classCommand);
+        var accountId = await CreateAccount(UserRole.Student, schoolResponse.Id, new List<Guid> { classResponse.Id });
 
         var command = new UpdateAccountCommand
         {
@@ -196,7 +209,8 @@ public class UpdateAccountTests : TestBase
             RegistrationNumber = "654321",
             AverageScore = 200.75m,
             EventAverageScore = 150.50m,
-            Stars = 5
+            Stars = 5,
+            ClassIds = new List<Guid> { classResponse.Id } // Add test class IDs
         };
 
         Assert.ThrowsAsync<ValidationException>(async () => await SendAsync(command));
@@ -207,8 +221,9 @@ public class UpdateAccountTests : TestBase
     {
         var schoolCommand = new CreateSchoolCommand("school", _client.Id);
         var schoolResponse = await SendAsync(schoolCommand);
-
-        var accountId = await CreateAccount(UserRole.Student, schoolResponse.Id);
+        var classCommand = new CreateClassCommand("class", "description", ClassPurpose.Default, schoolResponse.Id);
+        var classResponse = await SendAsync(classCommand);
+        var accountId = await CreateAccount(UserRole.Student, schoolResponse.Id, new List<Guid> { classResponse.Id });
 
         var command = new UpdateAccountCommand
         {
@@ -218,7 +233,8 @@ public class UpdateAccountTests : TestBase
             AverageScore = 200.75m,
             EventAverageScore = 150.50m,
             Stars = 5,
-            SchoolId = schoolResponse.Id
+            SchoolId = schoolResponse.Id,
+            ClassIds = new List<Guid> { classResponse.Id } // Add test class IDs
         };
 
         await SendAsync(command);
@@ -241,7 +257,8 @@ public class UpdateAccountTests : TestBase
             RegistrationNumber = "654321",
             AverageScore = 200.75m,
             EventAverageScore = 150.50m,
-            Stars = 5
+            Stars = 5,
+            ClassIds = new List<Guid> { Guid.NewGuid() } // Add test class IDs
         };
 
         Assert.DoesNotThrowAsync(async () => await SendAsync(command));

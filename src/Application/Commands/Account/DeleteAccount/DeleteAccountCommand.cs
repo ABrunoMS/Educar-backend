@@ -10,6 +10,7 @@ public class DeleteAccountCommandHandler(IApplicationDbContext context) : IReque
     public async Task<Unit> Handle(DeleteAccountCommand request, CancellationToken cancellationToken)
     {
         var entity = await context.Accounts
+            .Include(a => a.AccountClasses)
             .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
         Guard.Against.NotFound(request.Id, entity);
 

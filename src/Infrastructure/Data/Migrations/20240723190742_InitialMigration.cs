@@ -208,6 +208,33 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "classes",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    description = table.Column<string>(type: "text", nullable: false),
+                    purpose = table.Column<string>(type: "text", nullable: false),
+                    school_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<string>(type: "text", nullable: true),
+                    last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    last_modified_by = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_classes", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_classes_schools_school_id",
+                        column: x => x.school_id,
+                        principalTable: "schools",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "media_logs",
                 columns: table => new
                 {
@@ -241,6 +268,37 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "account_classes",
+                columns: table => new
+                {
+                    account_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    class_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_account_classes", x => new { x.account_id, x.class_id });
+                    table.ForeignKey(
+                        name: "FK_account_classes_accounts_account_id",
+                        column: x => x.account_id,
+                        principalTable: "accounts",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_account_classes_classes_class_id",
+                        column: x => x.class_id,
+                        principalTable: "classes",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_account_classes_class_id",
+                table: "account_classes",
+                column: "class_id");
+
             migrationBuilder.CreateIndex(
                 name: "IX_accounts_client_id",
                 table: "accounts",
@@ -255,6 +313,11 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_accounts_school_id",
                 table: "accounts",
+                column: "school_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_classes_school_id",
+                table: "classes",
                 column: "school_id");
 
             migrationBuilder.CreateIndex(
@@ -298,10 +361,16 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "account_classes");
+
+            migrationBuilder.DropTable(
                 name: "contracts");
 
             migrationBuilder.DropTable(
                 name: "media_logs");
+
+            migrationBuilder.DropTable(
+                name: "classes");
 
             migrationBuilder.DropTable(
                 name: "games");
