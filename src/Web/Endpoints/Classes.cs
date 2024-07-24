@@ -1,5 +1,7 @@
 using Educar.Backend.Application.Commands;
 using Educar.Backend.Application.Commands.Class.CreateClass;
+using Educar.Backend.Application.Common.Models;
+using Educar.Backend.Application.Queries.Class;
 using Educar.Backend.Domain.Enums;
 using Microsoft.OpenApi.Extensions;
 
@@ -11,8 +13,9 @@ public class Classes : EndpointGroupBase
     {
         app.MapGroup(this)
             .RequireAuthorization(UserRole.Admin.GetDisplayName())
-            .MapPost(CreateClass);
-        // .MapGet(GetClient, "{id}")
+            .MapPost(CreateClass)
+            .MapGet(GetClass, "{id}")
+            .MapGet(GetAllClassesBySchool, "school/{schoolId}");
         // .MapGet(GetAllClients)
         // .MapPut(UpdateClient, "{id}")
         // .MapDelete(DeleteClient, "{id}");
@@ -23,21 +26,23 @@ public class Classes : EndpointGroupBase
         return sender.Send(command);
     }
 
-    // public async Task<ClientDto> GetClient(ISender sender, Guid id)
-    // {
-    //     return await sender.Send(new GetClientQuery { Id = id });
-    // }
-    //
-    // public Task<PaginatedList<ClientDto>> GetAllClients(ISender sender, [AsParameters] PaginatedQuery paginatedQuery)
-    // {
-    //     var query = new GetClientsPaginatedQuery
-    //     {
-    //         PageNumber = paginatedQuery.PageNumber,
-    //         PageSize = paginatedQuery.PageSize
-    //     };
-    //
-    //     return sender.Send(query);
-    // }
+    public async Task<ClassDto> GetClass(ISender sender, Guid id)
+    {
+        return await sender.Send(new GetClassQuery { Id = id });
+    }
+
+    public Task<PaginatedList<ClassDto>> GetAllClassesBySchool(ISender sender,
+        Guid schoolId, [AsParameters] PaginatedQuery paginatedQuery)
+    {
+        var query = new GetClassesBySchoolPaginatedQuery(schoolId)
+        {
+            PageNumber = paginatedQuery.PageNumber,
+            PageSize = paginatedQuery.PageSize
+        };
+
+        return sender.Send(query);
+    }
+
     //
     // public async Task<IResult> DeleteClient(ISender sender, Guid id)
     // {

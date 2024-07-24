@@ -5,6 +5,7 @@ namespace Educar.Backend.Application.Queries.Class;
 
 public class ClassDto
 {
+    public Guid Id { get; set; }
     public string? Name { get; set; }
     public string? Description { get; set; }
     public ClassPurpose Purpose { get; set; }
