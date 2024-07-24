@@ -22,6 +22,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<MediaLog> MediaLogs => Set<MediaLog>();
     public DbSet<Class> Classes => Set<Class>();
     public DbSet<AccountClass> AccountClasses => Set<AccountClass>();
+    public DbSet<Grade> Grades => Set<Grade>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

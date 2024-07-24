@@ -16,10 +16,13 @@ public class Classes : EndpointGroupBase
         app.MapGroup(this)
             .RequireAuthorization(UserRole.Admin.GetDisplayName())
             .MapPost(CreateClass)
-            .MapGet(GetClass, "{id}")
-            .MapGet(GetAllClassesBySchool, "school/{schoolId}")
             .MapPut(UpdateClass, "{id}")
             .MapDelete(DeleteClass, "{id}");
+
+        app.MapGroup(this)
+            .RequireAuthorization(UserRole.Student.GetDisplayName())
+            .MapGet(GetClass, "{id}")
+            .MapGet(GetAllClassesBySchool, "school/{schoolId}");
     }
 
     public Task<CreatedResponseDto> CreateClass(ISender sender, CreateClassCommand command)
