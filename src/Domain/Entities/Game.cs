@@ -9,4 +9,6 @@ public class Game(string name, string description, string lore, string purpose)
     public string Description { get; set; } = description;
     public string Lore { get; set; } = lore;
     public string Purpose { get; set; } = purpose;
+    
+    public IList<GameSubject> GameSubjects { get; set; } = new List<GameSubject>();
 }
