@@ -75,7 +75,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedListOfAccountDto"
+                  "$ref": "#/components/schemas/PaginatedListOfCleanAccountDto"
                 }
               }
             }
@@ -193,7 +193,7 @@
         ]
       }
     },
-    "/api/Accounts/school/{clientId}": {
+    "/api/Accounts/school/{schoolId}": {
       "get": {
         "tags": [
           "Accounts"
@@ -201,7 +201,7 @@
         "operationId": "GetAllAccountsBySchool",
         "parameters": [
           {
-            "name": "clientId",
+            "name": "schoolId",
             "in": "path",
             "required": true,
             "schema": {
@@ -237,10 +237,96 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedListOfAccountDto"
+                  "$ref": "#/components/schemas/PaginatedListOfCleanAccountDto"
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Accounts/class/{classId}": {
+      "get": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "GetAllAccountsByClass",
+        "parameters": [
+          {
+            "name": "classId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "page_number",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedListOfCleanAccountDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Accounts/forgot-password/{email}": {
+      "put": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "ForgotPassword",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
           }
         },
         "security": [
@@ -348,6 +434,205 @@
         "responses": {
           "200": {
             "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Classes": {
+      "post": {
+        "tags": [
+          "Classes"
+        ],
+        "operationId": "CreateClass",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateClassCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Classes/{id}": {
+      "get": {
+        "tags": [
+          "Classes"
+        ],
+        "operationId": "GetClass",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClassDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Classes"
+        ],
+        "operationId": "UpdateClass",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateClassCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Classes"
+        ],
+        "operationId": "DeleteClass",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Classes/school/{schoolId}": {
+      "get": {
+        "tags": [
+          "Classes"
+        ],
+        "operationId": "GetAllClassesBySchool",
+        "parameters": [
+          {
+            "name": "schoolId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "page_number",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedListOfClassDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1522,6 +1807,14 @@
             "type": "string",
             "format": "guid",
             "nullable": true
+          },
+          "classIds": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
           }
         }
       },
@@ -1571,9 +1864,13 @@
             "type": "integer",
             "format": "int32"
           },
-          "clientId": {
-            "type": "string",
-            "format": "guid"
+          "client": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ClientCleanDto"
+              }
+            ]
           },
           "role": {
             "$ref": "#/components/schemas/UserRole"
@@ -1585,6 +1882,30 @@
                 "$ref": "#/components/schemas/SchoolDto"
               }
             ]
+          },
+          "classes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClassDto"
+            }
+          }
+        }
+      },
+      "ClientCleanDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -1662,7 +1983,7 @@
           }
         }
       },
-      "ClientCleanDto": {
+      "ClassDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -1677,17 +1998,44 @@
           "description": {
             "type": "string",
             "nullable": true
+          },
+          "purpose": {
+            "$ref": "#/components/schemas/ClassPurpose"
+          },
+          "school": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SchoolDto"
+              }
+            ]
           }
         }
       },
-      "PaginatedListOfAccountDto": {
+      "ClassPurpose": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "None",
+          "Reinforcement",
+          "Default",
+          "SpecialProficiencies"
+        ],
+        "enum": [
+          "None",
+          "Reinforcement",
+          "Default",
+          "SpecialProficiencies"
+        ]
+      },
+      "PaginatedListOfCleanAccountDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/AccountDto"
+              "$ref": "#/components/schemas/CleanAccountDto"
             }
           },
           "pageNumber": {
@@ -1707,6 +2055,59 @@
           },
           "hasNextPage": {
             "type": "boolean"
+          }
+        }
+      },
+      "CleanAccountDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "registrationNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "averageScore": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "eventAverageScore": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "stars": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "client": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ClientCleanDto"
+              }
+            ]
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole"
+          },
+          "school": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SchoolDto"
+              }
+            ]
           }
         }
       },
@@ -1742,6 +2143,13 @@
             "type": "string",
             "format": "guid",
             "nullable": true
+          },
+          "classIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
           }
         }
       },
@@ -1813,6 +2221,88 @@
             "type": "number",
             "format": "decimal",
             "nullable": true
+          }
+        }
+      },
+      "CreateClassCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "purpose": {
+            "$ref": "#/components/schemas/ClassPurpose"
+          },
+          "schoolId": {
+            "type": "string",
+            "format": "guid"
+          }
+        }
+      },
+      "PaginatedListOfClassDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClassDto"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hasPreviousPage": {
+            "type": "boolean"
+          },
+          "hasNextPage": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdateClassCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "purpose": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ClassPurpose"
+              }
+            ]
+          },
+          "accountIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
           }
         }
       },

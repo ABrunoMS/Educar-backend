@@ -61,8 +61,8 @@ public class GetAccountTests : TestBase
             SchoolId = _school.Id,
             AccountClasses = new List<AccountClass>
             {
-                new AccountClass { Class = _class1 },
-                new AccountClass { Class = _class2 }
+                new() { Class = _class1 },
+                new() { Class = _class2 }
             }
         };
         Context.Accounts.Add(_account);
@@ -330,6 +330,129 @@ public class GetAccountTests : TestBase
         await Context.SaveChangesAsync();
 
         var query = new GetAccountsBySchoolPaginatedQuery(_school.Id) { PageNumber = 3, PageSize = 10 };
+
+        // Act
+        var result = await SendAsync(query);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Items, Has.Count.EqualTo(1)); // Only one account on the third page
+            Assert.That(result.PageNumber, Is.EqualTo(3));
+            Assert.That(result.TotalCount, Is.EqualTo(21)); // Including the initial account
+            Assert.That(result.TotalPages, Is.EqualTo(3));
+        });
+    }
+
+    [Test]
+    public async Task GivenValidPaginationRequestByClass_ShouldReturnPaginatedAccounts()
+    {
+        // Arrange
+        for (var i = 1; i <= 20; i++)
+        {
+            var account = new Domain.Entities.Account($"Test Account {i}", $"test.account{i}@example.com", "123456",
+                UserRole.Student)
+            {
+                ClientId = _client.Id,
+                Role = UserRole.Student,
+                AverageScore = 100.50m,
+                EventAverageScore = 95.75m,
+                Stars = 4,
+                SchoolId = _school.Id,
+                AccountClasses = new List<AccountClass>
+                {
+                    new AccountClass { Class = _class1 }
+                }
+            };
+            Context.Accounts.Add(account);
+        }
+
+        await Context.SaveChangesAsync();
+
+        var query = new GetAccountsByClassPaginatedQuery(_class1.Id) { PageNumber = 1, PageSize = 10 };
+
+        // Act
+        var result = await SendAsync(query);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Items, Has.Count.EqualTo(10));
+            Assert.That(result.PageNumber, Is.EqualTo(1));
+            Assert.That(result.TotalCount, Is.EqualTo(21)); // Including the initial account
+            Assert.That(result.TotalPages, Is.EqualTo(3));
+        });
+    }
+
+    [Test]
+    public async Task GivenSpecificPageRequestByClass_ShouldReturnCorrectPage()
+    {
+        // Arrange
+        for (var i = 1; i <= 20; i++)
+        {
+            var account = new Domain.Entities.Account($"Test Account {i}", $"test.account{i}@example.com", "123456",
+                UserRole.Student)
+            {
+                ClientId = _client.Id,
+                Role = UserRole.Student,
+                AverageScore = 100.50m,
+                EventAverageScore = 95.75m,
+                Stars = 4,
+                SchoolId = _school.Id,
+                AccountClasses = new List<AccountClass>
+                {
+                    new AccountClass { Class = _class1 }
+                }
+            };
+            Context.Accounts.Add(account);
+        }
+
+        await Context.SaveChangesAsync();
+
+        var query = new GetAccountsByClassPaginatedQuery(_class1.Id) { PageNumber = 2, PageSize = 10 };
+
+        // Act
+        var result = await SendAsync(query);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Items.Count, Is.EqualTo(10));
+            Assert.That(result.PageNumber, Is.EqualTo(2));
+            Assert.That(result.TotalCount, Is.EqualTo(21)); // Including the initial account
+            Assert.That(result.TotalPages, Is.EqualTo(3));
+        });
+    }
+
+    [Test]
+    public async Task GivenOutOfRangePageRequestByClass_ShouldReturnEmptyPage()
+    {
+        // Arrange
+        for (var i = 1; i <= 20; i++)
+        {
+            var account = new Domain.Entities.Account($"Test Account {i}", $"test.account{i}@example.com", "123456",
+                UserRole.Student)
+            {
+                ClientId = _client.Id,
+                Role = UserRole.Student,
+                AverageScore = 100.50m,
+                EventAverageScore = 95.75m,
+                Stars = 4,
+                SchoolId = _school.Id,
+                AccountClasses = new List<AccountClass>
+                {
+                    new AccountClass { Class = _class1 }
+                }
+            };
+            Context.Accounts.Add(account);
+        }
+
+        await Context.SaveChangesAsync();
+
+        var query = new GetAccountsByClassPaginatedQuery(_class1.Id) { PageNumber = 3, PageSize = 10 };
 
         // Act
         var result = await SendAsync(query);
