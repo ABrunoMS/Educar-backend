@@ -15,5 +15,11 @@ public class ClassConfiguration(DatabaseFacade database) : IEntityTypeConfigurat
         builder.Property(t => t.Description).IsRequired();
         builder.Property(t => t.Purpose).IsRequired().HasConversion<string>();
         builder.Property(t => t.SchoolId).IsRequired();
+
+        builder
+            .HasMany(a => a.AccountClasses)
+            .WithOne(c => c.Class)
+            .HasForeignKey(c => c.ClassId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

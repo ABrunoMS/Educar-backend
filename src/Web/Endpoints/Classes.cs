@@ -1,5 +1,6 @@
 using Educar.Backend.Application.Commands;
 using Educar.Backend.Application.Commands.Class.CreateClass;
+using Educar.Backend.Application.Commands.Class.DeleteClass;
 using Educar.Backend.Application.Common.Models;
 using Educar.Backend.Application.Queries.Class;
 using Educar.Backend.Domain.Enums;
@@ -15,10 +16,9 @@ public class Classes : EndpointGroupBase
             .RequireAuthorization(UserRole.Admin.GetDisplayName())
             .MapPost(CreateClass)
             .MapGet(GetClass, "{id}")
-            .MapGet(GetAllClassesBySchool, "school/{schoolId}");
-        // .MapGet(GetAllClients)
-        // .MapPut(UpdateClient, "{id}")
-        // .MapDelete(DeleteClient, "{id}");
+            .MapGet(GetAllClassesBySchool, "school/{schoolId}")
+            // .MapPut(UpdateClient, "{id}")
+            .MapDelete(DeleteClass,"{id}");
     }
 
     public Task<CreatedResponseDto> CreateClass(ISender sender, CreateClassCommand command)
@@ -43,12 +43,11 @@ public class Classes : EndpointGroupBase
         return sender.Send(query);
     }
 
-    //
-    // public async Task<IResult> DeleteClient(ISender sender, Guid id)
-    // {
-    //     await sender.Send(new DeleteClientCommand(id));
-    //     return Results.NoContent();
-    // }
+    public async Task<IResult> DeleteClass(ISender sender, Guid id)
+    {
+        await sender.Send(new DeleteClassCommand(id));
+        return Results.NoContent();
+    }
     //
     // public async Task<IResult> UpdateClient(ISender sender, Guid id, UpdateClientCommand command)
     // {
