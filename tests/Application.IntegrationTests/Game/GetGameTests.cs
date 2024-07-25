@@ -1,5 +1,6 @@
 using Ardalis.GuardClauses;
 using Educar.Backend.Application.Commands.Game.CreateGame;
+using Educar.Backend.Application.Commands.Subject.CreateSubject;
 using Educar.Backend.Application.Queries.Game;
 using NUnit.Framework;
 using static Educar.Backend.Application.IntegrationTests.Testing;
@@ -19,8 +20,14 @@ public class GetGameTests : TestBase
     public async Task GivenValidId_ShouldReturnGame()
     {
         // Arrange
-        var command = new CreateGameCommand("Test Game", "Description", "Lore", "Purpose");
-        var createdResponse = await SendAsync(command);
+        var createSubjectCommand = new CreateSubjectCommand("Test Subject", "Subject Description");
+        var createdSubjectResponse = await SendAsync(createSubjectCommand);
+
+        var createCommand = new CreateGameCommand("Test Game", "Description", "Lore", "Purpose")
+        {
+            SubjectIds = new List<Guid> { createdSubjectResponse.Id }
+        };
+        var createdResponse = await SendAsync(createCommand);
         var gameId = createdResponse.Id;
 
         var query = new GetGameQuery { Id = gameId };
@@ -34,6 +41,8 @@ public class GetGameTests : TestBase
         Assert.That(result.Description, Is.EqualTo("Description"));
         Assert.That(result.Lore, Is.EqualTo("Lore"));
         Assert.That(result.Purpose, Is.EqualTo("Purpose"));
+        Assert.That(result.Subjects, Is.Not.Empty);
+        Assert.That(result.Subjects.First().Name, Is.EqualTo("Test Subject"));
     }
 
     [Test]
@@ -48,9 +57,15 @@ public class GetGameTests : TestBase
     public async Task GivenPageAndPageSize_ShouldReturnPaginatedGames()
     {
         // Arrange
+        var createSubjectCommand = new CreateSubjectCommand("Test Subject", "Subject Description");
+        var createdSubjectResponse = await SendAsync(createSubjectCommand);
+
         for (var i = 1; i <= 20; i++)
         {
-            var command = new CreateGameCommand($"Test Game {i}", "Description", "Lore", "Purpose");
+            var command = new CreateGameCommand($"Test Game {i}", "Description", "Lore", "Purpose")
+            {
+                SubjectIds = new List<Guid> { createdSubjectResponse.Id }
+            };
             await SendAsync(command);
         }
 
@@ -74,9 +89,15 @@ public class GetGameTests : TestBase
     public async Task GivenPageAndPageSize_ShouldReturnCorrectPage()
     {
         // Arrange
+        var createSubjectCommand = new CreateSubjectCommand("Test Subject", "Subject Description");
+        var createdSubjectResponse = await SendAsync(createSubjectCommand);
+
         for (var i = 1; i <= 2; i++)
         {
-            var command = new CreateGameCommand($"Test Game {i}", "Description", "Lore", "Purpose");
+            var command = new CreateGameCommand($"Test Game {i}", "Description", "Lore", "Purpose")
+            {
+                SubjectIds = new List<Guid> { createdSubjectResponse.Id }
+            };
             await SendAsync(command);
         }
 
@@ -101,9 +122,15 @@ public class GetGameTests : TestBase
     public async Task GivenPageAndPageSize_ShouldReturnEmptyWhenOutOfRange()
     {
         // Arrange
+        var createSubjectCommand = new CreateSubjectCommand("Test Subject", "Subject Description");
+        var createdSubjectResponse = await SendAsync(createSubjectCommand);
+
         for (var i = 1; i <= 20; i++)
         {
-            var command = new CreateGameCommand($"Test Game {i}", "Description", "Lore", "Purpose");
+            var command = new CreateGameCommand($"Test Game {i}", "Description", "Lore", "Purpose")
+            {
+                SubjectIds = new List<Guid> { createdSubjectResponse.Id }
+            };
             await SendAsync(command);
         }
 

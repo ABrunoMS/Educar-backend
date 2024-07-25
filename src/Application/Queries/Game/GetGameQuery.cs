@@ -12,6 +12,8 @@ public class GetGameQueryHandler(IApplicationDbContext context, IMapper mapper) 
     public async Task<GameDto> Handle(GetGameQuery request, CancellationToken cancellationToken)
     {
         var entity = await context.Games
+            .Include(g => g.GameSubjects)
+            .ThenInclude(gs => gs.Subject)
             .ProjectTo<GameDto>(mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
 

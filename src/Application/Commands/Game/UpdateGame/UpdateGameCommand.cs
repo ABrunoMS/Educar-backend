@@ -76,4 +76,11 @@ public class UpdateGameCommandHandler(IApplicationDbContext context) : IRequestH
 
         return Unit.Value;
     }
+
+    public async Task<bool> BeUniqueName(string name, Guid id, CancellationToken cancellationToken)
+    {
+        return await context.Games
+            .Where(g => g.Id != id)
+            .AllAsync(l => l.Name != name, cancellationToken);
+    }
 }

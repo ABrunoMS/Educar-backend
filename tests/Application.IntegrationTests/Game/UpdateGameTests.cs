@@ -1,7 +1,9 @@
 using Ardalis.GuardClauses;
 using Educar.Backend.Application.Commands.Game.CreateGame;
 using Educar.Backend.Application.Commands.Game.UpdateGame;
+using Educar.Backend.Application.Commands.Subject.CreateSubject;
 using Educar.Backend.Application.Common.Exceptions;
+using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using static Educar.Backend.Application.IntegrationTests.Testing;
 
@@ -20,10 +22,19 @@ public class UpdateGameTests : TestBase
     public async Task GivenValidRequest_ShouldUpdateGame()
     {
         // Arrange
+        var createSubjectCommand = new CreateSubjectCommand("Original Subject", "Original Subject Description");
+        var createdSubjectResponse = await SendAsync(createSubjectCommand);
+
         var createCommand =
-            new CreateGameCommand("Original Name", "Original Description", "Original Lore", "Original Purpose");
+            new CreateGameCommand("Original Name", "Original Description", "Original Lore", "Original Purpose")
+            {
+                SubjectIds = new List<Guid> { createdSubjectResponse.Id }
+            };
         var createdResponse = await SendAsync(createCommand);
         var gameId = createdResponse.Id;
+
+        var updateSubjectCommand = new CreateSubjectCommand("Updated Subject", "Updated Subject Description");
+        var updatedSubjectResponse = await SendAsync(updateSubjectCommand);
 
         var updateCommand = new UpdateGameCommand
         {
@@ -31,7 +42,8 @@ public class UpdateGameTests : TestBase
             Name = "Updated Name",
             Description = "Updated Description",
             Lore = "Updated Lore",
-            Purpose = "Updated Purpose"
+            Purpose = "Updated Purpose",
+            SubjectIds = new List<Guid> { updatedSubjectResponse.Id }
         };
 
         // Act
@@ -40,12 +52,17 @@ public class UpdateGameTests : TestBase
         // Assert
         if (Context.Games != null)
         {
-            var updatedGame = await Context.Games.FindAsync(gameId);
+            var updatedGame = await Context.Games
+                .Include(g => g.GameSubjects)
+                .ThenInclude(gs => gs.Subject)
+                .FirstOrDefaultAsync(g => g.Id == gameId);
             Assert.That(updatedGame, Is.Not.Null);
             Assert.That(updatedGame.Name, Is.EqualTo("Updated Name"));
             Assert.That(updatedGame.Description, Is.EqualTo("Updated Description"));
             Assert.That(updatedGame.Lore, Is.EqualTo("Updated Lore"));
             Assert.That(updatedGame.Purpose, Is.EqualTo("Updated Purpose"));
+            Assert.That(updatedGame.GameSubjects, Has.Count.EqualTo(1));
+            Assert.That(updatedGame.GameSubjects.First().Subject.Name, Is.EqualTo("Updated Subject"));
         }
     }
 

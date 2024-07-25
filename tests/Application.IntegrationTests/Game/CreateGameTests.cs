@@ -1,6 +1,8 @@
 using Educar.Backend.Application.Commands;
 using Educar.Backend.Application.Commands.Game.CreateGame;
+using Educar.Backend.Application.Commands.Subject.CreateSubject;
 using Educar.Backend.Application.Common.Exceptions;
+using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using static Educar.Backend.Application.IntegrationTests.Testing;
 
@@ -24,7 +26,13 @@ public class CreateGameTests : TestBase
         const string purpose = "Game Purpose";
 
         // Arrange
-        var command = new CreateGameCommand(name, description, lore, purpose);
+        var createSubjectCommand = new CreateSubjectCommand("Test Subject", "Subject Description");
+        var createdSubjectResponse = await SendAsync(createSubjectCommand);
+
+        var command = new CreateGameCommand(name, description, lore, purpose)
+        {
+            SubjectIds = new List<Guid> { createdSubjectResponse.Id }
+        };
 
         // Act
         var response = await SendAsync(command);
@@ -35,12 +43,17 @@ public class CreateGameTests : TestBase
 
         if (Context.Games != null)
         {
-            var createdGame = await Context.Games.FindAsync(response.Id);
+            var createdGame = await Context.Games
+                .Include(g => g.GameSubjects)
+                .ThenInclude(gs => gs.Subject)
+                .FirstOrDefaultAsync(g => g.Id == response.Id);
             Assert.That(createdGame, Is.Not.Null);
             Assert.That(createdGame.Name, Is.EqualTo(name));
             Assert.That(createdGame.Description, Is.EqualTo(description));
             Assert.That(createdGame.Lore, Is.EqualTo(lore));
             Assert.That(createdGame.Purpose, Is.EqualTo(purpose));
+            Assert.That(createdGame.GameSubjects, Has.Count.EqualTo(1));
+            Assert.That(createdGame.GameSubjects.First().Subject.Name, Is.EqualTo("Test Subject"));
         }
     }
 

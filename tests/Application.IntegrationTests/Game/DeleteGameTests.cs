@@ -3,6 +3,7 @@ using Educar.Backend.Application.Commands.Client.CreateClient;
 using Educar.Backend.Application.Commands.Contract.CreateContract;
 using Educar.Backend.Application.Commands.Game.CreateGame;
 using Educar.Backend.Application.Commands.Game.DeleteGame;
+using Educar.Backend.Application.Commands.Subject.CreateSubject;
 using Educar.Backend.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
@@ -23,7 +24,11 @@ public class DeleteGameTests : TestBase
     public async Task GivenValidId_ShouldDeleteGame()
     {
         // Arrange
-        var createCommand = new CreateGameCommand("Test Game", "Description", "Lore", "Purpose");
+        var createSubjectCommand = new CreateSubjectCommand("Test Subject", "Description");
+        var createdSubjectResponse = await SendAsync(createSubjectCommand);
+
+        var createCommand = new CreateGameCommand("Test Game", "Description", "Lore", "Purpose")
+            { SubjectIds = new List<Guid> { createdSubjectResponse.Id } };
         var createdResponse = await SendAsync(createCommand);
         var gameId = createdResponse.Id;
 
@@ -36,6 +41,11 @@ public class DeleteGameTests : TestBase
         var deletedGame = await Context.Games.IgnoreQueryFilters().FirstOrDefaultAsync(g => g.Id == gameId);
         Assert.That(deletedGame, Is.Not.Null);
         Assert.That(deletedGame.IsDeleted, Is.True);
+
+        // Ensure the associated subjects are also soft-deleted
+        var deletedGameSubjects =
+            await Context.GameSubjects.IgnoreQueryFilters().Where(gs => gs.GameId == gameId).ToListAsync();
+        Assert.That(deletedGameSubjects.All(gs => gs.IsDeleted), Is.True);
     }
 
     [Test]
@@ -50,7 +60,11 @@ public class DeleteGameTests : TestBase
     public async Task GivenGameWithContracts_ShouldThrowException()
     {
         // Arrange
-        var createGameCommand = new CreateGameCommand("Test Game", "Description", "Lore", "Purpose");
+        var createSubjectCommand = new CreateSubjectCommand("Test Subject", "Description");
+        var createdSubjectResponse = await SendAsync(createSubjectCommand);
+
+        var createGameCommand = new CreateGameCommand("Test Game", "Description", "Lore", "Purpose")
+            { SubjectIds = new List<Guid> { createdSubjectResponse.Id } };
         var createdGameResponse = await SendAsync(createGameCommand);
 
         var createClientCommand = new CreateClientCommand("client");

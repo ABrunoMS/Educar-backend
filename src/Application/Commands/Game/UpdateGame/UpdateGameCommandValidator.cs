@@ -17,7 +17,7 @@ public class UpdateGameCommandValidator : AbstractValidator<UpdateGameCommand>
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Name is required.")
             .MaximumLength(100).WithMessage("Name must not exceed 100 characters.")
-            .MustAsync(BeUniqueTitle).WithMessage("'{PropertyName}' must be unique.");
+            .MustAsync(BeUniqueName).WithMessage("Name must be unique.");
 
         RuleFor(x => x.Description)
             .NotEmpty().WithMessage("Description is required.");
@@ -30,9 +30,10 @@ public class UpdateGameCommandValidator : AbstractValidator<UpdateGameCommand>
             .MaximumLength(255).WithMessage("Purpose must not exceed 255 characters.");
     }
 
-    public async Task<bool> BeUniqueTitle(string name, CancellationToken cancellationToken)
+    private async Task<bool> BeUniqueName(UpdateGameCommand command, string name, CancellationToken cancellationToken)
     {
         return await _context.Games
-            .AllAsync(l => l.Name != name, cancellationToken);
+            .Where(g => g.Id != command.Id) // Exclude the current game
+            .AllAsync(g => g.Name != name, cancellationToken); // Check for uniqueness
     }
 }
