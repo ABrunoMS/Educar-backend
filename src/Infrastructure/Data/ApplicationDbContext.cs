@@ -25,6 +25,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Grade> Grades => Set<Grade>();
     public DbSet<Subject> Subjects => Set<Subject>();
     public DbSet<GameSubject> GameSubjects => Set<GameSubject>();
+    public DbSet<Proficiency> Proficiencies => Set<Proficiency>();
+    public DbSet<ProficiencyGroup> ProficiencyGroups => Set<ProficiencyGroup>();
+    public DbSet<ProficiencyGroupProficiency> ProficiencyGroupProficiencies => Set<ProficiencyGroupProficiency>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

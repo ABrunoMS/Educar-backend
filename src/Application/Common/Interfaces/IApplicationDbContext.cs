@@ -17,6 +17,9 @@ public interface IApplicationDbContext
     DbSet<Grade> Grades { get; }
     DbSet<Subject> Subjects { get; }
     DbSet<GameSubject> GameSubjects { get; }
+    DbSet<Proficiency> Proficiencies { get; }
+    DbSet<ProficiencyGroup> ProficiencyGroups { get; }
+    DbSet<ProficiencyGroupProficiency> ProficiencyGroupProficiencies { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

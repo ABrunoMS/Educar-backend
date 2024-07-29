@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Educar.Backend.Domain.Entities;
 
@@ -9,6 +8,6 @@ public class Game(string name, string description, string lore, string purpose)
     public string Description { get; set; } = description;
     public string Lore { get; set; } = lore;
     public string Purpose { get; set; } = purpose;
-    
     public IList<GameSubject> GameSubjects { get; set; } = new List<GameSubject>();
+    public IList<GameProficiencyGroup> GameProficiencyGroups { get; set; } = new List<GameProficiencyGroup>();
 }

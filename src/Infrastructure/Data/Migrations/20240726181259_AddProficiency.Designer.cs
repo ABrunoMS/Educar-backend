@@ -3,6 +3,7 @@ using System;
 using Educar.Backend.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Educar.Backend.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240726181259_AddProficiency")]
+    partial class AddProficiency
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -451,31 +454,6 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.ToTable("games");
                 });
 
-            modelBuilder.Entity("Educar.Backend.Domain.Entities.GameProficiencyGroup", b =>
-                {
-                    b.Property<Guid>("GameId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("game_id");
-
-                    b.Property<Guid>("ProficiencyGroupId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("proficiency_group_id");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
-
-                    b.HasKey("GameId", "ProficiencyGroupId");
-
-                    b.HasIndex("ProficiencyGroupId");
-
-                    b.ToTable("game_proficiency_groups");
-                });
-
             modelBuilder.Entity("Educar.Backend.Domain.Entities.GameSubject", b =>
                 {
                     b.Property<Guid>("GameId")
@@ -738,78 +716,6 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.ToTable("proficiencies");
                 });
 
-            modelBuilder.Entity("Educar.Backend.Domain.Entities.ProficiencyGroup", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTimeOffset>("Created")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("description");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
-
-                    b.Property<DateTimeOffset>("LastModified")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_modified");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("last_modified_by");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("name");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("proficiency_groups");
-                });
-
-            modelBuilder.Entity("Educar.Backend.Domain.Entities.ProficiencyGroupProficiency", b =>
-                {
-                    b.Property<Guid>("ProficiencyGroupId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("proficiency_group_id");
-
-                    b.Property<Guid>("ProficiencyId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("proficiency_id");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
-
-                    b.HasKey("ProficiencyGroupId", "ProficiencyId");
-
-                    b.HasIndex("ProficiencyId");
-
-                    b.ToTable("proficiency_group_proficiencies");
-                });
-
             modelBuilder.Entity("Educar.Backend.Domain.Entities.School", b =>
                 {
                     b.Property<Guid>("Id")
@@ -980,25 +886,6 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("Game");
                 });
 
-            modelBuilder.Entity("Educar.Backend.Domain.Entities.GameProficiencyGroup", b =>
-                {
-                    b.HasOne("Educar.Backend.Domain.Entities.Game", "Game")
-                        .WithMany("GameProficiencyGroups")
-                        .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Educar.Backend.Domain.Entities.ProficiencyGroup", "ProficiencyGroup")
-                        .WithMany("GameProficiencyGroups")
-                        .HasForeignKey("ProficiencyGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Game");
-
-                    b.Navigation("ProficiencyGroup");
-                });
-
             modelBuilder.Entity("Educar.Backend.Domain.Entities.GameSubject", b =>
                 {
                     b.HasOne("Educar.Backend.Domain.Entities.Game", "Game")
@@ -1037,25 +924,6 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("Media");
                 });
 
-            modelBuilder.Entity("Educar.Backend.Domain.Entities.ProficiencyGroupProficiency", b =>
-                {
-                    b.HasOne("Educar.Backend.Domain.Entities.ProficiencyGroup", "ProficiencyGroup")
-                        .WithMany("ProficiencyGroupProficiencies")
-                        .HasForeignKey("ProficiencyGroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Educar.Backend.Domain.Entities.Proficiency", "Proficiency")
-                        .WithMany("ProficiencyGroupProficiencies")
-                        .HasForeignKey("ProficiencyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Proficiency");
-
-                    b.Navigation("ProficiencyGroup");
-                });
-
             modelBuilder.Entity("Educar.Backend.Domain.Entities.School", b =>
                 {
                     b.HasOne("Educar.Backend.Domain.Entities.Address", "Address")
@@ -1092,21 +960,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Game", b =>
                 {
-                    b.Navigation("GameProficiencyGroups");
-
                     b.Navigation("GameSubjects");
-                });
-
-            modelBuilder.Entity("Educar.Backend.Domain.Entities.Proficiency", b =>
-                {
-                    b.Navigation("ProficiencyGroupProficiencies");
-                });
-
-            modelBuilder.Entity("Educar.Backend.Domain.Entities.ProficiencyGroup", b =>
-                {
-                    b.Navigation("GameProficiencyGroups");
-
-                    b.Navigation("ProficiencyGroupProficiencies");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.School", b =>
