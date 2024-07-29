@@ -3,6 +3,7 @@ using Educar.Backend.Application.Commands.Client.CreateClient;
 using Educar.Backend.Application.Commands.Contract.CreateContract;
 using Educar.Backend.Application.Commands.Game.CreateGame;
 using Educar.Backend.Application.Commands.Game.DeleteGame;
+using Educar.Backend.Application.Commands.ProficiencyGroup.CreateProficiencyGroup;
 using Educar.Backend.Application.Commands.Subject.CreateSubject;
 using Educar.Backend.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -27,8 +28,15 @@ public class DeleteGameTests : TestBase
         var createSubjectCommand = new CreateSubjectCommand("Test Subject", "Description");
         var createdSubjectResponse = await SendAsync(createSubjectCommand);
 
+        var createProficiencyGroupCommand =
+            new CreateProficiencyGroupCommand("Test ProficiencyGroup", "ProficiencyGroup Description");
+        var createdProficiencyGroupResponse = await SendAsync(createProficiencyGroupCommand);
+
         var createCommand = new CreateGameCommand("Test Game", "Description", "Lore", "Purpose")
-            { SubjectIds = new List<Guid> { createdSubjectResponse.Id } };
+        {
+            SubjectIds = new List<Guid> { createdSubjectResponse.Id },
+            ProficiencyGroupIds = new List<Guid> { createdProficiencyGroupResponse.Id }
+        };
         var createdResponse = await SendAsync(createCommand);
         var gameId = createdResponse.Id;
 
@@ -46,6 +54,11 @@ public class DeleteGameTests : TestBase
         var deletedGameSubjects =
             await Context.GameSubjects.IgnoreQueryFilters().Where(gs => gs.GameId == gameId).ToListAsync();
         Assert.That(deletedGameSubjects.All(gs => gs.IsDeleted), Is.True);
+
+        // Ensure the associated proficiency groups are also soft-deleted
+        var deletedGameProficiencyGroups =
+            await Context.GameProficiencyGroups.IgnoreQueryFilters().Where(gpg => gpg.GameId == gameId).ToListAsync();
+        Assert.That(deletedGameProficiencyGroups.All(gpg => gpg.IsDeleted), Is.True);
     }
 
     [Test]
@@ -63,8 +76,15 @@ public class DeleteGameTests : TestBase
         var createSubjectCommand = new CreateSubjectCommand("Test Subject", "Description");
         var createdSubjectResponse = await SendAsync(createSubjectCommand);
 
+        var createProficiencyGroupCommand =
+            new CreateProficiencyGroupCommand("Test ProficiencyGroup", "ProficiencyGroup Description");
+        var createdProficiencyGroupResponse = await SendAsync(createProficiencyGroupCommand);
+
         var createGameCommand = new CreateGameCommand("Test Game", "Description", "Lore", "Purpose")
-            { SubjectIds = new List<Guid> { createdSubjectResponse.Id } };
+        {
+            SubjectIds = new List<Guid> { createdSubjectResponse.Id },
+            ProficiencyGroupIds = new List<Guid> { createdProficiencyGroupResponse.Id }
+        };
         var createdGameResponse = await SendAsync(createGameCommand);
 
         var createClientCommand = new CreateClientCommand("client");

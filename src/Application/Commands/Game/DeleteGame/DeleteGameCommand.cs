@@ -10,7 +10,8 @@ public class DeleteGameCommandHandler(IApplicationDbContext context) : IRequestH
     public async Task<Unit> Handle(DeleteGameCommand request, CancellationToken cancellationToken)
     {
         var entity = await context.Games
-            .Include(gs => gs.GameSubjects)  
+            .Include(gs => gs.GameSubjects)
+            .Include(gp => gp.GameProficiencyGroups)
             .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
         Guard.Against.NotFound(request.Id, entity);
 
@@ -21,6 +22,7 @@ public class DeleteGameCommandHandler(IApplicationDbContext context) : IRequestH
         }
         
         entity.GameSubjects.Clear();
+        entity.GameProficiencyGroups.Clear();
         context.Games.Remove(entity);
         await context.SaveChangesAsync(cancellationToken);
 

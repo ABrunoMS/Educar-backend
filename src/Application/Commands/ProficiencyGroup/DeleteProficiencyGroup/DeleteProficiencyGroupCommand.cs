@@ -11,10 +11,12 @@ public class DeleteProficiencyGroupCommandHandler(IApplicationDbContext context)
     {
         var entity = await context.ProficiencyGroups
             .Include(gs => gs.ProficiencyGroupProficiencies)
+            .Include(gs => gs.GameProficiencyGroups)
             .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
         Guard.Against.NotFound(request.Id, entity);
 
         entity.ProficiencyGroupProficiencies.Clear();
+        entity.GameProficiencyGroups.Clear();
         context.ProficiencyGroups.Remove(entity);
         await context.SaveChangesAsync(cancellationToken);
 

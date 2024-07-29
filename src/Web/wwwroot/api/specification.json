@@ -1770,7 +1770,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedListOfProficiencyDto"
+                  "$ref": "#/components/schemas/PaginatedListOfProficiencyCleanDto"
                 }
               }
             }
@@ -1916,6 +1916,156 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "ProficiencyGroups"
+        ],
+        "operationId": "GetAllProficiencyGroups",
+        "parameters": [
+          {
+            "name": "page_number",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedListOfProficiencyGroupCleanDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/ProficiencyGroups/{id}": {
+      "get": {
+        "tags": [
+          "ProficiencyGroups"
+        ],
+        "operationId": "GetProficiencyGroup",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProficiencyGroupDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "ProficiencyGroups"
+        ],
+        "operationId": "UpdateProficiencyGroup",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProficiencyGroupCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "ProficiencyGroups"
+        ],
+        "operationId": "DeleteProficiencyGroup",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
           }
         },
         "security": [
@@ -3179,6 +3329,13 @@
               "type": "string",
               "format": "guid"
             }
+          },
+          "proficiencyGroupIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
           }
         }
       },
@@ -3241,10 +3398,34 @@
             "items": {
               "$ref": "#/components/schemas/SubjectDto"
             }
+          },
+          "proficiencyGroups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProficiencyGroupCleanDto"
+            }
           }
         }
       },
       "SubjectDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ProficiencyGroupCleanDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -3287,6 +3468,13 @@
             "nullable": true
           },
           "subjectIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
+          },
+          "proficiencyGroupIds": {
             "type": "array",
             "items": {
               "type": "string",
@@ -3733,14 +3921,14 @@
           }
         }
       },
-      "PaginatedListOfProficiencyDto": {
+      "PaginatedListOfProficiencyCleanDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ProficiencyDto"
+              "$ref": "#/components/schemas/ProficiencyCleanDto"
             }
           },
           "pageNumber": {
@@ -3760,6 +3948,28 @@
           },
           "hasNextPage": {
             "type": "boolean"
+          }
+        }
+      },
+      "ProficiencyCleanDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "purpose": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -3786,22 +3996,8 @@
           "proficiencyGroups": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ProficiencyGroupDto"
+              "$ref": "#/components/schemas/ProficiencyGroupCleanDto"
             }
-          }
-        }
-      },
-      "ProficiencyGroupDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid"
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
           }
         }
       },
@@ -3836,6 +4032,85 @@
           },
           "description": {
             "type": "string"
+          },
+          "proficiencyIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        }
+      },
+      "PaginatedListOfProficiencyGroupCleanDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProficiencyGroupCleanDto"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hasPreviousPage": {
+            "type": "boolean"
+          },
+          "hasNextPage": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ProficiencyGroupDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "proficiencies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProficiencyCleanDto"
+            }
+          }
+        }
+      },
+      "UpdateProficiencyGroupCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
           },
           "proficiencyIds": {
             "type": "array",

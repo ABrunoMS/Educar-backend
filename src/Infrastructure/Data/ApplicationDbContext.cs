@@ -28,6 +28,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Proficiency> Proficiencies => Set<Proficiency>();
     public DbSet<ProficiencyGroup> ProficiencyGroups => Set<ProficiencyGroup>();
     public DbSet<ProficiencyGroupProficiency> ProficiencyGroupProficiencies => Set<ProficiencyGroupProficiency>();
+    public DbSet<GameProficiencyGroup> GameProficiencyGroups => Set<GameProficiencyGroup>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

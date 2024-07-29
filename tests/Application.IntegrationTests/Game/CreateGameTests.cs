@@ -1,5 +1,6 @@
 using Educar.Backend.Application.Commands;
 using Educar.Backend.Application.Commands.Game.CreateGame;
+using Educar.Backend.Application.Commands.ProficiencyGroup.CreateProficiencyGroup;
 using Educar.Backend.Application.Commands.Subject.CreateSubject;
 using Educar.Backend.Application.Common.Exceptions;
 using Microsoft.EntityFrameworkCore;
@@ -29,9 +30,14 @@ public class CreateGameTests : TestBase
         var createSubjectCommand = new CreateSubjectCommand("Test Subject", "Subject Description");
         var createdSubjectResponse = await SendAsync(createSubjectCommand);
 
+        var createProficiencyGroupCommand =
+            new CreateProficiencyGroupCommand("Test ProficiencyGroup", "ProficiencyGroup Description");
+        var createdProficiencyGroupResponse = await SendAsync(createProficiencyGroupCommand);
+
         var command = new CreateGameCommand(name, description, lore, purpose)
         {
-            SubjectIds = new List<Guid> { createdSubjectResponse.Id }
+            SubjectIds = new List<Guid> { createdSubjectResponse.Id },
+            ProficiencyGroupIds = new List<Guid> { createdProficiencyGroupResponse.Id }
         };
 
         // Act
@@ -46,6 +52,8 @@ public class CreateGameTests : TestBase
             var createdGame = await Context.Games
                 .Include(g => g.GameSubjects)
                 .ThenInclude(gs => gs.Subject)
+                .Include(g => g.GameProficiencyGroups)
+                .ThenInclude(gpg => gpg.ProficiencyGroup)
                 .FirstOrDefaultAsync(g => g.Id == response.Id);
             Assert.That(createdGame, Is.Not.Null);
             Assert.That(createdGame.Name, Is.EqualTo(name));
@@ -54,6 +62,9 @@ public class CreateGameTests : TestBase
             Assert.That(createdGame.Purpose, Is.EqualTo(purpose));
             Assert.That(createdGame.GameSubjects, Has.Count.EqualTo(1));
             Assert.That(createdGame.GameSubjects.First().Subject.Name, Is.EqualTo("Test Subject"));
+            Assert.That(createdGame.GameProficiencyGroups, Has.Count.EqualTo(1));
+            Assert.That(createdGame.GameProficiencyGroups.First().ProficiencyGroup.Name,
+                Is.EqualTo("Test ProficiencyGroup"));
         }
     }
 

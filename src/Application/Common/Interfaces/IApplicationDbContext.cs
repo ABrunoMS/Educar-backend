@@ -20,6 +20,7 @@ public interface IApplicationDbContext
     DbSet<Proficiency> Proficiencies { get; }
     DbSet<ProficiencyGroup> ProficiencyGroups { get; }
     DbSet<ProficiencyGroupProficiency> ProficiencyGroupProficiencies { get; }
+    DbSet<GameProficiencyGroup> GameProficiencyGroups { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

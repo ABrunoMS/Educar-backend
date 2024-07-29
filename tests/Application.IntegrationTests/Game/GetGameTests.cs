@@ -1,5 +1,6 @@
 using Ardalis.GuardClauses;
 using Educar.Backend.Application.Commands.Game.CreateGame;
+using Educar.Backend.Application.Commands.ProficiencyGroup.CreateProficiencyGroup;
 using Educar.Backend.Application.Commands.Subject.CreateSubject;
 using Educar.Backend.Application.Queries.Game;
 using NUnit.Framework;
@@ -23,9 +24,14 @@ public class GetGameTests : TestBase
         var createSubjectCommand = new CreateSubjectCommand("Test Subject", "Subject Description");
         var createdSubjectResponse = await SendAsync(createSubjectCommand);
 
+        var createProficiencyGroupCommand =
+            new CreateProficiencyGroupCommand("Test ProficiencyGroup", "ProficiencyGroup Description");
+        var createdProficiencyGroupResponse = await SendAsync(createProficiencyGroupCommand);
+
         var createCommand = new CreateGameCommand("Test Game", "Description", "Lore", "Purpose")
         {
-            SubjectIds = new List<Guid> { createdSubjectResponse.Id }
+            SubjectIds = new List<Guid> { createdSubjectResponse.Id },
+            ProficiencyGroupIds = new List<Guid> { createdProficiencyGroupResponse.Id }
         };
         var createdResponse = await SendAsync(createCommand);
         var gameId = createdResponse.Id;
@@ -43,6 +49,8 @@ public class GetGameTests : TestBase
         Assert.That(result.Purpose, Is.EqualTo("Purpose"));
         Assert.That(result.Subjects, Is.Not.Empty);
         Assert.That(result.Subjects.First().Name, Is.EqualTo("Test Subject"));
+        Assert.That(result.ProficiencyGroups, Is.Not.Empty);
+        Assert.That(result.ProficiencyGroups.First().Name, Is.EqualTo("Test ProficiencyGroup"));
     }
 
     [Test]
@@ -60,11 +68,16 @@ public class GetGameTests : TestBase
         var createSubjectCommand = new CreateSubjectCommand("Test Subject", "Subject Description");
         var createdSubjectResponse = await SendAsync(createSubjectCommand);
 
+        var createProficiencyGroupCommand =
+            new CreateProficiencyGroupCommand("Test ProficiencyGroup", "ProficiencyGroup Description");
+        var createdProficiencyGroupResponse = await SendAsync(createProficiencyGroupCommand);
+
         for (var i = 1; i <= 20; i++)
         {
             var command = new CreateGameCommand($"Test Game {i}", "Description", "Lore", "Purpose")
             {
-                SubjectIds = new List<Guid> { createdSubjectResponse.Id }
+                SubjectIds = new List<Guid> { createdSubjectResponse.Id },
+                ProficiencyGroupIds = new List<Guid> { createdProficiencyGroupResponse.Id }
             };
             await SendAsync(command);
         }
@@ -92,11 +105,16 @@ public class GetGameTests : TestBase
         var createSubjectCommand = new CreateSubjectCommand("Test Subject", "Subject Description");
         var createdSubjectResponse = await SendAsync(createSubjectCommand);
 
+        var createProficiencyGroupCommand =
+            new CreateProficiencyGroupCommand("Test ProficiencyGroup", "ProficiencyGroup Description");
+        var createdProficiencyGroupResponse = await SendAsync(createProficiencyGroupCommand);
+
         for (var i = 1; i <= 2; i++)
         {
             var command = new CreateGameCommand($"Test Game {i}", "Description", "Lore", "Purpose")
             {
-                SubjectIds = new List<Guid> { createdSubjectResponse.Id }
+                SubjectIds = new List<Guid> { createdSubjectResponse.Id },
+                ProficiencyGroupIds = new List<Guid> { createdProficiencyGroupResponse.Id }
             };
             await SendAsync(command);
         }
@@ -125,11 +143,16 @@ public class GetGameTests : TestBase
         var createSubjectCommand = new CreateSubjectCommand("Test Subject", "Subject Description");
         var createdSubjectResponse = await SendAsync(createSubjectCommand);
 
+        var createProficiencyGroupCommand =
+            new CreateProficiencyGroupCommand("Test ProficiencyGroup", "ProficiencyGroup Description");
+        var createdProficiencyGroupResponse = await SendAsync(createProficiencyGroupCommand);
+
         for (var i = 1; i <= 20; i++)
         {
             var command = new CreateGameCommand($"Test Game {i}", "Description", "Lore", "Purpose")
             {
-                SubjectIds = new List<Guid> { createdSubjectResponse.Id }
+                SubjectIds = new List<Guid> { createdSubjectResponse.Id },
+                ProficiencyGroupIds = new List<Guid> { createdProficiencyGroupResponse.Id }
             };
             await SendAsync(command);
         }

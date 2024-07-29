@@ -25,6 +25,10 @@ public class GetGamesPaginatedQueryHandler : IRequestHandler<GetGamesPaginatedQu
         CancellationToken cancellationToken)
     {
         return await _context.Games
+            .Include(g => g.GameSubjects)
+            .ThenInclude(gs => gs.Subject)
+            .Include(g => g.GameProficiencyGroups)
+            .ThenInclude(gp => gp.ProficiencyGroup)
             .OrderBy(x => x.Name)
             .ProjectTo<GameDto>(_mapper.ConfigurationProvider)
             .PaginatedListAsync(request.PageNumber, request.PageSize);

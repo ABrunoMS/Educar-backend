@@ -1,6 +1,7 @@
 using Ardalis.GuardClauses;
 using Educar.Backend.Application.Commands.Game.CreateGame;
 using Educar.Backend.Application.Commands.Game.UpdateGame;
+using Educar.Backend.Application.Commands.ProficiencyGroup.CreateProficiencyGroup;
 using Educar.Backend.Application.Commands.Subject.CreateSubject;
 using Educar.Backend.Application.Common.Exceptions;
 using Microsoft.EntityFrameworkCore;
@@ -25,16 +26,25 @@ public class UpdateGameTests : TestBase
         var createSubjectCommand = new CreateSubjectCommand("Original Subject", "Original Subject Description");
         var createdSubjectResponse = await SendAsync(createSubjectCommand);
 
+        var createProficiencyGroupCommand =
+            new CreateProficiencyGroupCommand("Original ProficiencyGroup", "Original ProficiencyGroup Description");
+        var createdProficiencyGroupResponse = await SendAsync(createProficiencyGroupCommand);
+
         var createCommand =
             new CreateGameCommand("Original Name", "Original Description", "Original Lore", "Original Purpose")
             {
-                SubjectIds = new List<Guid> { createdSubjectResponse.Id }
+                SubjectIds = new List<Guid> { createdSubjectResponse.Id },
+                ProficiencyGroupIds = new List<Guid> { createdProficiencyGroupResponse.Id }
             };
         var createdResponse = await SendAsync(createCommand);
         var gameId = createdResponse.Id;
 
         var updateSubjectCommand = new CreateSubjectCommand("Updated Subject", "Updated Subject Description");
         var updatedSubjectResponse = await SendAsync(updateSubjectCommand);
+
+        var updateProficiencyGroupCommand =
+            new CreateProficiencyGroupCommand("Updated ProficiencyGroup", "Updated ProficiencyGroup Description");
+        var updatedProficiencyGroupResponse = await SendAsync(updateProficiencyGroupCommand);
 
         var updateCommand = new UpdateGameCommand
         {
@@ -43,7 +53,8 @@ public class UpdateGameTests : TestBase
             Description = "Updated Description",
             Lore = "Updated Lore",
             Purpose = "Updated Purpose",
-            SubjectIds = new List<Guid> { updatedSubjectResponse.Id }
+            SubjectIds = new List<Guid> { updatedSubjectResponse.Id },
+            ProficiencyGroupIds = new List<Guid> { updatedProficiencyGroupResponse.Id }
         };
 
         // Act
@@ -55,6 +66,8 @@ public class UpdateGameTests : TestBase
             var updatedGame = await Context.Games
                 .Include(g => g.GameSubjects)
                 .ThenInclude(gs => gs.Subject)
+                .Include(g => g.GameProficiencyGroups)
+                .ThenInclude(gpg => gpg.ProficiencyGroup)
                 .FirstOrDefaultAsync(g => g.Id == gameId);
             Assert.That(updatedGame, Is.Not.Null);
             Assert.That(updatedGame.Name, Is.EqualTo("Updated Name"));
@@ -63,6 +76,9 @@ public class UpdateGameTests : TestBase
             Assert.That(updatedGame.Purpose, Is.EqualTo("Updated Purpose"));
             Assert.That(updatedGame.GameSubjects, Has.Count.EqualTo(1));
             Assert.That(updatedGame.GameSubjects.First().Subject.Name, Is.EqualTo("Updated Subject"));
+            Assert.That(updatedGame.GameProficiencyGroups, Has.Count.EqualTo(1));
+            Assert.That(updatedGame.GameProficiencyGroups.First().ProficiencyGroup.Name,
+                Is.EqualTo("Updated ProficiencyGroup"));
         }
     }
 

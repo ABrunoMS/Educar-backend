@@ -11,6 +11,8 @@ public record CreateGameCommand(string Name, string Description, string Lore, st
     public string Lore { get; set; } = Lore;
     public string Purpose { get; set; } = Purpose;
     public IList<Guid> SubjectIds { get; set; } = new List<Guid>();
+
+    public IList<Guid> ProficiencyGroupIds { get; set; } = new List<Guid>();
 }
 
 public class CreateGameCommandHandler(IApplicationDbContext context)
@@ -32,12 +34,33 @@ public class CreateGameCommandHandler(IApplicationDbContext context)
             }
         }
 
-        var entity = new Domain.Entities.Game(request.Name, request.Description, request.Lore, request.Purpose);
+        var proficiencyGroupEntities = new List<Domain.Entities.ProficiencyGroup>();
+        if (request.ProficiencyGroupIds != null && request.ProficiencyGroupIds.Count != 0)
+        {
+            proficiencyGroupEntities = await context.ProficiencyGroups
+                .Where(pg => request.ProficiencyGroupIds.Contains(pg.Id))
+                .ToListAsync(cancellationToken);
 
+            var missingProficiencyGroupIds = request.ProficiencyGroupIds
+                .Except(proficiencyGroupEntities.Select(pg => pg.Id)).ToList();
+            if (missingProficiencyGroupIds.Count != 0)
+            {
+                throw new NotFoundException(nameof(Domain.Entities.ProficiencyGroup),
+                    string.Join(", ", missingProficiencyGroupIds));
+            }
+        }
+
+        var entity = new Domain.Entities.Game(request.Name, request.Description, request.Lore, request.Purpose);
 
         foreach (var subjectEntity in subjectEntities)
         {
             entity.GameSubjects.Add(new GameSubject { Game = entity, Subject = subjectEntity });
+        }
+
+        foreach (var proficiencyGroupEntity in proficiencyGroupEntities)
+        {
+            entity.GameProficiencyGroups.Add(new GameProficiencyGroup
+                { Game = entity, ProficiencyGroup = proficiencyGroupEntity });
         }
 
         context.Games.Add(entity);
