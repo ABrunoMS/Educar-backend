@@ -29,6 +29,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<ProficiencyGroup> ProficiencyGroups => Set<ProficiencyGroup>();
     public DbSet<ProficiencyGroupProficiency> ProficiencyGroupProficiencies => Set<ProficiencyGroupProficiency>();
     public DbSet<GameProficiencyGroup> GameProficiencyGroups => Set<GameProficiencyGroup>();
+    public DbSet<Item> Items => Set<Item>();
+    public DbSet<Npc> Npcs => Set<Npc>();
+    public DbSet<NpcItem> NpcItems => Set<NpcItem>();
+    public DbSet<Dialogue> Dialogues => Set<Dialogue>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

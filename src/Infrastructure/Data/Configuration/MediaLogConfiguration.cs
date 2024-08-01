@@ -1,7 +1,6 @@
 using Educar.Backend.Application.Common.Extensions;
 using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Domain.Entities;
-using Educar.Backend.Infrastructure.Data.Comparers;
 using Educar.Backend.Infrastructure.Data.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;

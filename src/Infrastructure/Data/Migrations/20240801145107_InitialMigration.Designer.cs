@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Educar.Backend.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240723202039_AccountClassCascadeConfig")]
-    partial class AccountClassCascadeConfig
+    [Migration("20240801145107_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -393,6 +393,57 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.ToTable("contracts");
                 });
 
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Dialogue", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<Guid>("NpcId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("npc_id");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer")
+                        .HasColumnName("order");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NpcId");
+
+                    b.ToTable("dialogues");
+                });
+
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Game", b =>
                 {
                     b.Property<Guid>("Id")
@@ -452,6 +503,186 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("games");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.GameProficiencyGroup", b =>
+                {
+                    b.Property<Guid>("GameId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("game_id");
+
+                    b.Property<Guid>("ProficiencyGroupId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("proficiency_group_id");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.HasKey("GameId", "ProficiencyGroupId");
+
+                    b.HasIndex("ProficiencyGroupId");
+
+                    b.ToTable("game_proficiency_groups");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.GameSubject", b =>
+                {
+                    b.Property<Guid>("GameId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("game_id");
+
+                    b.Property<Guid>("SubjectId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("subject_id");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.HasKey("GameId", "SubjectId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.ToTable("game_subjects");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Grade", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("grades");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Item", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DismantleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("dismantle_id");
+
+                    b.Property<decimal>("DropRate")
+                        .HasColumnType("decimal(5,2)")
+                        .HasColumnName("drop_rate");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<string>("ItemRarity")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("item_rarity");
+
+                    b.Property<string>("ItemType")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("item_type");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<string>("Lore")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("lore");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Reference2D")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("reference2d");
+
+                    b.Property<string>("Reference3D")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("reference3d");
+
+                    b.Property<decimal>("SellValue")
+                        .HasColumnType("decimal(10,2)")
+                        .HasColumnName("sell_value");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DismantleId");
+
+                    b.ToTable("items");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Media", b =>
@@ -591,6 +822,216 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.ToTable("media_logs");
                 });
 
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Npc", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<decimal>("GoldAmount")
+                        .HasColumnType("decimal(10,2)")
+                        .HasColumnName("gold_amount");
+
+                    b.Property<decimal>("GoldDropRate")
+                        .HasColumnType("decimal(5,2)")
+                        .HasColumnName("gold_drop_rate");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<string>("Lore")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("lore");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("NpcType")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("npc_type");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("npcs");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.NpcItem", b =>
+                {
+                    b.Property<Guid>("NpcId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("npc_id");
+
+                    b.Property<Guid>("ItemId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("item_id");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.HasKey("NpcId", "ItemId");
+
+                    b.HasIndex("ItemId");
+
+                    b.ToTable("npc_items");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Proficiency", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Purpose")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("purpose");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("proficiencies");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.ProficiencyGroup", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("proficiency_groups");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.ProficiencyGroupProficiency", b =>
+                {
+                    b.Property<Guid>("ProficiencyGroupId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("proficiency_group_id");
+
+                    b.Property<Guid>("ProficiencyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("proficiency_id");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.HasKey("ProficiencyGroupId", "ProficiencyId");
+
+                    b.HasIndex("ProficiencyId");
+
+                    b.ToTable("proficiency_group_proficiencies");
+                });
+
             modelBuilder.Entity("Educar.Backend.Domain.Entities.School", b =>
                 {
                     b.Property<Guid>("Id")
@@ -648,6 +1089,53 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.ToTable("schools");
                 });
 
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Subject", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("subjects");
+                });
+
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Account", b =>
                 {
                     b.HasOne("Educar.Backend.Domain.Entities.Client", "Client")
@@ -670,13 +1158,13 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.HasOne("Educar.Backend.Domain.Entities.Account", "Account")
                         .WithMany("AccountClasses")
                         .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Educar.Backend.Domain.Entities.Class", "Class")
                         .WithMany("AccountClasses")
                         .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Account");
@@ -714,6 +1202,64 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("Game");
                 });
 
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Dialogue", b =>
+                {
+                    b.HasOne("Educar.Backend.Domain.Entities.Npc", "Npc")
+                        .WithMany("Dialogues")
+                        .HasForeignKey("NpcId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Npc");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.GameProficiencyGroup", b =>
+                {
+                    b.HasOne("Educar.Backend.Domain.Entities.Game", "Game")
+                        .WithMany("GameProficiencyGroups")
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Educar.Backend.Domain.Entities.ProficiencyGroup", "ProficiencyGroup")
+                        .WithMany("GameProficiencyGroups")
+                        .HasForeignKey("ProficiencyGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Game");
+
+                    b.Navigation("ProficiencyGroup");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.GameSubject", b =>
+                {
+                    b.HasOne("Educar.Backend.Domain.Entities.Game", "Game")
+                        .WithMany("GameSubjects")
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Educar.Backend.Domain.Entities.Subject", "Subject")
+                        .WithMany("GameSubjects")
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Game");
+
+                    b.Navigation("Subject");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Item", b =>
+                {
+                    b.HasOne("Educar.Backend.Domain.Entities.Item", "Dismantle")
+                        .WithMany()
+                        .HasForeignKey("DismantleId");
+
+                    b.Navigation("Dismantle");
+                });
+
             modelBuilder.Entity("Educar.Backend.Domain.Entities.MediaLog", b =>
                 {
                     b.HasOne("Educar.Backend.Domain.Entities.Account", "Account")
@@ -731,6 +1277,44 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("Account");
 
                     b.Navigation("Media");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.NpcItem", b =>
+                {
+                    b.HasOne("Educar.Backend.Domain.Entities.Item", "Item")
+                        .WithMany("NpcItems")
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Educar.Backend.Domain.Entities.Npc", "Npc")
+                        .WithMany("NpcItems")
+                        .HasForeignKey("NpcId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Item");
+
+                    b.Navigation("Npc");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.ProficiencyGroupProficiency", b =>
+                {
+                    b.HasOne("Educar.Backend.Domain.Entities.ProficiencyGroup", "ProficiencyGroup")
+                        .WithMany("ProficiencyGroupProficiencies")
+                        .HasForeignKey("ProficiencyGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Educar.Backend.Domain.Entities.Proficiency", "Proficiency")
+                        .WithMany("ProficiencyGroupProficiencies")
+                        .HasForeignKey("ProficiencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Proficiency");
+
+                    b.Navigation("ProficiencyGroup");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.School", b =>
@@ -767,9 +1351,45 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("Contracts");
                 });
 
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Game", b =>
+                {
+                    b.Navigation("GameProficiencyGroups");
+
+                    b.Navigation("GameSubjects");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Item", b =>
+                {
+                    b.Navigation("NpcItems");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Npc", b =>
+                {
+                    b.Navigation("Dialogues");
+
+                    b.Navigation("NpcItems");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Proficiency", b =>
+                {
+                    b.Navigation("ProficiencyGroupProficiencies");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.ProficiencyGroup", b =>
+                {
+                    b.Navigation("GameProficiencyGroups");
+
+                    b.Navigation("ProficiencyGroupProficiencies");
+                });
+
             modelBuilder.Entity("Educar.Backend.Domain.Entities.School", b =>
                 {
                     b.Navigation("Accounts");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Subject", b =>
+                {
+                    b.Navigation("GameSubjects");
                 });
 #pragma warning restore 612, 618
         }

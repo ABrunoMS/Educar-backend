@@ -76,6 +76,56 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "grades",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    description = table.Column<string>(type: "text", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<string>(type: "text", nullable: true),
+                    last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    last_modified_by = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_grades", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "items",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    lore = table.Column<string>(type: "text", nullable: false),
+                    item_type = table.Column<string>(type: "text", nullable: false),
+                    item_rarity = table.Column<string>(type: "text", nullable: false),
+                    sell_value = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
+                    dismantle_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    reference2d = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    reference3d = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    drop_rate = table.Column<decimal>(type: "numeric(5,2)", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<string>(type: "text", nullable: true),
+                    last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    last_modified_by = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_items", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_items_items_dismantle_id",
+                        column: x => x.dismantle_id,
+                        principalTable: "items",
+                        principalColumn: "id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "medias",
                 columns: table => new
                 {
@@ -98,6 +148,86 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_medias", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "npcs",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    lore = table.Column<string>(type: "text", nullable: false),
+                    npc_type = table.Column<string>(type: "text", nullable: false),
+                    gold_drop_rate = table.Column<decimal>(type: "numeric(5,2)", nullable: false),
+                    gold_amount = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<string>(type: "text", nullable: true),
+                    last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    last_modified_by = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_npcs", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "proficiencies",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    description = table.Column<string>(type: "text", nullable: false),
+                    purpose = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<string>(type: "text", nullable: true),
+                    last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    last_modified_by = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_proficiencies", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "proficiency_groups",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    description = table.Column<string>(type: "text", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<string>(type: "text", nullable: true),
+                    last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    last_modified_by = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_proficiency_groups", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "subjects",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    description = table.Column<string>(type: "text", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<string>(type: "text", nullable: true),
+                    last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    last_modified_by = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_subjects", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -166,6 +296,136 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         name: "FK_contracts_games_game_id",
                         column: x => x.game_id,
                         principalTable: "games",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "dialogues",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    text = table.Column<string>(type: "text", nullable: false),
+                    order = table.Column<int>(type: "integer", nullable: false),
+                    npc_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<string>(type: "text", nullable: true),
+                    last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    last_modified_by = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_dialogues", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_dialogues_npcs_npc_id",
+                        column: x => x.npc_id,
+                        principalTable: "npcs",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "npc_items",
+                columns: table => new
+                {
+                    npc_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    item_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_npc_items", x => new { x.npc_id, x.item_id });
+                    table.ForeignKey(
+                        name: "FK_npc_items_items_item_id",
+                        column: x => x.item_id,
+                        principalTable: "items",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_npc_items_npcs_npc_id",
+                        column: x => x.npc_id,
+                        principalTable: "npcs",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "game_proficiency_groups",
+                columns: table => new
+                {
+                    game_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    proficiency_group_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_game_proficiency_groups", x => new { x.game_id, x.proficiency_group_id });
+                    table.ForeignKey(
+                        name: "FK_game_proficiency_groups_games_game_id",
+                        column: x => x.game_id,
+                        principalTable: "games",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_game_proficiency_groups_proficiency_groups_proficiency_grou~",
+                        column: x => x.proficiency_group_id,
+                        principalTable: "proficiency_groups",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "proficiency_group_proficiencies",
+                columns: table => new
+                {
+                    proficiency_group_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    proficiency_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_proficiency_group_proficiencies", x => new { x.proficiency_group_id, x.proficiency_id });
+                    table.ForeignKey(
+                        name: "FK_proficiency_group_proficiencies_proficiencies_proficiency_id",
+                        column: x => x.proficiency_id,
+                        principalTable: "proficiencies",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_proficiency_group_proficiencies_proficiency_groups_proficie~",
+                        column: x => x.proficiency_group_id,
+                        principalTable: "proficiency_groups",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "game_subjects",
+                columns: table => new
+                {
+                    game_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    subject_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_game_subjects", x => new { x.game_id, x.subject_id });
+                    table.ForeignKey(
+                        name: "FK_game_subjects_games_game_id",
+                        column: x => x.game_id,
+                        principalTable: "games",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_game_subjects_subjects_subject_id",
+                        column: x => x.subject_id,
+                        principalTable: "subjects",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -331,10 +591,30 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 column: "game_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_dialogues_npc_id",
+                table: "dialogues",
+                column: "npc_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_game_proficiency_groups_proficiency_group_id",
+                table: "game_proficiency_groups",
+                column: "proficiency_group_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_game_subjects_subject_id",
+                table: "game_subjects",
+                column: "subject_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_games_name",
                 table: "games",
                 column: "name",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_items_dismantle_id",
+                table: "items",
+                column: "dismantle_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_media_logs_account_id",
@@ -345,6 +625,16 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 name: "IX_media_logs_media_id",
                 table: "media_logs",
                 column: "media_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_npc_items_item_id",
+                table: "npc_items",
+                column: "item_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_proficiency_group_proficiencies_proficiency_id",
+                table: "proficiency_group_proficiencies",
+                column: "proficiency_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_schools_address_id",
@@ -367,7 +657,25 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 name: "contracts");
 
             migrationBuilder.DropTable(
+                name: "dialogues");
+
+            migrationBuilder.DropTable(
+                name: "game_proficiency_groups");
+
+            migrationBuilder.DropTable(
+                name: "game_subjects");
+
+            migrationBuilder.DropTable(
+                name: "grades");
+
+            migrationBuilder.DropTable(
                 name: "media_logs");
+
+            migrationBuilder.DropTable(
+                name: "npc_items");
+
+            migrationBuilder.DropTable(
+                name: "proficiency_group_proficiencies");
 
             migrationBuilder.DropTable(
                 name: "classes");
@@ -376,10 +684,25 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 name: "games");
 
             migrationBuilder.DropTable(
+                name: "subjects");
+
+            migrationBuilder.DropTable(
                 name: "accounts");
 
             migrationBuilder.DropTable(
                 name: "medias");
+
+            migrationBuilder.DropTable(
+                name: "items");
+
+            migrationBuilder.DropTable(
+                name: "npcs");
+
+            migrationBuilder.DropTable(
+                name: "proficiencies");
+
+            migrationBuilder.DropTable(
+                name: "proficiency_groups");
 
             migrationBuilder.DropTable(
                 name: "schools");

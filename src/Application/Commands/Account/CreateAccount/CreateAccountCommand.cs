@@ -31,7 +31,7 @@ public class CreateAccountCommandHandler(IApplicationDbContext context)
         Domain.Entities.School? school = null;
         if (request.SchoolId != null && request.SchoolId != Guid.Empty)
         {
-            school = await context.Schools.FindAsync(new object[] { request.SchoolId }, cancellationToken: cancellationToken);
+            school = await context.Schools.FindAsync([request.SchoolId], cancellationToken: cancellationToken);
             if (school == null) throw new NotFoundException(nameof(School), request.SchoolId.ToString()!);
         }
 

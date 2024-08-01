@@ -21,6 +21,10 @@ public interface IApplicationDbContext
     DbSet<ProficiencyGroup> ProficiencyGroups { get; }
     DbSet<ProficiencyGroupProficiency> ProficiencyGroupProficiencies { get; }
     DbSet<GameProficiencyGroup> GameProficiencyGroups { get; }
+    DbSet<Item> Items { get; }
+    DbSet<Npc> Npcs { get; }
+    DbSet<NpcItem> NpcItems { get; }
+    DbSet<Dialogue> Dialogues { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
