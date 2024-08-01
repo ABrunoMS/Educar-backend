@@ -10,10 +10,12 @@ public class DeleteGameCommandHandler(IApplicationDbContext context) : IRequestH
     {
         var entity = await context.Npcs
             .Include(gs => gs.NpcItems)
+            .Include(gs => gs.GameNpcs)
             .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
         Guard.Against.NotFound(request.Id, entity);
 
         entity.NpcItems.Clear();
+        entity.GameNpcs.Clear();
         context.Npcs.Remove(entity);
         await context.SaveChangesAsync(cancellationToken);
 

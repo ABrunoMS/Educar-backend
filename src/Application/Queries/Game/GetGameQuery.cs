@@ -16,6 +16,8 @@ public class GetGameQueryHandler(IApplicationDbContext context, IMapper mapper) 
             .ThenInclude(gs => gs.Subject)
             .Include(g => g.GameProficiencyGroups)
             .ThenInclude(gp => gp.ProficiencyGroup)
+            .Include(g => g.GameNpcs)
+            .ThenInclude(gn => gn.Npc)
             .ProjectTo<GameDto>(mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
 

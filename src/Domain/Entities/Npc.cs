@@ -20,4 +20,6 @@ public class Npc : BaseAuditableEntity
     public decimal GoldAmount { get; set; }
     public IList<NpcItem> NpcItems { get; set; } = new List<NpcItem>();
     public IList<Dialogue> Dialogues { get; set; } = new List<Dialogue>();
+    public IList<GameNpc> GameNpcs { get; set; } = new List<GameNpc>();
+    
 }

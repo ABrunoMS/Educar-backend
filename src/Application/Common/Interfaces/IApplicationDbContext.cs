@@ -25,6 +25,7 @@ public interface IApplicationDbContext
     DbSet<Npc> Npcs { get; }
     DbSet<NpcItem> NpcItems { get; }
     DbSet<Dialogue> Dialogues { get; }
+    DbSet<GameNpc> GameNpcs { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

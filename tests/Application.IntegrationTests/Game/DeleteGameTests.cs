@@ -3,6 +3,7 @@ using Educar.Backend.Application.Commands.Client.CreateClient;
 using Educar.Backend.Application.Commands.Contract.CreateContract;
 using Educar.Backend.Application.Commands.Game.CreateGame;
 using Educar.Backend.Application.Commands.Game.DeleteGame;
+using Educar.Backend.Application.Commands.Npc.CreateNpc;
 using Educar.Backend.Application.Commands.ProficiencyGroup.CreateProficiencyGroup;
 using Educar.Backend.Application.Commands.Subject.CreateSubject;
 using Educar.Backend.Domain.Enums;
@@ -40,6 +41,12 @@ public class DeleteGameTests : TestBase
         var createdResponse = await SendAsync(createCommand);
         var gameId = createdResponse.Id;
 
+        var createNpcCommand = new CreateNpcCommand("npc", "npc lore", NpcType.Boss, 5.00m, 100.00m)
+        {
+            GameIds = new List<Guid> { gameId }
+        };
+        await SendAsync(createNpcCommand);
+
         var deleteCommand = new DeleteGameCommand(gameId);
 
         // Act
@@ -59,6 +66,11 @@ public class DeleteGameTests : TestBase
         var deletedGameProficiencyGroups =
             await Context.GameProficiencyGroups.IgnoreQueryFilters().Where(gpg => gpg.GameId == gameId).ToListAsync();
         Assert.That(deletedGameProficiencyGroups.All(gpg => gpg.IsDeleted), Is.True);
+
+        // Ensure the associated npcs are also soft-deleted
+        var deletedGameNpcs =
+            await Context.GameNpcs.IgnoreQueryFilters().Where(gpg => gpg.GameId == gameId).ToListAsync();
+        Assert.That(deletedGameNpcs.All(gpg => gpg.IsDeleted), Is.True);
     }
 
     [Test]

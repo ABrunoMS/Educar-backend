@@ -33,6 +33,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Npc> Npcs => Set<Npc>();
     public DbSet<NpcItem> NpcItems => Set<NpcItem>();
     public DbSet<Dialogue> Dialogues => Set<Dialogue>();
+    public DbSet<GameNpc> GameNpcs => Set<GameNpc>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -10,4 +10,5 @@ public class Game(string name, string description, string lore, string purpose)
     public string Purpose { get; set; } = purpose;
     public IList<GameSubject> GameSubjects { get; set; } = new List<GameSubject>();
     public IList<GameProficiencyGroup> GameProficiencyGroups { get; set; } = new List<GameProficiencyGroup>();
+    public IList<GameNpc> GameNpcs { get; set; } = new List<GameNpc>();
 }

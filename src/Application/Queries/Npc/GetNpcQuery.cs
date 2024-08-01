@@ -15,6 +15,8 @@ public class GetNpcQueryHandler(IApplicationDbContext context, IMapper mapper) :
             .Include(g => g.NpcItems)
             .ThenInclude(gs => gs.Item)
             .Include(g => g.Dialogues)
+            .Include(g => g.GameNpcs)
+            .ThenInclude(gs => gs.Game)
             .ProjectTo<NpcDto>(mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
 

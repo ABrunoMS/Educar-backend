@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using Educar.Backend.Application.Commands.Game.CreateGame;
 using Educar.Backend.Application.Commands.Item.CreateItem;
 using Educar.Backend.Application.Commands.Npc.CreateNpc;
 using Educar.Backend.Application.Commands.Npc.DeleteNpc;
@@ -53,6 +54,54 @@ public class DeleteNpcTests : TestBase
         // Ensure the associated items are also cleared
         var deletedNpcItems = await Context.NpcItems.IgnoreQueryFilters().Where(ni => ni.NpcId == npcId).ToListAsync();
         Assert.That(deletedNpcItems.All(ni => ni.IsDeleted), Is.True);
+    }
+
+    [Test]
+    public async Task GivenValidId_ShouldDeleteNpcAndAssociatedGame()
+    {
+        // Arrange
+        var createItemCommand = new CreateItemCommand(
+            "Test Item",
+            "Item Lore",
+            ItemType.Equipment,
+            ItemRarity.Common,
+            50.00m,
+            "http://example.com/item2d.png",
+            "http://example.com/item3d.png",
+            10.00m);
+        var createdItemResponse = await SendAsync(createItemCommand);
+
+        var createGameCommand = new CreateGameCommand(
+            "Test Game",
+            "Game Description",
+            "Game Lore",
+            "Game Purpose");
+        var createdGameResponse = await SendAsync(createGameCommand);
+
+        var createNpcCommand = new CreateNpcCommand("Test Npc", "Npc Lore", NpcType.Boss, 5.00m, 100.00m)
+        {
+            ItemIds = new List<Guid> { createdItemResponse.Id },
+            GameIds = new List<Guid> { createdGameResponse.Id }
+        };
+        var createdNpcResponse = await SendAsync(createNpcCommand);
+        var npcId = createdNpcResponse.Id;
+
+        var deleteCommand = new DeleteNpcCommand(npcId);
+
+        // Act
+        await SendAsync(deleteCommand);
+
+        // Assert
+        var deletedNpc = await Context.Npcs.IgnoreQueryFilters().FirstOrDefaultAsync(n => n.Id == npcId);
+        Assert.That(deletedNpc, Is.Not.Null);
+        Assert.That(deletedNpc.IsDeleted, Is.True);
+
+        // Ensure the associated items are also cleared
+        var deletedNpcItems = await Context.NpcItems.IgnoreQueryFilters().Where(ni => ni.NpcId == npcId).ToListAsync();
+        Assert.That(deletedNpcItems.All(ni => ni.IsDeleted), Is.True);
+
+        var deletedGameNpcs = await Context.GameNpcs.IgnoreQueryFilters().Where(ni => ni.NpcId == npcId).ToListAsync();
+        Assert.That(deletedGameNpcs.All(ni => ni.IsDeleted), Is.True);
     }
 
     [Test]

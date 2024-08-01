@@ -28,5 +28,11 @@ public class GameConfiguration(DatabaseFacade database) : IEntityTypeConfigurati
             .WithOne(gs => gs.Game)
             .HasForeignKey(gs => gs.GameId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        builder
+            .HasMany(g => g.GameNpcs)
+            .WithOne(gs => gs.Game)
+            .HasForeignKey(gs => gs.GameId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -33,7 +33,7 @@ public class Npcs : EndpointGroupBase
         return await sender.Send(new GetNpcQuery { Id = id });
     }
 
-    public Task<PaginatedList<NpcDto>> GetAllNpcByName(ISender sender, [FromQuery(Name = "name")] string name,
+    public Task<PaginatedList<NpcCleanDto>> GetAllNpcByName(ISender sender, [FromQuery(Name = "name")] string name,
         [AsParameters] PaginatedQuery paginatedQuery)
     {
         var query = new GetNpcsByNamePaginatedQuery(name)

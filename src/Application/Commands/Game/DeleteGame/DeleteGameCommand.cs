@@ -12,6 +12,7 @@ public class DeleteGameCommandHandler(IApplicationDbContext context) : IRequestH
         var entity = await context.Games
             .Include(gs => gs.GameSubjects)
             .Include(gp => gp.GameProficiencyGroups)
+            .Include(gp => gp.GameNpcs)
             .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
         Guard.Against.NotFound(request.Id, entity);
 
@@ -23,6 +24,7 @@ public class DeleteGameCommandHandler(IApplicationDbContext context) : IRequestH
         
         entity.GameSubjects.Clear();
         entity.GameProficiencyGroups.Clear();
+        entity.GameNpcs.Clear();
         context.Games.Remove(entity);
         await context.SaveChangesAsync(cancellationToken);
 
