@@ -1,4 +1,4 @@
-using Educar.Backend.Application.Commands.QuestStepContent.ExpectedAnswerTypes;
+using Educar.Backend.Application.Commands.AnswerTypes;
 using Educar.Backend.Application.Common.Extensions;
 using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Domain.Enums;
@@ -9,7 +9,7 @@ public record CreateQuestStepContentCommand(
     QuestStepContentType QuestStepContentType,
     QuestionType QuestionType,
     string Description,
-    IExpectedAnswer ExpectedAnswers,
+    IAnswer Answers,
     decimal Weight,
     Guid QuestStepId)
     : IRequest<CreatedResponseDto>
@@ -17,7 +17,7 @@ public record CreateQuestStepContentCommand(
     public QuestStepContentType QuestStepContentType { get; set; } = QuestStepContentType;
     public QuestionType QuestionType { get; set; } = QuestionType;
     public string Description { get; set; } = Description;
-    public IExpectedAnswer ExpectedAnswers { get; set; } = ExpectedAnswers;
+    public IAnswer Answers { get; set; } = Answers;
     public decimal Weight { get; set; } = Weight;
     public Guid QuestStepId { get; set; } = QuestStepId;
 }
@@ -33,7 +33,7 @@ public class CreateQuestStepContentCommandHandler(IApplicationDbContext context)
         Guard.Against.NotFound(request.QuestStepId, questStep);
 
         var entity = new Domain.Entities.QuestStepContent(request.QuestStepContentType,
-            request.QuestionType, request.Description, request.ExpectedAnswers.ToJsonObject(), request.Weight)
+            request.QuestionType, request.Description, request.Answers.ToJsonObject(), request.Weight)
         {
             QuestStep = questStep
         };

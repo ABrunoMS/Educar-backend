@@ -17,4 +17,5 @@ public class Account(string name, string email, string registrationNumber, UserR
     public School? School { get; set; }
     public IList<AccountClass> AccountClasses { get; set; } = new List<AccountClass>();
     public UserRole Role { get; set; } = role;
+    public IList<Answer> Answers { get; set; } = new List<Answer>();
 }

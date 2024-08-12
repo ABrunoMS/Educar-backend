@@ -39,6 +39,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<QuestStepMedia> QuestStepMedias => Set<QuestStepMedia>();
     public DbSet<QuestStepNpc> QuestStepNpcs => Set<QuestStepNpc>();
     public DbSet<QuestStepItem> QuestStepItems => Set<QuestStepItem>();
+    public DbSet<Answer> Answers => Set<Answer>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

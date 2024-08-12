@@ -1,4 +1,4 @@
-using Educar.Backend.Application.Commands.QuestStepContent.ExpectedAnswerTypes;
+using Educar.Backend.Application.Commands.AnswerTypes;
 using Educar.Backend.Domain.Enums;
 
 namespace Educar.Backend.Application.Commands.QuestStepContent.UpdateQuestStepContent;
@@ -25,8 +25,8 @@ public class UpdateQuestStepContentCommandValidator : AbstractValidator<UpdateQu
 
         RuleFor(v => v.ExpectedAnswers)
             .Must((command, expectedAnswers) =>
-                QuestStepContentCommandValidator.ValidateExpectedAnswer(command.QuestionType,
-                    expectedAnswers as IExpectedAnswer))
+                AnswerTypeValidator.ValidateAnswer(command.QuestionType,
+                    expectedAnswers as IAnswer))
             .WithMessage("ExpectedAnswers is not valid for the specified QuestionType.");
     }
 }

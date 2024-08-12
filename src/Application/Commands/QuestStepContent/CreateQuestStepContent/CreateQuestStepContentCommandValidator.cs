@@ -1,4 +1,4 @@
-using Educar.Backend.Application.Commands.QuestStepContent.ExpectedAnswerTypes;
+using Educar.Backend.Application.Commands.AnswerTypes;
 using Educar.Backend.Domain.Enums;
 
 namespace Educar.Backend.Application.Commands.QuestStepContent.CreateQuestStepContent;
@@ -24,10 +24,9 @@ public class CreateQuestStepContentCommandValidator : AbstractValidator<CreateQu
         RuleFor(v => v.Weight)
             .GreaterThan(0).WithMessage("Weight must be greater than 0.");
 
-        RuleFor(v => v.ExpectedAnswers)
+        RuleFor(v => v.Answers)
             .Must((command, expectedAnswers) =>
-                QuestStepContentCommandValidator.ValidateExpectedAnswer(command.QuestionType,
-                    expectedAnswers as IExpectedAnswer))
-            .WithMessage("ExpectedAnswers is not valid for the specified QuestionType.");
+                AnswerTypeValidator.ValidateAnswer(command.QuestionType, expectedAnswers))
+            .WithMessage("Answers is not valid for the specified QuestionType.");
     }
 }

@@ -1,5 +1,4 @@
 using System.Reflection;
-using Educar.Backend.Application.Commands.QuestStepContent.ExpectedAnswerTypes;
 using Educar.Backend.Application.Common.Behaviours;
 using Microsoft.Extensions.DependencyInjection;
 

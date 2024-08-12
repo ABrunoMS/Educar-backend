@@ -443,6 +443,205 @@
         ]
       }
     },
+    "/api/Answers": {
+      "post": {
+        "tags": [
+          "Answers"
+        ],
+        "operationId": "CreateAnswer",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAnswerCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Answers/account/{accountId}": {
+      "get": {
+        "tags": [
+          "Answers"
+        ],
+        "operationId": "GetAllAnswerByAccount",
+        "parameters": [
+          {
+            "name": "page_number",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedListOfAnswerDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Answers/{id}": {
+      "get": {
+        "tags": [
+          "Answers"
+        ],
+        "operationId": "GetAnswer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnswerDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Answers"
+        ],
+        "operationId": "UpdateAnswer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAnswerCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Answers"
+        ],
+        "operationId": "DeleteAnswer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/Classes": {
       "post": {
         "tags": [
@@ -2703,6 +2902,168 @@
         ]
       }
     },
+    "/api/QuestStepContents/queststep/{questStepId}": {
+      "get": {
+        "tags": [
+          "QuestStepContents"
+        ],
+        "operationId": "GetAllQuestStepContentByQuestStep",
+        "parameters": [
+          {
+            "name": "questStepId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "page_number",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedListOfQuestStepContentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/QuestStepContents/{id}": {
+      "get": {
+        "tags": [
+          "QuestStepContents"
+        ],
+        "operationId": "GetQuestStepContent",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestStepContentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "QuestStepContents"
+        ],
+        "operationId": "UpdateQuestStepContent",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuestStepContentCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "QuestStepContents"
+        ],
+        "operationId": "DeleteQuestStepContent",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/QuestSteps": {
       "post": {
         "tags": [
@@ -3738,6 +4099,191 @@
           "lng": {
             "type": "number",
             "format": "decimal",
+            "nullable": true
+          }
+        }
+      },
+      "CreateAnswerCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "questStepContentId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "givenAnswer": {
+            "$ref": "#/components/schemas/IAnswer"
+          },
+          "isCorrect": {
+            "type": "boolean"
+          }
+        }
+      },
+      "IAnswer": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "questionType": {
+            "$ref": "#/components/schemas/QuestionType"
+          }
+        }
+      },
+      "QuestionType": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "None",
+          "MultipleChoice",
+          "TrueOrFalse",
+          "SingleChoice",
+          "Dissertative",
+          "ColumnFill",
+          "AlwaysCorrect"
+        ],
+        "enum": [
+          "None",
+          "MultipleChoice",
+          "TrueOrFalse",
+          "SingleChoice",
+          "Dissertative",
+          "ColumnFill",
+          "AlwaysCorrect"
+        ]
+      },
+      "PaginatedListOfAnswerDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnswerDto"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hasPreviousPage": {
+            "type": "boolean"
+          },
+          "hasNextPage": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AnswerDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "givenAnswer": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/KeyValuePairOfStringAndJsonNode"
+            }
+          },
+          "isCorrect": {
+            "type": "boolean"
+          },
+          "questStepContentId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "guid"
+          }
+        }
+      },
+      "KeyValuePairOfStringAndJsonNode": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "type": "string",
+            "nullable": true
+          },
+          "value": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            ]
+          }
+        }
+      },
+      "JsonNode": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "options": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/JsonNodeOptions"
+              }
+            ]
+          },
+          "parent": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            ]
+          },
+          "root": {
+            "$ref": "#/components/schemas/JsonNode"
+          }
+        }
+      },
+      "JsonNodeOptions": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "propertyNameCaseInsensitive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdateAnswerCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "givenAnswer": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IAnswer"
+              }
+            ]
+          },
+          "isCorrect": {
+            "type": "boolean",
             "nullable": true
           }
         }
@@ -4786,59 +5332,6 @@
           "Delete"
         ]
       },
-      "KeyValuePairOfStringAndJsonNode": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "key": {
-            "type": "string",
-            "nullable": true
-          },
-          "value": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/JsonNode"
-              }
-            ]
-          }
-        }
-      },
-      "JsonNode": {
-        "type": "object",
-        "x-abstract": true,
-        "additionalProperties": false,
-        "properties": {
-          "options": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/JsonNodeOptions"
-              }
-            ]
-          },
-          "parent": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/JsonNode"
-              }
-            ]
-          },
-          "root": {
-            "$ref": "#/components/schemas/JsonNode"
-          }
-        }
-      },
-      "JsonNodeOptions": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "propertyNameCaseInsensitive": {
-            "type": "boolean"
-          }
-        }
-      },
       "UploadResponseDto": {
         "type": "object",
         "additionalProperties": false,
@@ -5475,8 +5968,8 @@
           "description": {
             "type": "string"
           },
-          "expectedAnswers": {
-            "$ref": "#/components/schemas/IExpectedAnswer"
+          "answers": {
+            "$ref": "#/components/schemas/IAnswer"
           },
           "weight": {
             "type": "number",
@@ -5502,35 +5995,117 @@
           "Exercise"
         ]
       },
-      "QuestionType": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "None",
-          "MultipleChoice",
-          "TrueOrFalse",
-          "SingleChoice",
-          "Dissertative",
-          "ColumnFill",
-          "AlwaysCorrect"
-        ],
-        "enum": [
-          "None",
-          "MultipleChoice",
-          "TrueOrFalse",
-          "SingleChoice",
-          "Dissertative",
-          "ColumnFill",
-          "AlwaysCorrect"
-        ]
-      },
-      "IExpectedAnswer": {
+      "PaginatedListOfQuestStepContentDto": {
         "type": "object",
-        "x-abstract": true,
         "additionalProperties": false,
         "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestStepContentDto"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hasPreviousPage": {
+            "type": "boolean"
+          },
+          "hasNextPage": {
+            "type": "boolean"
+          }
+        }
+      },
+      "QuestStepContentDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "questStepContentType": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestStepContentType"
+              }
+            ]
+          },
           "questionType": {
-            "$ref": "#/components/schemas/QuestionType"
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestionType"
+              }
+            ]
+          },
+          "expectedAnswers": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/KeyValuePairOfStringAndJsonNode"
+            }
+          },
+          "weight": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "questStepId": {
+            "type": "string",
+            "format": "guid"
+          }
+        }
+      },
+      "UpdateQuestStepContentCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "questStepContentType": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestStepContentType"
+              }
+            ]
+          },
+          "questionType": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestionType"
+              }
+            ]
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "expectedAnswers": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IAnswer"
+              }
+            ]
+          },
+          "weight": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
           }
         }
       },
@@ -5695,6 +6270,12 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ItemDto"
+            }
+          },
+          "contents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestStepContentDto"
             }
           }
         }

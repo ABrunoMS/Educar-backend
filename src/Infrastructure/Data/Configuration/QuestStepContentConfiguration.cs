@@ -16,5 +16,11 @@ public class QuestStepContentConfiguration(DatabaseFacade database) : IEntityTyp
         builder.Property(t => t.Weight).IsRequired().HasColumnType("decimal(5,2)");
         builder.Property(t => t.QuestStepId).IsRequired();
         builder.ConfigureJsonProperty(nameof(QuestStepContent.ExpectedAnswers), database).IsRequired();
+        
+        builder
+            .HasMany(qsc => qsc.Answers)
+            .WithOne(ans => ans.QuestStepContent)
+            .HasForeignKey(ans => ans.QuestStepContentId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

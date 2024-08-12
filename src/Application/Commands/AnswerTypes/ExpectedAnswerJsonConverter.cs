@@ -1,13 +1,12 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Educar.Backend.Application.Commands.QuestStepContent.ExpectedAnswerTypes;
 using Educar.Backend.Domain.Enums;
 
-namespace Educar.Backend.Application.Commands.QuestStepContent.Converter;
+namespace Educar.Backend.Application.Commands.AnswerTypes;
 
-public class ExpectedAnswerJsonConverter : JsonConverter<IExpectedAnswer>
+public class ExpectedAnswerJsonConverter : JsonConverter<IAnswer>
 {
-    public override IExpectedAnswer? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override IAnswer? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         using var jsonDoc = JsonDocument.ParseValue(ref reader);
         var root = jsonDoc.RootElement;
@@ -30,7 +29,7 @@ public class ExpectedAnswerJsonConverter : JsonConverter<IExpectedAnswer>
         };
     }
 
-    public override void Write(Utf8JsonWriter writer, IExpectedAnswer value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, IAnswer value, JsonSerializerOptions options)
     {
         JsonSerializer.Serialize(writer, value, value.GetType(), options);
     }

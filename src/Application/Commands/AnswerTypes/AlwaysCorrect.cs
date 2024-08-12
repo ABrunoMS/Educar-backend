@@ -1,8 +1,8 @@
 using Educar.Backend.Domain.Enums;
 
-namespace Educar.Backend.Application.Commands.QuestStepContent.ExpectedAnswerTypes;
+namespace Educar.Backend.Application.Commands.AnswerTypes;
 
-public class AlwaysCorrect : IExpectedAnswer
+public class AlwaysCorrect : IAnswer
 {
     // No specific fields needed as any answer is correct
     public QuestionType QuestionType { get; } = QuestionType.AlwaysCorrect;

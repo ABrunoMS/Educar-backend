@@ -31,6 +31,7 @@ public interface IApplicationDbContext
     DbSet<QuestStepMedia> QuestStepMedias { get; }
     DbSet<QuestStepNpc> QuestStepNpcs { get; }
     DbSet<QuestStepItem> QuestStepItems { get; }
+    DbSet<Answer> Answers { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

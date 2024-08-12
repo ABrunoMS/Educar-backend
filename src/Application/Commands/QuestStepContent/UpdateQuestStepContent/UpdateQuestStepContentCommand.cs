@@ -1,4 +1,4 @@
-using Educar.Backend.Application.Commands.QuestStepContent.ExpectedAnswerTypes;
+using Educar.Backend.Application.Commands.AnswerTypes;
 using Educar.Backend.Application.Common.Extensions;
 using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Domain.Enums;
@@ -11,7 +11,7 @@ public class UpdateQuestStepContentCommand : IRequest<CreatedResponseDto>
     public QuestStepContentType? QuestStepContentType { get; set; }
     public QuestionType? QuestionType { get; set; }
     public string? Description { get; set; }
-    public IExpectedAnswer? ExpectedAnswers { get; set; }
+    public IAnswer? ExpectedAnswers { get; set; }
     public decimal? Weight { get; set; }
 }
 

@@ -26,5 +26,11 @@ public class AccountConfiguration(DatabaseFacade database) : IEntityTypeConfigur
             .WithOne(ac => ac.Account)
             .HasForeignKey(ac => ac.AccountId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        builder
+            .HasMany(a => a.Answers)
+            .WithOne(ans => ans.Account)
+            .HasForeignKey(ans => ans.AccountId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -18,4 +18,5 @@ public class QuestStepContent(
     public decimal Weight { get; set; } = weight;
     public Guid QuestStepId { get; set; }
     public QuestStep QuestStep { get; set; } = null!;
+    public IList<Answer> Answers { get; set; } = new List<Answer>();
 }

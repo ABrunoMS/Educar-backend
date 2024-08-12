@@ -1,9 +1,9 @@
 using System.Text.Json.Serialization;
 using Educar.Backend.Domain.Enums;
 
-namespace Educar.Backend.Application.Commands.QuestStepContent.ExpectedAnswerTypes;
+namespace Educar.Backend.Application.Commands.AnswerTypes;
 
-public class MultipleChoice : IExpectedAnswer
+public class MultipleChoice : IAnswer
 {
     public QuestionType QuestionType { get; } = QuestionType.MultipleChoice;
     [JsonPropertyName("options")]

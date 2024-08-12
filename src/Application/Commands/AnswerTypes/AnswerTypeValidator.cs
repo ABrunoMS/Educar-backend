@@ -1,11 +1,10 @@
-using Educar.Backend.Application.Commands.QuestStepContent.ExpectedAnswerTypes;
 using Educar.Backend.Domain.Enums;
 
-namespace Educar.Backend.Application.Commands.QuestStepContent;
+namespace Educar.Backend.Application.Commands.AnswerTypes;
 
-public static class QuestStepContentCommandValidator
+public static class AnswerTypeValidator
 {
-    public static bool ValidateExpectedAnswer(QuestionType? questionType, IExpectedAnswer? expectedAnswer)
+    public static bool ValidateAnswer(QuestionType? questionType, IAnswer? expectedAnswer)
     {
         if (expectedAnswer == null) return false;
 
@@ -41,13 +40,13 @@ public static class QuestStepContentCommandValidator
     private static bool ValidateSingleChoice(SingleChoice? singleChoice)
     {
         // Ensure the correct option is not empty
-        return singleChoice != null && !string.IsNullOrWhiteSpace(singleChoice.CorrectOption);
+        return singleChoice != null && !string.IsNullOrWhiteSpace(singleChoice.Option);
     }
 
     private static bool ValidateDissertative(Dissertative? dissertative)
     {
         // Ensure the expected text is not empty
-        return dissertative != null && !string.IsNullOrWhiteSpace(dissertative.ExpectedText);
+        return dissertative != null && !string.IsNullOrWhiteSpace(dissertative.Text);
     }
 
     private static bool ValidateColumnFill(ColumnFill? columnFill)
