@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
+using Educar.Backend.Application.Commands.QuestStepContent.Converter;
 using Educar.Backend.Application.Common.Interfaces;
+using Educar.Backend.Application.Common.NamingPolicies;
 using Educar.Backend.Domain.Enums;
 using Educar.Backend.Infrastructure.Data;
 using Educar.Backend.Web.Extensions;
@@ -48,17 +50,21 @@ public static class DependencyInjection
 
         // services.AddRazorPages();
         services.AddControllers();
+
+
         services.AddHttpClient();
 
         services.ConfigureHttpJsonOptions(options =>
         {
             options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            options.SerializerOptions.Converters.Add(new ExpectedAnswerJsonConverter());
             options.SerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
         });
 
         services.Configure<JsonOptions>(options =>
         {
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            options.JsonSerializerOptions.Converters.Add(new ExpectedAnswerJsonConverter());
         });
 
         services.AddAuthorizationBuilder()

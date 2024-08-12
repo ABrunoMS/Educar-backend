@@ -27,4 +27,5 @@ public class Item : BaseAuditableEntity
     public string Reference3D { get; set; }
     public decimal DropRate { get; set; }
     public IList<NpcItem> NpcItems { get; set; } = new List<NpcItem>();
+    public IList<QuestStepItem> QuestStepItems { get; set; } = new List<QuestStepItem>();
 }

@@ -13,4 +13,6 @@ public class Media(string name, MediaPurpose purpose, MediaType type, bool agree
     public bool Agreement { get; set; } = agreement;
     public string Url { get; set; } = url;
     public string ObjectName { get; set; } = objectName;
+    
+    public IList<QuestStepMedia> QuestStepMedias { get; set; } = new List<QuestStepMedia>();
 }

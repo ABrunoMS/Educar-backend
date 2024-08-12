@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Educar.Backend.Application.Extensions;
 
-namespace Educar.Backend.Web.Infrastructure;
+namespace Educar.Backend.Application.Common.NamingPolicies;
 
 public class JsonSnakeCaseNamingPolicy : JsonNamingPolicy
 {

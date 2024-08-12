@@ -34,6 +34,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<NpcItem> NpcItems => Set<NpcItem>();
     public DbSet<Dialogue> Dialogues => Set<Dialogue>();
     public DbSet<GameNpc> GameNpcs => Set<GameNpc>();
+    public DbSet<QuestStep> QuestSteps => Set<QuestStep>();
+    public DbSet<QuestStepContent> QuestStepContents => Set<QuestStepContent>();
+    public DbSet<QuestStepMedia> QuestStepMedias => Set<QuestStepMedia>();
+    public DbSet<QuestStepNpc> QuestStepNpcs => Set<QuestStepNpc>();
+    public DbSet<QuestStepItem> QuestStepItems => Set<QuestStepItem>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -28,5 +28,11 @@ public class NpcConfiguration(DatabaseFacade database) : IEntityTypeConfiguratio
             .WithOne(gs => gs.Npc)
             .HasForeignKey(gs => gs.NpcId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        builder
+            .HasMany(g => g.QuestStepNpcs)
+            .WithOne(gs => gs.Npc)
+            .HasForeignKey(gs => gs.NpcId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

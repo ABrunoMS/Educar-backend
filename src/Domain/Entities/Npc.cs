@@ -21,5 +21,6 @@ public class Npc : BaseAuditableEntity
     public IList<NpcItem> NpcItems { get; set; } = new List<NpcItem>();
     public IList<Dialogue> Dialogues { get; set; } = new List<Dialogue>();
     public IList<GameNpc> GameNpcs { get; set; } = new List<GameNpc>();
+    public IList<QuestStepNpc> QuestStepNpcs { get; set; } = new List<QuestStepNpc>();
     
 }

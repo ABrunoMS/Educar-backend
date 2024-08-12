@@ -25,5 +25,11 @@ public class ItemConfiguration(DatabaseFacade database) : IEntityTypeConfigurati
             .WithOne(gs => gs.Item)
             .HasForeignKey(gs => gs.ItemId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder
+            .HasMany(g => g.QuestStepItems)
+            .WithOne(gs => gs.Item)
+            .HasForeignKey(gs => gs.ItemId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

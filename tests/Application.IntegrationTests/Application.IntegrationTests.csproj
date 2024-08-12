@@ -35,4 +35,8 @@
         <ProjectReference Include="..\..\src\Web\Web.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="QuestStep\" />
+    </ItemGroup>
+
 </Project>

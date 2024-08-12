@@ -26,6 +26,11 @@ public interface IApplicationDbContext
     DbSet<NpcItem> NpcItems { get; }
     DbSet<Dialogue> Dialogues { get; }
     DbSet<GameNpc> GameNpcs { get; }
+    DbSet<QuestStep> QuestSteps { get; }
+    DbSet<QuestStepContent> QuestStepContents { get; }
+    DbSet<QuestStepMedia> QuestStepMedias { get; }
+    DbSet<QuestStepNpc> QuestStepNpcs { get; }
+    DbSet<QuestStepItem> QuestStepItems { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

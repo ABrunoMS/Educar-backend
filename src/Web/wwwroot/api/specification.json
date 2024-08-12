@@ -2666,6 +2666,185 @@
         ]
       }
     },
+    "/api/QuestStepContents": {
+      "post": {
+        "tags": [
+          "QuestStepContents"
+        ],
+        "operationId": "CreateQuestStepContent",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuestStepContentCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/QuestSteps": {
+      "post": {
+        "tags": [
+          "QuestSteps"
+        ],
+        "operationId": "CreateQuestStep",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuestStepCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/QuestSteps/{id}": {
+      "get": {
+        "tags": [
+          "QuestSteps"
+        ],
+        "operationId": "GetQuestStep",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestStepDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "QuestSteps"
+        ],
+        "operationId": "UpdateQuestStep",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuestStepCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "QuestSteps"
+        ],
+        "operationId": "DeleteQuestStep",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/Schools": {
       "post": {
         "tags": [
@@ -5275,6 +5454,318 @@
             "nullable": true
           },
           "proficiencyIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        }
+      },
+      "CreateQuestStepContentCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "questStepContentType": {
+            "$ref": "#/components/schemas/QuestStepContentType"
+          },
+          "questionType": {
+            "$ref": "#/components/schemas/QuestionType"
+          },
+          "description": {
+            "type": "string"
+          },
+          "expectedAnswers": {
+            "$ref": "#/components/schemas/IExpectedAnswer"
+          },
+          "weight": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "questStepId": {
+            "type": "string",
+            "format": "guid"
+          }
+        }
+      },
+      "QuestStepContentType": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "None",
+          "Informative",
+          "Exercise"
+        ],
+        "enum": [
+          "None",
+          "Informative",
+          "Exercise"
+        ]
+      },
+      "QuestionType": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "None",
+          "MultipleChoice",
+          "TrueOrFalse",
+          "SingleChoice",
+          "Dissertative",
+          "ColumnFill",
+          "AlwaysCorrect"
+        ],
+        "enum": [
+          "None",
+          "MultipleChoice",
+          "TrueOrFalse",
+          "SingleChoice",
+          "Dissertative",
+          "ColumnFill",
+          "AlwaysCorrect"
+        ]
+      },
+      "IExpectedAnswer": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "questionType": {
+            "$ref": "#/components/schemas/QuestionType"
+          }
+        }
+      },
+      "CreateQuestStepCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "questStepType": {
+            "$ref": "#/components/schemas/QuestStepType"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "npcType": {
+            "$ref": "#/components/schemas/QuestStepNpcType"
+          },
+          "npcBehaviour": {
+            "$ref": "#/components/schemas/QuestStepNpcBehaviour"
+          },
+          "type": {
+            "$ref": "#/components/schemas/QuestStepType"
+          },
+          "contentIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
+          },
+          "npcIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
+          },
+          "mediaIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
+          },
+          "itemIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        }
+      },
+      "QuestStepType": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "None",
+          "Item",
+          "Npc"
+        ],
+        "enum": [
+          "None",
+          "Item",
+          "Npc"
+        ]
+      },
+      "QuestStepNpcType": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "None",
+          "Passive",
+          "Enemy",
+          "Friend"
+        ],
+        "enum": [
+          "None",
+          "Passive",
+          "Enemy",
+          "Friend"
+        ]
+      },
+      "QuestStepNpcBehaviour": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "None",
+          "StandStill",
+          "Roaming"
+        ],
+        "enum": [
+          "None",
+          "StandStill",
+          "Roaming"
+        ]
+      },
+      "QuestStepDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "npcType": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestStepNpcType"
+              }
+            ]
+          },
+          "npcBehaviour": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestStepNpcBehaviour"
+              }
+            ]
+          },
+          "questStepType": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestStepType"
+              }
+            ]
+          },
+          "npcs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NpcCleanDto"
+            }
+          },
+          "medias": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaDto"
+            }
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemDto"
+            }
+          }
+        }
+      },
+      "UpdateQuestStepCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "npcType": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestStepNpcType"
+              }
+            ]
+          },
+          "npcBehaviour": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestStepNpcBehaviour"
+              }
+            ]
+          },
+          "type": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestStepType"
+              }
+            ]
+          },
+          "contentIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
+          },
+          "npcIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
+          },
+          "mediaIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
+          },
+          "itemIds": {
             "type": "array",
             "items": {
               "type": "string",
