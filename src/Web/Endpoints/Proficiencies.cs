@@ -27,7 +27,7 @@ public class Proficiencies : EndpointGroupBase
         return await sender.Send(new GetProficiencyQuery { Id = id });
     }
 
-    public Task<CreatedResponseDto> CreateProficiency(ISender sender, CreateProficiencyCommand command)
+    public Task<IdResponseDto> CreateProficiency(ISender sender, CreateProficiencyCommand command)
     {
         return sender.Send(command);
     }

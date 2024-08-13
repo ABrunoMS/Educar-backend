@@ -5,14 +5,14 @@ using ValidationException = Educar.Backend.Application.Common.Exceptions.Validat
 
 namespace Educar.Backend.Application.Commands.Answer.UpdateAnswer;
 
-public record UpdateAnswerCommand : IRequest<CreatedResponseDto>
+public record UpdateAnswerCommand : IRequest<IdResponseDto>
 {
     public Guid Id { get; set; }
     public IAnswer? GivenAnswer { get; set; }
     public bool? IsCorrect { get; set; }
 }
 
-public class UpdateAnswerCommandHandler : IRequestHandler<UpdateAnswerCommand, CreatedResponseDto>
+public class UpdateAnswerCommandHandler : IRequestHandler<UpdateAnswerCommand, IdResponseDto>
 {
     private readonly IApplicationDbContext _context;
 
@@ -21,7 +21,7 @@ public class UpdateAnswerCommandHandler : IRequestHandler<UpdateAnswerCommand, C
         _context = context;
     }
 
-    public async Task<CreatedResponseDto> Handle(UpdateAnswerCommand request, CancellationToken cancellationToken)
+    public async Task<IdResponseDto> Handle(UpdateAnswerCommand request, CancellationToken cancellationToken)
     {
         var entity = await _context.Answers
             .Include(a => a.QuestStepContent)
@@ -40,6 +40,6 @@ public class UpdateAnswerCommandHandler : IRequestHandler<UpdateAnswerCommand, C
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 }

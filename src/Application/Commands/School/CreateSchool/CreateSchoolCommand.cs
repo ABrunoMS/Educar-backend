@@ -3,7 +3,7 @@ using Educar.Backend.Application.Common.Interfaces;
 
 namespace Educar.Backend.Application.Commands.School.CreateSchool;
 
-public record CreateSchoolCommand(string Name, Guid ClientId) : IRequest<CreatedResponseDto>
+public record CreateSchoolCommand(string Name, Guid ClientId) : IRequest<IdResponseDto>
 {
     public string Name { get; set; } = Name;
     public string? Description { get; set; }
@@ -12,9 +12,9 @@ public record CreateSchoolCommand(string Name, Guid ClientId) : IRequest<Created
 }
 
 public class CreateSchoolCommandHandler(IApplicationDbContext context, ISender sender)
-    : IRequestHandler<CreateSchoolCommand, CreatedResponseDto>
+    : IRequestHandler<CreateSchoolCommand, IdResponseDto>
 {
-    public async Task<CreatedResponseDto> Handle(CreateSchoolCommand request, CancellationToken cancellationToken)
+    public async Task<IdResponseDto> Handle(CreateSchoolCommand request, CancellationToken cancellationToken)
     {
         var client = await context.Clients.FindAsync([request.ClientId], cancellationToken: cancellationToken);
         if (client == null) throw new NotFoundException(nameof(Client), request.ClientId.ToString());
@@ -42,6 +42,6 @@ public class CreateSchoolCommandHandler(IApplicationDbContext context, ISender s
         context.Schools.Add(entity);
         await context.SaveChangesAsync(cancellationToken);
 
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 }

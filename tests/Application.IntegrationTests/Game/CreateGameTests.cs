@@ -45,7 +45,7 @@ public class CreateGameTests : TestBase
 
         // Assert
         Assert.That(response, Is.Not.Null);
-        Assert.That(response, Is.InstanceOf<CreatedResponseDto>());
+        Assert.That(response, Is.InstanceOf<IdResponseDto>());
 
         if (Context.Games != null)
         {

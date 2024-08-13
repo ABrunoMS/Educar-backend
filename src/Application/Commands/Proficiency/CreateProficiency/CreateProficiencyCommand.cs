@@ -2,12 +2,12 @@ using Educar.Backend.Application.Common.Interfaces;
 
 namespace Educar.Backend.Application.Commands.Proficiency.CreateProficiency;
 
-public record CreateProficiencyCommand(string Name, string Description, string Purpose) : IRequest<CreatedResponseDto>;
+public record CreateProficiencyCommand(string Name, string Description, string Purpose) : IRequest<IdResponseDto>;
 
 public class CreateProficiencyCommandHandler(IApplicationDbContext context)
-    : IRequestHandler<CreateProficiencyCommand, CreatedResponseDto>
+    : IRequestHandler<CreateProficiencyCommand, IdResponseDto>
 {
-    public async Task<CreatedResponseDto> Handle(CreateProficiencyCommand request, CancellationToken cancellationToken)
+    public async Task<IdResponseDto> Handle(CreateProficiencyCommand request, CancellationToken cancellationToken)
     {
         var entity = new Domain.Entities.Proficiency(request.Name, request.Description, request.Purpose);
 
@@ -15,6 +15,6 @@ public class CreateProficiencyCommandHandler(IApplicationDbContext context)
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 }

@@ -17,7 +17,8 @@ public class QuestStepConfiguration(DatabaseFacade database) : IEntityTypeConfig
         builder.Property(t => t.NpcType).IsRequired().HasConversion<string>();
         builder.Property(t => t.NpcBehaviour).IsRequired().HasConversion<string>();
         builder.Property(t => t.QuestStepType).IsRequired().HasConversion<string>();
-
+        builder.Property(t => t.QuestId).IsRequired();
+        
         builder
             .HasMany(g => g.QuestStepNpcs)
             .WithOne(gs => gs.QuestStep)
@@ -35,5 +36,7 @@ public class QuestStepConfiguration(DatabaseFacade database) : IEntityTypeConfig
             .WithOne(gs => gs.QuestStep)
             .HasForeignKey(gs => gs.QuestStepId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        
     }
 }

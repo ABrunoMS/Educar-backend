@@ -327,6 +327,32 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "game_npcs",
+                columns: table => new
+                {
+                    game_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    npc_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_game_npcs", x => new { x.game_id, x.npc_id });
+                    table.ForeignKey(
+                        name: "FK_game_npcs_games_game_id",
+                        column: x => x.game_id,
+                        principalTable: "games",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_game_npcs_npcs_npc_id",
+                        column: x => x.npc_id,
+                        principalTable: "npcs",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "npc_items",
                 columns: table => new
                 {
@@ -431,6 +457,57 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "quests",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    description = table.Column<string>(type: "text", nullable: false),
+                    usage_template = table.Column<string>(type: "text", nullable: false),
+                    type = table.Column<string>(type: "text", nullable: false),
+                    max_players = table.Column<int>(type: "integer", nullable: false),
+                    total_quest_steps = table.Column<int>(type: "integer", nullable: false),
+                    combat_difficulty = table.Column<string>(type: "text", nullable: false),
+                    game_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    grade_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    subject_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    quest_dependency_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<string>(type: "text", nullable: true),
+                    last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    last_modified_by = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_quests", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_quests_games_game_id",
+                        column: x => x.game_id,
+                        principalTable: "games",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_quests_grades_grade_id",
+                        column: x => x.grade_id,
+                        principalTable: "grades",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_quests_quests_quest_dependency_id",
+                        column: x => x.quest_dependency_id,
+                        principalTable: "quests",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_quests_subjects_subject_id",
+                        column: x => x.subject_id,
+                        principalTable: "subjects",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "accounts",
                 columns: table => new
                 {
@@ -495,6 +572,62 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "quest_proficiencies",
+                columns: table => new
+                {
+                    quest_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    proficiency_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_quest_proficiencies", x => new { x.quest_id, x.proficiency_id });
+                    table.ForeignKey(
+                        name: "FK_quest_proficiencies_proficiencies_proficiency_id",
+                        column: x => x.proficiency_id,
+                        principalTable: "proficiencies",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_quest_proficiencies_quests_quest_id",
+                        column: x => x.quest_id,
+                        principalTable: "quests",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "quest_steps",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "text", nullable: false),
+                    description = table.Column<string>(type: "text", nullable: false),
+                    order = table.Column<int>(type: "integer", nullable: false),
+                    npc_type = table.Column<string>(type: "text", nullable: false),
+                    npc_behaviour = table.Column<string>(type: "text", nullable: false),
+                    quest_step_type = table.Column<string>(type: "text", nullable: false),
+                    quest_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<string>(type: "text", nullable: true),
+                    last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    last_modified_by = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_quest_steps", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_quest_steps_quests_quest_id",
+                        column: x => x.quest_id,
+                        principalTable: "quests",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "media_logs",
                 columns: table => new
                 {
@@ -554,6 +687,146 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "quest_step_contents",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    quest_step_content_type = table.Column<string>(type: "text", nullable: false),
+                    question_type = table.Column<string>(type: "text", nullable: false),
+                    description = table.Column<string>(type: "text", nullable: false),
+                    expected_answers = table.Column<string>(type: "jsonb", nullable: false),
+                    weight = table.Column<decimal>(type: "numeric(5,2)", nullable: false),
+                    quest_step_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<string>(type: "text", nullable: true),
+                    last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    last_modified_by = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_quest_step_contents", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_quest_step_contents_quest_steps_quest_step_id",
+                        column: x => x.quest_step_id,
+                        principalTable: "quest_steps",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "quest_step_items",
+                columns: table => new
+                {
+                    quest_step_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    item_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_quest_step_items", x => new { x.quest_step_id, x.item_id });
+                    table.ForeignKey(
+                        name: "FK_quest_step_items_items_item_id",
+                        column: x => x.item_id,
+                        principalTable: "items",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_quest_step_items_quest_steps_quest_step_id",
+                        column: x => x.quest_step_id,
+                        principalTable: "quest_steps",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "quest_step_medias",
+                columns: table => new
+                {
+                    quest_step_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    media_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_quest_step_medias", x => new { x.quest_step_id, x.media_id });
+                    table.ForeignKey(
+                        name: "FK_quest_step_medias_medias_media_id",
+                        column: x => x.media_id,
+                        principalTable: "medias",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_quest_step_medias_quest_steps_quest_step_id",
+                        column: x => x.quest_step_id,
+                        principalTable: "quest_steps",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "quest_step_npcs",
+                columns: table => new
+                {
+                    quest_step_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    npc_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_quest_step_npcs", x => new { x.quest_step_id, x.npc_id });
+                    table.ForeignKey(
+                        name: "FK_quest_step_npcs_npcs_npc_id",
+                        column: x => x.npc_id,
+                        principalTable: "npcs",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_quest_step_npcs_quest_steps_quest_step_id",
+                        column: x => x.quest_step_id,
+                        principalTable: "quest_steps",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "answers",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    account_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    quest_step_content_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    given_answer = table.Column<string>(type: "jsonb", nullable: false),
+                    is_correct = table.Column<bool>(type: "boolean", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<string>(type: "text", nullable: true),
+                    last_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    last_modified_by = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_answers", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_answers_accounts_account_id",
+                        column: x => x.account_id,
+                        principalTable: "accounts",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_answers_quest_step_contents_quest_step_content_id",
+                        column: x => x.quest_step_content_id,
+                        principalTable: "quest_step_contents",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_account_classes_class_id",
                 table: "account_classes",
@@ -576,6 +849,16 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 column: "school_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_answers_account_id",
+                table: "answers",
+                column: "account_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_answers_quest_step_content_id",
+                table: "answers",
+                column: "quest_step_content_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_classes_school_id",
                 table: "classes",
                 column: "school_id");
@@ -593,6 +876,11 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_dialogues_npc_id",
                 table: "dialogues",
+                column: "npc_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_game_npcs_npc_id",
+                table: "game_npcs",
                 column: "npc_id");
 
             migrationBuilder.CreateIndex(
@@ -637,6 +925,56 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 column: "proficiency_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_quest_proficiencies_proficiency_id",
+                table: "quest_proficiencies",
+                column: "proficiency_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_quest_step_contents_quest_step_id",
+                table: "quest_step_contents",
+                column: "quest_step_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_quest_step_items_item_id",
+                table: "quest_step_items",
+                column: "item_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_quest_step_medias_media_id",
+                table: "quest_step_medias",
+                column: "media_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_quest_step_npcs_npc_id",
+                table: "quest_step_npcs",
+                column: "npc_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_quest_steps_quest_id",
+                table: "quest_steps",
+                column: "quest_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_quests_game_id",
+                table: "quests",
+                column: "game_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_quests_grade_id",
+                table: "quests",
+                column: "grade_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_quests_quest_dependency_id",
+                table: "quests",
+                column: "quest_dependency_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_quests_subject_id",
+                table: "quests",
+                column: "subject_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_schools_address_id",
                 table: "schools",
                 column: "address_id");
@@ -654,19 +992,22 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 name: "account_classes");
 
             migrationBuilder.DropTable(
+                name: "answers");
+
+            migrationBuilder.DropTable(
                 name: "contracts");
 
             migrationBuilder.DropTable(
                 name: "dialogues");
 
             migrationBuilder.DropTable(
+                name: "game_npcs");
+
+            migrationBuilder.DropTable(
                 name: "game_proficiency_groups");
 
             migrationBuilder.DropTable(
                 name: "game_subjects");
-
-            migrationBuilder.DropTable(
-                name: "grades");
 
             migrationBuilder.DropTable(
                 name: "media_logs");
@@ -678,40 +1019,64 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 name: "proficiency_group_proficiencies");
 
             migrationBuilder.DropTable(
+                name: "quest_proficiencies");
+
+            migrationBuilder.DropTable(
+                name: "quest_step_items");
+
+            migrationBuilder.DropTable(
+                name: "quest_step_medias");
+
+            migrationBuilder.DropTable(
+                name: "quest_step_npcs");
+
+            migrationBuilder.DropTable(
                 name: "classes");
 
             migrationBuilder.DropTable(
-                name: "games");
-
-            migrationBuilder.DropTable(
-                name: "subjects");
+                name: "quest_step_contents");
 
             migrationBuilder.DropTable(
                 name: "accounts");
 
             migrationBuilder.DropTable(
-                name: "medias");
-
-            migrationBuilder.DropTable(
-                name: "items");
-
-            migrationBuilder.DropTable(
-                name: "npcs");
+                name: "proficiency_groups");
 
             migrationBuilder.DropTable(
                 name: "proficiencies");
 
             migrationBuilder.DropTable(
-                name: "proficiency_groups");
+                name: "items");
+
+            migrationBuilder.DropTable(
+                name: "medias");
+
+            migrationBuilder.DropTable(
+                name: "npcs");
+
+            migrationBuilder.DropTable(
+                name: "quest_steps");
 
             migrationBuilder.DropTable(
                 name: "schools");
+
+            migrationBuilder.DropTable(
+                name: "quests");
 
             migrationBuilder.DropTable(
                 name: "addresses");
 
             migrationBuilder.DropTable(
                 name: "clients");
+
+            migrationBuilder.DropTable(
+                name: "games");
+
+            migrationBuilder.DropTable(
+                name: "grades");
+
+            migrationBuilder.DropTable(
+                name: "subjects");
         }
     }
 }

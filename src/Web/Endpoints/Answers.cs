@@ -27,7 +27,7 @@ public class Answers : EndpointGroupBase
         return await sender.Send(new GetAnswerQuery { Id = id });
     }
 
-    public Task<CreatedResponseDto> CreateAnswer(ISender sender, CreateAnswerCommand command)
+    public Task<IdResponseDto> CreateAnswer(ISender sender, CreateAnswerCommand command)
     {
         return sender.Send(command);
     }

@@ -4,7 +4,7 @@ using Educar.Backend.Domain.Entities;
 namespace Educar.Backend.Application.Commands.Game.CreateGame;
 
 public record CreateGameCommand(string Name, string Description, string Lore, string Purpose)
-    : IRequest<CreatedResponseDto>
+    : IRequest<IdResponseDto>
 {
     public string Name { get; set; } = Name;
     public string Description { get; set; } = Description;
@@ -16,9 +16,9 @@ public record CreateGameCommand(string Name, string Description, string Lore, st
 }
 
 public class CreateGameCommandHandler(IApplicationDbContext context)
-    : IRequestHandler<CreateGameCommand, CreatedResponseDto>
+    : IRequestHandler<CreateGameCommand, IdResponseDto>
 {
-    public async Task<CreatedResponseDto> Handle(CreateGameCommand request, CancellationToken cancellationToken)
+    public async Task<IdResponseDto> Handle(CreateGameCommand request, CancellationToken cancellationToken)
     {
         var subjectEntities = new List<Domain.Entities.Subject>();
         if (request.SubjectIds != null && request.SubjectIds.Count != 0)
@@ -67,6 +67,6 @@ public class CreateGameCommandHandler(IApplicationDbContext context)
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 }

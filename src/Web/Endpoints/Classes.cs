@@ -25,7 +25,7 @@ public class Classes : EndpointGroupBase
             .MapGet(GetAllClassesBySchool, "school/{schoolId}");
     }
 
-    public Task<CreatedResponseDto> CreateClass(ISender sender, CreateClassCommand command)
+    public Task<IdResponseDto> CreateClass(ISender sender, CreateClassCommand command)
     {
         return sender.Send(command);
     }

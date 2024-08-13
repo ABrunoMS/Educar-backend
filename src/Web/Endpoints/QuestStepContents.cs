@@ -28,7 +28,7 @@ public class QuestStepContents : EndpointGroupBase
         return await sender.Send(new GetQuestStepContentQuery() { Id = id });
     }
 
-    public Task<CreatedResponseDto> CreateQuestStepContent(ISender sender, CreateQuestStepContentCommand command)
+    public Task<IdResponseDto> CreateQuestStepContent(ISender sender, CreateQuestStepContentCommand command)
     {
         return sender.Send(command);
     }

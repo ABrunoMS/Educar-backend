@@ -2,18 +2,18 @@ using Educar.Backend.Application.Common.Interfaces;
 
 namespace Educar.Backend.Application.Commands.Grade.CreateGradeCommand;
 
-public record CreateGradeCommand(string Name, string Description) : IRequest<CreatedResponseDto>;
+public record CreateGradeCommand(string Name, string Description) : IRequest<IdResponseDto>;
 
 public class CreateGradeCommandHandler(IApplicationDbContext context)
-    : IRequestHandler<CreateGradeCommand, CreatedResponseDto>
+    : IRequestHandler<CreateGradeCommand, IdResponseDto>
 {
-    public async Task<CreatedResponseDto> Handle(CreateGradeCommand request, CancellationToken cancellationToken)
+    public async Task<IdResponseDto> Handle(CreateGradeCommand request, CancellationToken cancellationToken)
     {
         var entity = new Domain.Entities.Grade(request.Name, request.Description);
         context.Grades.Add(entity);
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 }

@@ -11,7 +11,8 @@ public record CreateQuestStepCommand(
     int Order,
     QuestStepNpcType NpcType,
     QuestStepNpcBehaviour NpcBehaviour,
-    QuestStepType QuestStepType) : IRequest<CreatedResponseDto>
+    QuestStepType QuestStepType,
+    Guid QuestId) : IRequest<IdResponseDto>
 {
     public string Name { get; set; } = Name;
     public string Description { get; set; } = Description;
@@ -23,18 +24,22 @@ public record CreateQuestStepCommand(
     public IList<Guid> NpcIds { get; set; } = new List<Guid>();
     public IList<Guid> MediaIds { get; set; } = new List<Guid>();
     public IList<Guid> ItemIds { get; set; } = new List<Guid>();
+    public Guid QuestId { get; set; } = QuestId;
 }
 
 public class CreateQuestStepCommandHandler(IApplicationDbContext context)
-    : IRequestHandler<CreateQuestStepCommand, CreatedResponseDto>
+    : IRequestHandler<CreateQuestStepCommand, IdResponseDto>
 {
-    public async Task<CreatedResponseDto> Handle(CreateQuestStepCommand request, CancellationToken cancellationToken)
+    public async Task<IdResponseDto> Handle(CreateQuestStepCommand request, CancellationToken cancellationToken)
     {
         // Retrieve related entities
         var contentEntities = await GetQuestStepContentsByIdsAsync(request.ContentIds, cancellationToken);
         var npcEntities = await GetNpcsByIdsAsync(request.NpcIds, cancellationToken);
         var mediaEntities = await GetMediasByIdsAsync(request.MediaIds, cancellationToken);
         var itemEntities = await GetItemsByIdsAsync(request.ItemIds, cancellationToken);
+
+        var quest = await context.Quests.FirstOrDefaultAsync(e => e.Id == request.QuestId, cancellationToken);
+        Guard.Against.NotFound(request.QuestId, quest, nameof(Domain.Entities.Quest));
 
         // Create the QuestStep entity
         var entity = new Domain.Entities.QuestStep(
@@ -45,8 +50,8 @@ public class CreateQuestStepCommandHandler(IApplicationDbContext context)
             request.NpcBehaviour,
             request.QuestStepType)
         {
-            // Associate contents with QuestStep
-            Contents = contentEntities.ToList()
+            Contents = contentEntities.ToList(),
+            Quest = quest
         };
 
         // Associate NPCs with QuestStep
@@ -74,7 +79,7 @@ public class CreateQuestStepCommandHandler(IApplicationDbContext context)
         await context.SaveChangesAsync(cancellationToken);
 
         // Return the created response with the new QuestStep ID
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 
     private async Task<List<Domain.Entities.QuestStepContent>> GetQuestStepContentsByIdsAsync(IList<Guid> ids,

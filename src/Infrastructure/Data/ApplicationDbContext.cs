@@ -40,6 +40,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<QuestStepNpc> QuestStepNpcs => Set<QuestStepNpc>();
     public DbSet<QuestStepItem> QuestStepItems => Set<QuestStepItem>();
     public DbSet<Answer> Answers => Set<Answer>();
+    public DbSet<Quest> Quests => Set<Quest>();
+    public DbSet<QuestProficiency> QuestProficiencies => Set<QuestProficiency>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

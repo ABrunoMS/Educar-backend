@@ -23,7 +23,7 @@ public class Subjects : EndpointGroupBase
             .MapDelete(DeleteSubject, "{id}");
     }
 
-    public Task<CreatedResponseDto> CreateSubject(ISender sender, CreateSubjectCommand command)
+    public Task<IdResponseDto> CreateSubject(ISender sender, CreateSubjectCommand command)
     {
         return sender.Send(command);
     }

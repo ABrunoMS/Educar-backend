@@ -13,12 +13,12 @@ public record CreateMediaCommand(
     bool Agreement,
     string? References = null,
     string? Author = null)
-    : IRequest<CreatedResponseDto>;
+    : IRequest<IdResponseDto>;
 
 public class CreateMediaCommandHandler(IApplicationDbContext context, IUser currentUser)
-    : IRequestHandler<CreateMediaCommand, CreatedResponseDto>
+    : IRequestHandler<CreateMediaCommand, IdResponseDto>
 {
-    public async Task<CreatedResponseDto> Handle(CreateMediaCommand request, CancellationToken cancellationToken)
+    public async Task<IdResponseDto> Handle(CreateMediaCommand request, CancellationToken cancellationToken)
     {
         var entity = new Domain.Entities.Media(request.Name, request.Purpose, request.Type, request.Agreement,
             request.Url, request.ObjectName)
@@ -33,6 +33,6 @@ public class CreateMediaCommandHandler(IApplicationDbContext context, IUser curr
         context.Medias.Add(entity);
         await context.SaveChangesAsync(cancellationToken);
 
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 }

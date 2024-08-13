@@ -2,12 +2,12 @@ using Educar.Backend.Application.Common.Interfaces;
 
 namespace Educar.Backend.Application.Commands.Dialogue.CreateDialogue;
 
-public record CreateDialogueCommand(string Text, int Order, Guid NpcId) : IRequest<CreatedResponseDto>;
+public record CreateDialogueCommand(string Text, int Order, Guid NpcId) : IRequest<IdResponseDto>;
 
 public class CreateDialogueCommandHandler(IApplicationDbContext context)
-    : IRequestHandler<CreateDialogueCommand, CreatedResponseDto>
+    : IRequestHandler<CreateDialogueCommand, IdResponseDto>
 {
-    public async Task<CreatedResponseDto> Handle(CreateDialogueCommand request, CancellationToken cancellationToken)
+    public async Task<IdResponseDto> Handle(CreateDialogueCommand request, CancellationToken cancellationToken)
     {
         var npc = await context.Npcs.FindAsync([request.NpcId], cancellationToken: cancellationToken);
         if (npc == null) throw new NotFoundException(nameof(Npc), request.NpcId.ToString());
@@ -21,6 +21,6 @@ public class CreateDialogueCommandHandler(IApplicationDbContext context)
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 }

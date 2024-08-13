@@ -35,7 +35,7 @@ public class CreateItemTests : TestBase
 
         // Assert
         Assert.That(response, Is.Not.Null);
-        Assert.That(response, Is.InstanceOf<CreatedResponseDto>());
+        Assert.That(response, Is.InstanceOf<IdResponseDto>());
 
         var createdItem = await Context.Items.FindAsync(response.Id);
         Assert.That(createdItem, Is.Not.Null);

@@ -44,7 +44,7 @@ public class CreateMediaTests : TestBase
 
         // Assert
         Assert.That(response, Is.Not.Null);
-        Assert.That(response, Is.InstanceOf<CreatedResponseDto>());
+        Assert.That(response, Is.InstanceOf<IdResponseDto>());
 
         var createdMedia = await Context.Medias.FindAsync(response.Id);
         Assert.That(createdMedia, Is.Not.Null);

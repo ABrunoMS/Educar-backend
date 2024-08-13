@@ -28,7 +28,7 @@ public class Schools : EndpointGroupBase
         return await sender.Send(new GetSchoolQuery() { Id = id });
     }
 
-    public Task<CreatedResponseDto> CreateSchool(ISender sender, CreateSchoolCommand command)
+    public Task<IdResponseDto> CreateSchool(ISender sender, CreateSchoolCommand command)
     {
         return sender.Send(command);
     }

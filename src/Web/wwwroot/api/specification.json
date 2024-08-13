@@ -30,7 +30,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResponseDto"
+                  "$ref": "#/components/schemas/IdResponseDto"
                 }
               }
             }
@@ -360,7 +360,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResponseDto"
+                  "$ref": "#/components/schemas/IdResponseDto"
                 }
               }
             }
@@ -467,7 +467,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResponseDto"
+                  "$ref": "#/components/schemas/IdResponseDto"
                 }
               }
             }
@@ -666,7 +666,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResponseDto"
+                  "$ref": "#/components/schemas/IdResponseDto"
                 }
               }
             }
@@ -865,7 +865,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResponseDto"
+                  "$ref": "#/components/schemas/IdResponseDto"
                 }
               }
             }
@@ -1052,7 +1052,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResponseDto"
+                  "$ref": "#/components/schemas/IdResponseDto"
                 }
               }
             }
@@ -1239,7 +1239,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResponseDto"
+                  "$ref": "#/components/schemas/IdResponseDto"
                 }
               }
             }
@@ -1438,7 +1438,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResponseDto"
+                  "$ref": "#/components/schemas/IdResponseDto"
                 }
               }
             }
@@ -1625,7 +1625,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResponseDto"
+                  "$ref": "#/components/schemas/IdResponseDto"
                 }
               }
             }
@@ -1812,7 +1812,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResponseDto"
+                  "$ref": "#/components/schemas/IdResponseDto"
                 }
               }
             }
@@ -2106,7 +2106,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResponseDto"
+                  "$ref": "#/components/schemas/IdResponseDto"
                 }
               }
             }
@@ -2319,7 +2319,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResponseDto"
+                  "$ref": "#/components/schemas/IdResponseDto"
                 }
               }
             }
@@ -2515,7 +2515,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResponseDto"
+                  "$ref": "#/components/schemas/IdResponseDto"
                 }
               }
             }
@@ -2702,7 +2702,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResponseDto"
+                  "$ref": "#/components/schemas/IdResponseDto"
                 }
               }
             }
@@ -2865,6 +2865,226 @@
         ]
       }
     },
+    "/api/Quests": {
+      "post": {
+        "tags": [
+          "Quests"
+        ],
+        "operationId": "CreateQuest",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuestCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Quests"
+        ],
+        "operationId": "GetAllQuestsByGameGradeSubject",
+        "parameters": [
+          {
+            "name": "game_id",
+            "x-originalName": "GameId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "grade_id",
+            "x-originalName": "GradeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
+            "name": "subject_id",
+            "x-originalName": "SubjectId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true
+            },
+            "x-position": 3
+          },
+          {
+            "name": "page_number",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 4
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedListOfQuestCleanDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Quests/{id}": {
+      "put": {
+        "tags": [
+          "Quests"
+        ],
+        "operationId": "UpdateQuest",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuestCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Quests"
+        ],
+        "operationId": "DeleteQuest",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Quests"
+        ],
+        "operationId": "GetQuest",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/QuestStepContents": {
       "post": {
         "tags": [
@@ -2889,7 +3109,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResponseDto"
+                  "$ref": "#/components/schemas/IdResponseDto"
                 }
               }
             }
@@ -3088,7 +3308,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResponseDto"
+                  "$ref": "#/components/schemas/IdResponseDto"
                 }
               }
             }
@@ -3230,7 +3450,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResponseDto"
+                  "$ref": "#/components/schemas/IdResponseDto"
                 }
               }
             }
@@ -3474,7 +3694,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResponseDto"
+                  "$ref": "#/components/schemas/IdResponseDto"
                 }
               }
             }
@@ -3640,7 +3860,7 @@
   },
   "components": {
     "schemas": {
-      "CreatedResponseDto": {
+      "IdResponseDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -5955,54 +6175,120 @@
           }
         }
       },
-      "CreateQuestStepContentCommand": {
+      "CreateQuestCommand": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "questStepContentType": {
-            "$ref": "#/components/schemas/QuestStepContentType"
-          },
-          "questionType": {
-            "$ref": "#/components/schemas/QuestionType"
+          "name": {
+            "type": "string"
           },
           "description": {
             "type": "string"
           },
-          "answers": {
-            "$ref": "#/components/schemas/IAnswer"
+          "usageTemplate": {
+            "$ref": "#/components/schemas/QuestUsageTemplate"
           },
-          "weight": {
-            "type": "number",
-            "format": "decimal"
+          "type": {
+            "$ref": "#/components/schemas/QuestType"
           },
-          "questStepId": {
+          "maxPlayers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalQuestSteps": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "combatDifficulty": {
+            "$ref": "#/components/schemas/CombatDifficulty"
+          },
+          "gameId": {
             "type": "string",
             "format": "guid"
+          },
+          "gradeId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "questDependencyId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "proficiencyIds": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
           }
         }
       },
-      "QuestStepContentType": {
+      "QuestUsageTemplate": {
         "type": "string",
         "description": "",
         "x-enumNames": [
           "None",
-          "Informative",
-          "Exercise"
+          "TeacherOnly",
+          "Global",
+          "EntireSchool",
+          "DifferentSchoolsInContract"
         ],
         "enum": [
           "None",
-          "Informative",
-          "Exercise"
+          "TeacherOnly",
+          "Global",
+          "EntireSchool",
+          "DifferentSchoolsInContract"
         ]
       },
-      "PaginatedListOfQuestStepContentDto": {
+      "QuestType": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "None",
+          "SinglePlayer",
+          "MultiPlayer"
+        ],
+        "enum": [
+          "None",
+          "SinglePlayer",
+          "MultiPlayer"
+        ]
+      },
+      "CombatDifficulty": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "None",
+          "Passive",
+          "Easy",
+          "Medium",
+          "Hard",
+          "VeryHard"
+        ],
+        "enum": [
+          "None",
+          "Passive",
+          "Easy",
+          "Medium",
+          "Hard",
+          "VeryHard"
+        ]
+      },
+      "PaginatedListOfQuestCleanDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/QuestStepContentDto"
+              "$ref": "#/components/schemas/QuestCleanDto"
             }
           },
           "pageNumber": {
@@ -6024,6 +6310,376 @@
             "type": "boolean"
           }
         }
+      },
+      "QuestCleanDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "usageTemplate": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestUsageTemplate"
+              }
+            ]
+          },
+          "type": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestType"
+              }
+            ]
+          },
+          "maxPlayers": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "totalQuestSteps": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "combatDifficulty": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CombatDifficulty"
+              }
+            ]
+          },
+          "game": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GameCleanDto"
+              }
+            ]
+          },
+          "grade": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GradeDto"
+              }
+            ]
+          },
+          "subject": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SubjectDto"
+              }
+            ]
+          },
+          "questDependency": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestCleanDto"
+              }
+            ]
+          }
+        }
+      },
+      "UpdateQuestCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "usageTemplate": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestUsageTemplate"
+              }
+            ]
+          },
+          "type": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestType"
+              }
+            ]
+          },
+          "maxPlayers": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "totalQuestSteps": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "combatDifficulty": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CombatDifficulty"
+              }
+            ]
+          },
+          "gradeId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "questDependencyId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "proficiencyIds": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        }
+      },
+      "QuestDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "usageTemplate": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestUsageTemplate"
+              }
+            ]
+          },
+          "type": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestType"
+              }
+            ]
+          },
+          "maxPlayers": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "totalQuestSteps": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "combatDifficulty": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CombatDifficulty"
+              }
+            ]
+          },
+          "game": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GameCleanDto"
+              }
+            ]
+          },
+          "grade": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GradeDto"
+              }
+            ]
+          },
+          "subject": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SubjectDto"
+              }
+            ]
+          },
+          "questDependency": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestCleanDto"
+              }
+            ]
+          },
+          "questSteps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestStepDto"
+            }
+          },
+          "proficiencies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProficiencyCleanDto"
+            }
+          }
+        }
+      },
+      "QuestStepDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "npcType": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestStepNpcType"
+              }
+            ]
+          },
+          "npcBehaviour": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestStepNpcBehaviour"
+              }
+            ]
+          },
+          "questStepType": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QuestStepType"
+              }
+            ]
+          },
+          "npcs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NpcCleanDto"
+            }
+          },
+          "medias": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaDto"
+            }
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemDto"
+            }
+          },
+          "contents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestStepContentDto"
+            }
+          }
+        }
+      },
+      "QuestStepNpcType": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "None",
+          "Passive",
+          "Enemy",
+          "Friend"
+        ],
+        "enum": [
+          "None",
+          "Passive",
+          "Enemy",
+          "Friend"
+        ]
+      },
+      "QuestStepNpcBehaviour": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "None",
+          "StandStill",
+          "Roaming"
+        ],
+        "enum": [
+          "None",
+          "StandStill",
+          "Roaming"
+        ]
+      },
+      "QuestStepType": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "None",
+          "Item",
+          "Npc"
+        ],
+        "enum": [
+          "None",
+          "Item",
+          "Npc"
+        ]
       },
       "QuestStepContentDto": {
         "type": "object",
@@ -6063,6 +6719,76 @@
           "questStepId": {
             "type": "string",
             "format": "guid"
+          }
+        }
+      },
+      "QuestStepContentType": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "None",
+          "Informative",
+          "Exercise"
+        ],
+        "enum": [
+          "None",
+          "Informative",
+          "Exercise"
+        ]
+      },
+      "CreateQuestStepContentCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "questStepContentType": {
+            "$ref": "#/components/schemas/QuestStepContentType"
+          },
+          "questionType": {
+            "$ref": "#/components/schemas/QuestionType"
+          },
+          "description": {
+            "type": "string"
+          },
+          "answers": {
+            "$ref": "#/components/schemas/IAnswer"
+          },
+          "weight": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "questStepId": {
+            "type": "string",
+            "format": "guid"
+          }
+        }
+      },
+      "PaginatedListOfQuestStepContentDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestStepContentDto"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hasPreviousPage": {
+            "type": "boolean"
+          },
+          "hasNextPage": {
+            "type": "boolean"
           }
         }
       },
@@ -6162,121 +6888,10 @@
               "type": "string",
               "format": "guid"
             }
-          }
-        }
-      },
-      "QuestStepType": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "None",
-          "Item",
-          "Npc"
-        ],
-        "enum": [
-          "None",
-          "Item",
-          "Npc"
-        ]
-      },
-      "QuestStepNpcType": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "None",
-          "Passive",
-          "Enemy",
-          "Friend"
-        ],
-        "enum": [
-          "None",
-          "Passive",
-          "Enemy",
-          "Friend"
-        ]
-      },
-      "QuestStepNpcBehaviour": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "None",
-          "StandStill",
-          "Roaming"
-        ],
-        "enum": [
-          "None",
-          "StandStill",
-          "Roaming"
-        ]
-      },
-      "QuestStepDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
+          },
+          "questId": {
             "type": "string",
             "format": "guid"
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "order": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "npcType": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/QuestStepNpcType"
-              }
-            ]
-          },
-          "npcBehaviour": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/QuestStepNpcBehaviour"
-              }
-            ]
-          },
-          "questStepType": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/QuestStepType"
-              }
-            ]
-          },
-          "npcs": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/NpcCleanDto"
-            }
-          },
-          "medias": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MediaDto"
-            }
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ItemDto"
-            }
-          },
-          "contents": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/QuestStepContentDto"
-            }
           }
         }
       },

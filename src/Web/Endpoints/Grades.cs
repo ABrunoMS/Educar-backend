@@ -22,7 +22,7 @@ public class Grades : EndpointGroupBase
             .MapDelete(DeleteGrade, "{id}");
     }
 
-    public Task<CreatedResponseDto> CreateGrade(ISender sender, CreateGradeCommand command)
+    public Task<IdResponseDto> CreateGrade(ISender sender, CreateGradeCommand command)
     {
         return sender.Send(command);
     }

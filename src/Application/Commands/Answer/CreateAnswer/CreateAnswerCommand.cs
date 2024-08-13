@@ -5,7 +5,7 @@ using Educar.Backend.Application.Common.Interfaces;
 namespace Educar.Backend.Application.Commands.Answer.CreateAnswer;
 
 public class CreateAnswerCommand(IAnswer givenAnswer, Guid accountId, Guid questStepContentId, bool isCorrect)
-    : IRequest<CreatedResponseDto>
+    : IRequest<IdResponseDto>
 {
     public Guid AccountId { get; set; } = accountId;
     public Guid QuestStepContentId { get; set; } = questStepContentId;
@@ -14,9 +14,9 @@ public class CreateAnswerCommand(IAnswer givenAnswer, Guid accountId, Guid quest
 }
 
 public class CreateAnswerCommandHandler(IApplicationDbContext context)
-    : IRequestHandler<CreateAnswerCommand, CreatedResponseDto>
+    : IRequestHandler<CreateAnswerCommand, IdResponseDto>
 {
-    public async Task<CreatedResponseDto> Handle(CreateAnswerCommand request, CancellationToken cancellationToken)
+    public async Task<IdResponseDto> Handle(CreateAnswerCommand request, CancellationToken cancellationToken)
     {
         var questStepContent = await context.QuestStepContents
             .FirstOrDefaultAsync(qsc => qsc.Id == request.QuestStepContentId, cancellationToken);
@@ -35,6 +35,6 @@ public class CreateAnswerCommandHandler(IApplicationDbContext context)
         context.Answers.Add(entity);
         await context.SaveChangesAsync(cancellationToken);
 
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 }

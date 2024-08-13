@@ -21,4 +21,7 @@ public class QuestStep(
     public IList<QuestStepNpc> QuestStepNpcs { get; set; } = new List<QuestStepNpc>();
     public IList<QuestStepMedia> QuestStepMedias { get; set; } = new List<QuestStepMedia>();
     public IList<QuestStepItem> QuestStepItems { get; set; } = new List<QuestStepItem>();
+    
+    public Guid QuestId { get; set; }
+    public Quest Quest { get; set; } = null!;
 }

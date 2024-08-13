@@ -31,7 +31,7 @@ public class CreateAddressTests : TestBase
 
         // Assert
         Assert.That(response, Is.Not.Null);
-        Assert.That(response, Is.InstanceOf<CreatedResponseDto>());
+        Assert.That(response, Is.InstanceOf<IdResponseDto>());
 
         var createdAddress = await Context.Addresses.FirstOrDefaultAsync(a => a.Id == response.Id);
 

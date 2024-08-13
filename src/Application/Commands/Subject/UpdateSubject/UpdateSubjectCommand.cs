@@ -2,7 +2,7 @@ using Educar.Backend.Application.Common.Interfaces;
 
 namespace Educar.Backend.Application.Commands.Subject.UpdateSubject;
 
-public record UpdateSubjectCommand : IRequest<CreatedResponseDto>
+public record UpdateSubjectCommand : IRequest<IdResponseDto>
 {
     public Guid Id { get; set; }
     public string? Name { get; set; }
@@ -10,9 +10,9 @@ public record UpdateSubjectCommand : IRequest<CreatedResponseDto>
 }
 
 public class UpdateSubjectCommandHandler(IApplicationDbContext context)
-    : IRequestHandler<UpdateSubjectCommand, CreatedResponseDto>
+    : IRequestHandler<UpdateSubjectCommand, IdResponseDto>
 {
-    public async Task<CreatedResponseDto> Handle(UpdateSubjectCommand request, CancellationToken cancellationToken)
+    public async Task<IdResponseDto> Handle(UpdateSubjectCommand request, CancellationToken cancellationToken)
     {
         var entity = await context.Subjects
             .Where(a => a.Id == request.Id)
@@ -24,6 +24,6 @@ public class UpdateSubjectCommandHandler(IApplicationDbContext context)
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 }

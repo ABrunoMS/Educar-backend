@@ -22,7 +22,7 @@ public class Games : EndpointGroupBase
             .MapDelete(DeleteGame, "{id}");
     }
 
-    public Task<CreatedResponseDto> CreateGame(ISender sender, CreateGameCommand command)
+    public Task<IdResponseDto> CreateGame(ISender sender, CreateGameCommand command)
     {
         return sender.Send(command);
     }

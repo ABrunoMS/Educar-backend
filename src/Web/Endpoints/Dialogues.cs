@@ -22,7 +22,7 @@ public class Dialogues : EndpointGroupBase
             .MapDelete(DeleteDialogue, "{id}");
     }
 
-    public Task<CreatedResponseDto> CreateDialogue(ISender sender, CreateDialogueCommand command)
+    public Task<IdResponseDto> CreateDialogue(ISender sender, CreateDialogueCommand command)
     {
         return sender.Send(command);
     }

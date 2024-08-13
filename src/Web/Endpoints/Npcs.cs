@@ -23,7 +23,7 @@ public class Npcs : EndpointGroupBase
             .MapDelete(DeleteNpc, "{id}");
     }
 
-    public Task<CreatedResponseDto> CreateNpc(ISender sender, CreateNpcCommand command)
+    public Task<IdResponseDto> CreateNpc(ISender sender, CreateNpcCommand command)
     {
         return sender.Send(command);
     }

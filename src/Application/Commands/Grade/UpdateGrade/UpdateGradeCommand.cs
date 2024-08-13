@@ -2,7 +2,7 @@ using Educar.Backend.Application.Common.Interfaces;
 
 namespace Educar.Backend.Application.Commands.Grade.UpdateGrade;
 
-public class UpdateGradeCommand : IRequest<CreatedResponseDto>
+public class UpdateGradeCommand : IRequest<IdResponseDto>
 {
     public Guid Id { get; set; }
     public string? Name { get; set; }
@@ -10,9 +10,9 @@ public class UpdateGradeCommand : IRequest<CreatedResponseDto>
 }
 
 public class UpdateGradeCommandHandler(IApplicationDbContext context)
-    : IRequestHandler<UpdateGradeCommand, CreatedResponseDto>
+    : IRequestHandler<UpdateGradeCommand, IdResponseDto>
 {
-    public async Task<CreatedResponseDto> Handle(UpdateGradeCommand request, CancellationToken cancellationToken)
+    public async Task<IdResponseDto> Handle(UpdateGradeCommand request, CancellationToken cancellationToken)
     {
         var entity = await context.Grades
             .Where(a => a.Id == request.Id)
@@ -24,6 +24,6 @@ public class UpdateGradeCommandHandler(IApplicationDbContext context)
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 }

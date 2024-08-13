@@ -4,7 +4,7 @@ using Educar.Backend.Domain.Entities;
 namespace Educar.Backend.Application.Commands.ProficiencyGroup.CreateProficiencyGroup;
 
 public class CreateProficiencyGroupCommand(string Name, string Description)
-    : IRequest<CreatedResponseDto>
+    : IRequest<IdResponseDto>
 {
     public string Name { get; set; } = Name;
     public string Description { get; set; } = Description;
@@ -12,9 +12,9 @@ public class CreateProficiencyGroupCommand(string Name, string Description)
 }
 
 public class CreateProficiencyGroupCommandHandler(IApplicationDbContext context)
-    : IRequestHandler<CreateProficiencyGroupCommand, CreatedResponseDto>
+    : IRequestHandler<CreateProficiencyGroupCommand, IdResponseDto>
 {
-    public async Task<CreatedResponseDto> Handle(CreateProficiencyGroupCommand request,
+    public async Task<IdResponseDto> Handle(CreateProficiencyGroupCommand request,
         CancellationToken cancellationToken)
     {
         var proficiencyEntities = new List<Domain.Entities.Proficiency>();
@@ -42,6 +42,6 @@ public class CreateProficiencyGroupCommandHandler(IApplicationDbContext context)
         context.ProficiencyGroups.Add(entity);
         await context.SaveChangesAsync(cancellationToken);
 
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 }

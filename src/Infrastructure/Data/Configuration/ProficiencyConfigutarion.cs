@@ -20,5 +20,11 @@ public class ProficiencyConfigutarion(DatabaseFacade database) : IEntityTypeConf
             .WithOne(c => c.Proficiency)
             .HasForeignKey(c => c.ProficiencyId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        builder
+            .HasMany(a => a.QuestProficiencies)
+            .WithOne(c => c.Proficiency)
+            .HasForeignKey(c => c.ProficiencyId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

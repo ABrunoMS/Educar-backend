@@ -5,7 +5,7 @@ using Educar.Backend.Domain.Enums;
 namespace Educar.Backend.Application.Commands.Npc.CreateNpc;
 
 public record CreateNpcCommand(string Name, string Lore, NpcType NpcType, decimal GoldDropRate, decimal GoldAmount)
-    : IRequest<CreatedResponseDto>
+    : IRequest<IdResponseDto>
 {
     public string Name { get; set; } = Name;
     public string Lore { get; set; } = Lore;
@@ -17,9 +17,9 @@ public record CreateNpcCommand(string Name, string Lore, NpcType NpcType, decima
 }
 
 public class CreateNpcCommandHandler(IApplicationDbContext context)
-    : IRequestHandler<CreateNpcCommand, CreatedResponseDto>
+    : IRequestHandler<CreateNpcCommand, IdResponseDto>
 {
-    public async Task<CreatedResponseDto> Handle(CreateNpcCommand request, CancellationToken cancellationToken)
+    public async Task<IdResponseDto> Handle(CreateNpcCommand request, CancellationToken cancellationToken)
     {
         // Retrieve the items
         var itemEntities = new List<Domain.Entities.Item>();
@@ -70,6 +70,6 @@ public class CreateNpcCommandHandler(IApplicationDbContext context)
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 }

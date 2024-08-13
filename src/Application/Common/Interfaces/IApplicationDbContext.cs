@@ -32,6 +32,8 @@ public interface IApplicationDbContext
     DbSet<QuestStepNpc> QuestStepNpcs { get; }
     DbSet<QuestStepItem> QuestStepItems { get; }
     DbSet<Answer> Answers { get; }
+    DbSet<Quest> Quests { get; }
+    DbSet<QuestProficiency> QuestProficiencies { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

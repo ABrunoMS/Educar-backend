@@ -13,5 +13,11 @@ public class GradeConfiguration(DatabaseFacade database) : IEntityTypeConfigurat
     {
         builder.Property(t => t.Name).IsRequired().HasMaxLength(100);
         builder.Property(t => t.Description).IsRequired();
+
+        builder
+            .HasMany(g => g.Quests)
+            .WithOne(q => q.Grade)
+            .HasForeignKey(q => q.GradeId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

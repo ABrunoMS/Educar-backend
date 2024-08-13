@@ -32,7 +32,7 @@ public class Medias : EndpointGroupBase
         return sender.Send(command);
     }
 
-    public Task<CreatedResponseDto> CreateMedia(ISender sender, CreateMediaCommand command)
+    public Task<IdResponseDto> CreateMedia(ISender sender, CreateMediaCommand command)
     {
         return sender.Send(command);
     }

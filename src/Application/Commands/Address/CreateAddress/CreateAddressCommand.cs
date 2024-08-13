@@ -4,7 +4,7 @@ using Educar.Backend.Domain.Events;
 namespace Educar.Backend.Application.Commands.Address.CreateAddress;
 
 public record CreateAddressCommand(string Street, string City, string State, string PostalCode, string Country)
-    : IRequest<CreatedResponseDto>
+    : IRequest<IdResponseDto>
 {
     public string Street { get; set; } = Street;
     public string City { get; set; } = City;
@@ -17,9 +17,9 @@ public record CreateAddressCommand(string Street, string City, string State, str
 }
 
 public class CreateAddressCommandHandler(IApplicationDbContext context)
-    : IRequestHandler<CreateAddressCommand, CreatedResponseDto>
+    : IRequestHandler<CreateAddressCommand, IdResponseDto>
 {
-    public async Task<CreatedResponseDto> Handle(CreateAddressCommand request, CancellationToken cancellationToken)
+    public async Task<IdResponseDto> Handle(CreateAddressCommand request, CancellationToken cancellationToken)
     {
         var entity = new Domain.Entities.Address(request.Street, request.City, request.State, request.PostalCode,
             request.Country)
@@ -33,6 +33,6 @@ public class CreateAddressCommandHandler(IApplicationDbContext context)
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 }

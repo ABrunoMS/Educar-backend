@@ -3,7 +3,7 @@ using Educar.Backend.Domain.Enums;
 
 namespace Educar.Backend.Application.Commands.Contract.CreateContract;
 
-public record CreateContractCommand : IRequest<CreatedResponseDto>
+public record CreateContractCommand : IRequest<IdResponseDto>
 {
     public CreateContractCommand(Guid clientId, Guid gameId)
     {
@@ -22,7 +22,7 @@ public record CreateContractCommand : IRequest<CreatedResponseDto>
     public Guid GameId { get; init; }
 }
 
-public class CreateContractCommandHandler : IRequestHandler<CreateContractCommand, CreatedResponseDto>
+public class CreateContractCommandHandler : IRequestHandler<CreateContractCommand, IdResponseDto>
 {
     private readonly IApplicationDbContext _context;
 
@@ -31,7 +31,7 @@ public class CreateContractCommandHandler : IRequestHandler<CreateContractComman
         _context = context;
     }
 
-    public async Task<CreatedResponseDto> Handle(CreateContractCommand request, CancellationToken cancellationToken)
+    public async Task<IdResponseDto> Handle(CreateContractCommand request, CancellationToken cancellationToken)
     {
         var client = await _context.Clients.FindAsync([request.ClientId], cancellationToken: cancellationToken);
         // Guard.Against.Null(client, message: $"Client {request.ClientId} not found.");
@@ -58,6 +58,6 @@ public class CreateContractCommandHandler : IRequestHandler<CreateContractComman
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 }

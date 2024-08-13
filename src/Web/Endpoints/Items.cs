@@ -23,7 +23,7 @@ public class Items : EndpointGroupBase
             .MapDelete(DeleteItem, "{id}");
     }
 
-    public Task<CreatedResponseDto> CreateItem(ISender sender, CreateItemCommand command)
+    public Task<IdResponseDto> CreateItem(ISender sender, CreateItemCommand command)
     {
         return sender.Send(command);
     }

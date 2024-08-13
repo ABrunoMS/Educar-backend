@@ -12,7 +12,7 @@ public record CreateQuestStepContentCommand(
     IAnswer Answers,
     decimal Weight,
     Guid QuestStepId)
-    : IRequest<CreatedResponseDto>
+    : IRequest<IdResponseDto>
 {
     public QuestStepContentType QuestStepContentType { get; set; } = QuestStepContentType;
     public QuestionType QuestionType { get; set; } = QuestionType;
@@ -23,9 +23,9 @@ public record CreateQuestStepContentCommand(
 }
 
 public class CreateQuestStepContentCommandHandler(IApplicationDbContext context)
-    : IRequestHandler<CreateQuestStepContentCommand, CreatedResponseDto>
+    : IRequestHandler<CreateQuestStepContentCommand, IdResponseDto>
 {
-    public async Task<CreatedResponseDto> Handle(CreateQuestStepContentCommand request,
+    public async Task<IdResponseDto> Handle(CreateQuestStepContentCommand request,
         CancellationToken cancellationToken)
     {
         var questStep = await context.QuestSteps
@@ -41,6 +41,6 @@ public class CreateQuestStepContentCommandHandler(IApplicationDbContext context)
         context.QuestStepContents.Add(entity);
         await context.SaveChangesAsync(cancellationToken);
 
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 }

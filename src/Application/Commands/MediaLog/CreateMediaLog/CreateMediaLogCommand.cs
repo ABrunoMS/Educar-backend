@@ -7,15 +7,15 @@ using Educar.Backend.Domain.Events;
 namespace Educar.Backend.Application.Commands.MediaLog.CreateMediaLog;
 
 public record CreateMediaLogCommand(AuditableAction Action, JsonObject CurrentState, Guid AccountId, Guid MediaId)
-    : IRequest<CreatedResponseDto>
+    : IRequest<IdResponseDto>
 {
     public JsonObject? PreviousState { get; set; }
 }
 
 public class CreateMediaLogCommandHandler(IApplicationDbContext context)
-    : IRequestHandler<CreateMediaLogCommand, CreatedResponseDto>
+    : IRequestHandler<CreateMediaLogCommand, IdResponseDto>
 {
-    public async Task<CreatedResponseDto> Handle(CreateMediaLogCommand request, CancellationToken cancellationToken)
+    public async Task<IdResponseDto> Handle(CreateMediaLogCommand request, CancellationToken cancellationToken)
     {
         var account = await context.Accounts.FindAsync([request.AccountId], cancellationToken: cancellationToken);
         if (account == null) throw new NotFoundException(nameof(account), request.AccountId.ToString());
@@ -33,6 +33,6 @@ public class CreateMediaLogCommandHandler(IApplicationDbContext context)
         context.MediaLogs.Add(entity);
         await context.SaveChangesAsync(cancellationToken);
 
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 }

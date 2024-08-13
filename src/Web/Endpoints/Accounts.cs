@@ -29,7 +29,7 @@ public class Accounts : EndpointGroupBase
             .MapPut(ForgotPassword, "forgot-password/{email}");
     }
 
-    public Task<CreatedResponseDto> CreateAccount(ISender sender, CreateAccountCommand command)
+    public Task<IdResponseDto> CreateAccount(ISender sender, CreateAccountCommand command)
     {
         return sender.Send(command);
     }

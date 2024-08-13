@@ -12,7 +12,7 @@ public record CreateItemCommand(
     string Reference2D,
     string Reference3D,
     decimal DropRate)
-    : IRequest<CreatedResponseDto>
+    : IRequest<IdResponseDto>
 {
     public string Name { get; set; } = Name;
     public string Lore { get; set; } = Lore;
@@ -26,9 +26,9 @@ public record CreateItemCommand(
 }
 
 public class CreateItemCommandHandler(IApplicationDbContext context)
-    : IRequestHandler<CreateItemCommand, CreatedResponseDto>
+    : IRequestHandler<CreateItemCommand, IdResponseDto>
 {
-    public async Task<CreatedResponseDto> Handle(CreateItemCommand request, CancellationToken cancellationToken)
+    public async Task<IdResponseDto> Handle(CreateItemCommand request, CancellationToken cancellationToken)
     {
         Domain.Entities.Item? dismantleItem = null;
         if (request.DismantleId != null && request.DismantleId != Guid.Empty)
@@ -47,6 +47,6 @@ public class CreateItemCommandHandler(IApplicationDbContext context)
         context.Items.Add(entity);
         await context.SaveChangesAsync(cancellationToken);
 
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 }

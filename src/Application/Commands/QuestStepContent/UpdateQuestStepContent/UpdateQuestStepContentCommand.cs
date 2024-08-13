@@ -5,7 +5,7 @@ using Educar.Backend.Domain.Enums;
 
 namespace Educar.Backend.Application.Commands.QuestStepContent.UpdateQuestStepContent;
 
-public class UpdateQuestStepContentCommand : IRequest<CreatedResponseDto>
+public class UpdateQuestStepContentCommand : IRequest<IdResponseDto>
 {
     public Guid Id { get; set; }
     public QuestStepContentType? QuestStepContentType { get; set; }
@@ -16,9 +16,9 @@ public class UpdateQuestStepContentCommand : IRequest<CreatedResponseDto>
 }
 
 public class UpdateQuestStepContentCommandHandler(IApplicationDbContext context)
-    : IRequestHandler<UpdateQuestStepContentCommand, CreatedResponseDto>
+    : IRequestHandler<UpdateQuestStepContentCommand, IdResponseDto>
 {
-    public async Task<CreatedResponseDto> Handle(UpdateQuestStepContentCommand request,
+    public async Task<IdResponseDto> Handle(UpdateQuestStepContentCommand request,
         CancellationToken cancellationToken)
     {
         var entity = await context.QuestStepContents
@@ -34,6 +34,6 @@ public class UpdateQuestStepContentCommandHandler(IApplicationDbContext context)
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 }

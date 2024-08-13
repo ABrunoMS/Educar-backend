@@ -45,7 +45,7 @@ public class CreateSchoolTests : TestBase
 
         // Assert
         Assert.That(response, Is.Not.Null);
-        Assert.That(response, Is.InstanceOf<CreatedResponseDto>());
+        Assert.That(response, Is.InstanceOf<IdResponseDto>());
 
         var createdSchool = await Context.Schools
             .Include(s => s.Client)
@@ -71,7 +71,7 @@ public class CreateSchoolTests : TestBase
 
         // Assert
         Assert.That(response, Is.Not.Null);
-        Assert.That(response, Is.InstanceOf<CreatedResponseDto>());
+        Assert.That(response, Is.InstanceOf<IdResponseDto>());
 
         var createdSchool = await Context.Schools
             .Include(s => s.Client)
@@ -139,7 +139,7 @@ public class CreateSchoolTests : TestBase
 
         // Assert
         Assert.That(response, Is.Not.Null);
-        Assert.That(response, Is.InstanceOf<CreatedResponseDto>());
+        Assert.That(response, Is.InstanceOf<IdResponseDto>());
 
         var createdSchool = await Context.Schools
             .Include(s => s.Client)

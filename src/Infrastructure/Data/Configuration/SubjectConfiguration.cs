@@ -19,5 +19,11 @@ public class SubjectConfiguration(DatabaseFacade database) : IEntityTypeConfigur
             .WithOne(c => c.Subject)
             .HasForeignKey(c => c.SubjectId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder
+            .HasMany(s => s.Quests)
+            .WithOne(q => q.Subject)
+            .HasForeignKey(q => q.SubjectId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

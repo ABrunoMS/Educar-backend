@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Educar.Backend.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240807182150_AddQuestStep")]
-    partial class AddQuestStep
+    [Migration("20240813145130_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -211,6 +211,63 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("addresses");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Answer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("account_id");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("GivenAnswer")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("given_answer");
+
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_correct");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<Guid>("QuestStepContentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("quest_step_content_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("QuestStepContentId");
+
+                    b.ToTable("answers");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Class", b =>
@@ -1057,6 +1114,125 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.ToTable("proficiency_group_proficiencies");
                 });
 
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Quest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("CombatDifficulty")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("combat_difficulty");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<Guid>("GameId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("game_id");
+
+                    b.Property<Guid>("GradeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("grade_id");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<int>("MaxPlayers")
+                        .HasColumnType("integer")
+                        .HasColumnName("max_players");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("name");
+
+                    b.Property<Guid?>("QuestDependencyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("quest_dependency_id");
+
+                    b.Property<Guid>("SubjectId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("subject_id");
+
+                    b.Property<int>("TotalQuestSteps")
+                        .HasColumnType("integer")
+                        .HasColumnName("total_quest_steps");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.Property<string>("UsageTemplate")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("usage_template");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameId");
+
+                    b.HasIndex("GradeId");
+
+                    b.HasIndex("QuestDependencyId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.ToTable("quests");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.QuestProficiency", b =>
+                {
+                    b.Property<Guid>("QuestId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("quest_id");
+
+                    b.Property<Guid>("ProficiencyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("proficiency_id");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.HasKey("QuestId", "ProficiencyId");
+
+                    b.HasIndex("ProficiencyId");
+
+                    b.ToTable("quest_proficiencies");
+                });
+
             modelBuilder.Entity("Educar.Backend.Domain.Entities.QuestStep", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1108,12 +1284,22 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("npc_type");
 
+                    b.Property<int>("Order")
+                        .HasColumnType("integer")
+                        .HasColumnName("order");
+
+                    b.Property<Guid>("QuestId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("quest_id");
+
                     b.Property<string>("QuestStepType")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("quest_step_type");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("QuestId");
 
                     b.ToTable("quest_steps");
                 });
@@ -1399,6 +1585,25 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("Class");
                 });
 
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Answer", b =>
+                {
+                    b.HasOne("Educar.Backend.Domain.Entities.Account", "Account")
+                        .WithMany("Answers")
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Educar.Backend.Domain.Entities.QuestStepContent", "QuestStepContent")
+                        .WithMany("Answers")
+                        .HasForeignKey("QuestStepContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("QuestStepContent");
+                });
+
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Class", b =>
                 {
                     b.HasOne("Educar.Backend.Domain.Entities.School", "School")
@@ -1563,6 +1768,69 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("ProficiencyGroup");
                 });
 
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Quest", b =>
+                {
+                    b.HasOne("Educar.Backend.Domain.Entities.Game", "Game")
+                        .WithMany("Quests")
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Educar.Backend.Domain.Entities.Grade", "Grade")
+                        .WithMany("Quests")
+                        .HasForeignKey("GradeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Educar.Backend.Domain.Entities.Quest", "QuestDependency")
+                        .WithMany()
+                        .HasForeignKey("QuestDependencyId");
+
+                    b.HasOne("Educar.Backend.Domain.Entities.Subject", "Subject")
+                        .WithMany("Quests")
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Game");
+
+                    b.Navigation("Grade");
+
+                    b.Navigation("QuestDependency");
+
+                    b.Navigation("Subject");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.QuestProficiency", b =>
+                {
+                    b.HasOne("Educar.Backend.Domain.Entities.Proficiency", "Proficiency")
+                        .WithMany("QuestProficiencies")
+                        .HasForeignKey("ProficiencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Educar.Backend.Domain.Entities.Quest", "Quest")
+                        .WithMany("QuestProficiencies")
+                        .HasForeignKey("QuestId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Proficiency");
+
+                    b.Navigation("Quest");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.QuestStep", b =>
+                {
+                    b.HasOne("Educar.Backend.Domain.Entities.Quest", "Quest")
+                        .WithMany("QuestSteps")
+                        .HasForeignKey("QuestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Quest");
+                });
+
             modelBuilder.Entity("Educar.Backend.Domain.Entities.QuestStepContent", b =>
                 {
                     b.HasOne("Educar.Backend.Domain.Entities.QuestStep", "QuestStep")
@@ -1651,6 +1919,8 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Account", b =>
                 {
                     b.Navigation("AccountClasses");
+
+                    b.Navigation("Answers");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Class", b =>
@@ -1672,6 +1942,13 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("GameProficiencyGroups");
 
                     b.Navigation("GameSubjects");
+
+                    b.Navigation("Quests");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Grade", b =>
+                {
+                    b.Navigation("Quests");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Item", b =>
@@ -1700,6 +1977,8 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Proficiency", b =>
                 {
                     b.Navigation("ProficiencyGroupProficiencies");
+
+                    b.Navigation("QuestProficiencies");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.ProficiencyGroup", b =>
@@ -1707,6 +1986,13 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("GameProficiencyGroups");
 
                     b.Navigation("ProficiencyGroupProficiencies");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Quest", b =>
+                {
+                    b.Navigation("QuestProficiencies");
+
+                    b.Navigation("QuestSteps");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.QuestStep", b =>
@@ -1720,6 +2006,11 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("QuestStepNpcs");
                 });
 
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.QuestStepContent", b =>
+                {
+                    b.Navigation("Answers");
+                });
+
             modelBuilder.Entity("Educar.Backend.Domain.Entities.School", b =>
                 {
                     b.Navigation("Accounts");
@@ -1728,6 +2019,8 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Subject", b =>
                 {
                     b.Navigation("GameSubjects");
+
+                    b.Navigation("Quests");
                 });
 #pragma warning restore 612, 618
         }

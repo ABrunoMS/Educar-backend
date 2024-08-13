@@ -18,7 +18,7 @@ public class Addresses : EndpointGroupBase
             .MapDelete(DeleteAddress, "{id}");
     }
 
-    public Task<CreatedResponseDto> CreateAddress(ISender sender, CreateAddressCommand command)
+    public Task<IdResponseDto> CreateAddress(ISender sender, CreateAddressCommand command)
     {
         return sender.Send(command);
     }

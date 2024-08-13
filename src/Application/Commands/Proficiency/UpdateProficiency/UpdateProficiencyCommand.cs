@@ -2,7 +2,7 @@ using Educar.Backend.Application.Common.Interfaces;
 
 namespace Educar.Backend.Application.Commands.Proficiency.UpdateProficiency;
 
-public class UpdateProficiencyCommand : IRequest<CreatedResponseDto>
+public class UpdateProficiencyCommand : IRequest<IdResponseDto>
 {
     public Guid Id { get; set; }
     public string? Name { get; set; }
@@ -11,9 +11,9 @@ public class UpdateProficiencyCommand : IRequest<CreatedResponseDto>
 }
 
 public class UpdateProficiencyCommandHandler(IApplicationDbContext context)
-    : IRequestHandler<UpdateProficiencyCommand, CreatedResponseDto>
+    : IRequestHandler<UpdateProficiencyCommand, IdResponseDto>
 {
-    public async Task<CreatedResponseDto> Handle(UpdateProficiencyCommand request, CancellationToken cancellationToken)
+    public async Task<IdResponseDto> Handle(UpdateProficiencyCommand request, CancellationToken cancellationToken)
     {
         var entity = await context.Proficiencies
             .Where(a => a.Id == request.Id)
@@ -26,6 +26,6 @@ public class UpdateProficiencyCommandHandler(IApplicationDbContext context)
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 }

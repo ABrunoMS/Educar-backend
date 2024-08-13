@@ -29,7 +29,7 @@ public class QuestSteps : EndpointGroupBase
         return await sender.Send(new GetQuestStepQuery { Id = id });
     }
 
-    public Task<CreatedResponseDto> CreateQuestStep(ISender sender, CreateQuestStepCommand command)
+    public Task<IdResponseDto> CreateQuestStep(ISender sender, CreateQuestStepCommand command)
     {
         return sender.Send(command);
     }

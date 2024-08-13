@@ -29,7 +29,7 @@ public class CreateClientTests: TestBase
 
         // Assert
         Assert.That(response, Is.Not.Null);
-        Assert.That(response, Is.InstanceOf<CreatedResponseDto>());
+        Assert.That(response, Is.InstanceOf<IdResponseDto>());
 
         if (Context.Clients != null)
         {
@@ -63,7 +63,7 @@ public class CreateClientTests: TestBase
 
         // Assert
         Assert.That(response, Is.Not.Null);
-        Assert.That(response, Is.InstanceOf<CreatedResponseDto>());
+        Assert.That(response, Is.InstanceOf<IdResponseDto>());
 
         var createdClient = await Context.Clients.FindAsync(response.Id);
         Assert.That(createdClient, Is.Not.Null);

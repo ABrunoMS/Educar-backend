@@ -46,7 +46,7 @@ public class CreateContractTests : TestBase
 
         // Assert
         Assert.That(response, Is.Not.Null);
-        Assert.That(response, Is.InstanceOf<CreatedResponseDto>());
+        Assert.That(response, Is.InstanceOf<IdResponseDto>());
 
         var createdContract = await Context.Contracts
             .Include(c => c.Client)

@@ -2,15 +2,15 @@ using Educar.Backend.Application.Common.Interfaces;
 
 namespace Educar.Backend.Application.Commands.Client.CreateClient;
 
-public record CreateClientCommand(string Name) : IRequest<CreatedResponseDto>
+public record CreateClientCommand(string Name) : IRequest<IdResponseDto>
 {
     public string? Description { get; init; }
 }
 
 public class CreateClientCommandHandler(IApplicationDbContext context)
-    : IRequestHandler<CreateClientCommand, CreatedResponseDto>
+    : IRequestHandler<CreateClientCommand, IdResponseDto>
 {
-    public async Task<CreatedResponseDto> Handle(CreateClientCommand request, CancellationToken cancellationToken)
+    public async Task<IdResponseDto> Handle(CreateClientCommand request, CancellationToken cancellationToken)
     {
         var entity = new Domain.Entities.Client(request.Name)
         {
@@ -21,6 +21,6 @@ public class CreateClientCommandHandler(IApplicationDbContext context)
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return new CreatedResponseDto(entity.Id);
+        return new IdResponseDto(entity.Id);
     }
 }

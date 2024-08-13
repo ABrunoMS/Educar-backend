@@ -22,7 +22,7 @@ public class Clients : EndpointGroupBase
             .MapDelete(DeleteClient, "{id}");
     }
 
-    public Task<CreatedResponseDto> CreateClient(ISender sender, CreateClientCommand command)
+    public Task<IdResponseDto> CreateClient(ISender sender, CreateClientCommand command)
     {
         return sender.Send(command);
     }

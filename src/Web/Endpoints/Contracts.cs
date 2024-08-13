@@ -27,7 +27,7 @@ public class Contracts : EndpointGroupBase
         return await sender.Send(new GetContractQuery { Id = id });
     }
 
-    public Task<CreatedResponseDto> CreateContract(ISender sender, CreateContractCommand command)
+    public Task<IdResponseDto> CreateContract(ISender sender, CreateContractCommand command)
     {
         return sender.Send(command);
     }
