@@ -12,6 +12,9 @@ The project can be executed using the following command assuming you have the co
 ```bash
  dotnet run --project src/Web
 ```
+
+There is an example of the appsettings file in the `src/Web/appsettings.Example.json` file. You can copy this file to `src/Web/appsettings.json` and configure the connection strings and other settings as needed.
+
 Once the application is running, you can access the Swagger API documentation at `/api`.
 
 ## Running the tests
