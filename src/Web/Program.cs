@@ -12,7 +12,8 @@ builder.Services.AddWebServices();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment()) await app.InitialiseDatabaseAsync();
+// if (app.Environment.IsDevelopment()) 
+await app.InitialiseDatabaseAsync();
 
 app.UseHealthChecks("/health");
 

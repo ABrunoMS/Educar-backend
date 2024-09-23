@@ -28,13 +28,9 @@ public class UpdateAccountCommandHandler(IApplicationDbContext context) : IReque
 
         var school = await GetEntityByIdAsync(context.Schools, request.SchoolId, cancellationToken);
 
-        var classEntities = await context.Classes
-            .Where(c => request.ClassIds.Contains(c.Id))
-            .ToListAsync(cancellationToken);
-
         ValidateNonAdminRole(entity.Role, request.SchoolId, request.ClassIds);
 
-        UpdateEntity(entity, request, school, classEntities, context);
+        UpdateEntity(entity, request, school, context);
 
         await context.SaveChangesAsync(cancellationToken);
 
@@ -46,7 +42,7 @@ public class UpdateAccountCommandHandler(IApplicationDbContext context) : IReque
     {
         if (id == null || id == Guid.Empty) return null;
 
-        var entity = await dbSet.FindAsync(new object[] { id }, cancellationToken);
+        var entity = await dbSet.FindAsync([id], cancellationToken);
         if (entity == null) throw new NotFoundException(typeof(T).Name, id.ToString()!);
         return entity;
     }
@@ -73,7 +69,7 @@ public class UpdateAccountCommandHandler(IApplicationDbContext context) : IReque
     }
 
     private void UpdateEntity(Domain.Entities.Account entity, UpdateAccountCommand request,
-        Domain.Entities.School? school, List<Domain.Entities.Class> classEntities, IApplicationDbContext context)
+        Domain.Entities.School? school, IApplicationDbContext context)
     {
         if (request.Name != null) entity.Name = request.Name;
         if (request.RegistrationNumber != null) entity.RegistrationNumber = request.RegistrationNumber;

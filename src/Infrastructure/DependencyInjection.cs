@@ -24,7 +24,16 @@ public static class DependencyInjection
         services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
         services.AddScoped<ISaveChangesInterceptor, SoftDeleteInterceptor>();
         services.AddScoped<IIdentityService, KeycloakService>();
-        services.AddSingleton<IObjectStorage, OciObjectStorageService>();
+
+        var useAzureFlag = configuration.GetValue<bool>("UseAzureCloud");
+        if (useAzureFlag)
+        {
+            services.AddSingleton<IObjectStorage, AzureBlobStorageService>();
+        }
+        else
+        {
+            services.AddSingleton<IObjectStorage, OciObjectStorageService>();
+        }
 
 
         if (context != null)
