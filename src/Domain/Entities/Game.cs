@@ -11,4 +11,5 @@ public class Game(string name, string description, string lore, string purpose)
     public IList<GameProficiencyGroup> GameProficiencyGroups { get; set; } = new List<GameProficiencyGroup>();
     public IList<GameNpc> GameNpcs { get; set; } = new List<GameNpc>();
     public IList<Quest> Quests { get; set; } = new List<Quest>();
+    public IList<Map> Maps { get; set; } = new List<Map>();
 }

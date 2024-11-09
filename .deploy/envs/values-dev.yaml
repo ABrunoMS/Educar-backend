@@ -1,0 +1,33 @@
+envs: 
+  UseInMemoryDatabase: "false"
+  EnsureDeletedDatabase: "false"
+  Logging__LogLevel__Default: "Debug"
+  AllowedHosts: "*"
+  AppSettings__TopicGeneratedEvents: "nstech.zeus.hub.events"
+  AppSettings__Azure__AzureBlobMaxFileSize: "6291456"
+  AppSettings__Azure__AzureBlobSasExpireSeconds: "14400"
+  AppSettings__Azure__AzureBlobContainerName: "rmp-files"
+  Auth__Audience: "zeus-aegis-api"
+  Auth__Authority: "https://dev.nstech.com.br/auth/realms/zeus"
+  Auth__AuthorizationUrl: "https://dev.nstech.com.br/auth/realms/zeus/protocol/openid-connect/auth"
+  Auth__TokenUrl: "https://dev.nstech.com.br/auth/realms/zeus/protocol/openid-connect/token"
+  Auth__ClientId: "zeus-aegis-api"
+  RabbitMQ__HostName: "rabbitmq-zeus-dev.nstech.com.br"
+  RabbitMQ__Port: "5672"
+  RabbitMQ__UserName: "hub"
+  RabbitMQ__VirtualHost: "dev"
+  Cache__InstanceName: "Zeus.Hub"
+  RMP__TokenUrl: "https://dev.nstech.com.br/auth/realms/zeus/protocol/openid-connect/token"
+  RMP__Url: "https://dev.nstech.com.br/zeus/api/rmp/"
+  RMP__ClientId: "zeus-aegis-api"
+
+secrets: 
+  ConnectionStrings__DefaultConnection: psql-aegis-connstr
+  AppSettings__Azure__AzureConnectionString: stg-connstr
+  Auth__ClientSecret: aegis-keycloak-secret
+  Encryption__Key: cache-encryption-key
+  Cache__ConnectionString: redis-primary-connstr
+  RabbitMQ__Password: rabbitmq-hub-password
+  RMP__ClientSecret: aegis-keycloak-secret
+
+  

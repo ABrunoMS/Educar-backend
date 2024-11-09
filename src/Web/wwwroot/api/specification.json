@@ -1984,6 +1984,205 @@
         ]
       }
     },
+    "/api/Maps": {
+      "post": {
+        "tags": [
+          "Maps"
+        ],
+        "operationId": "CreateMap",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMapCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Maps/{id}": {
+      "get": {
+        "tags": [
+          "Maps"
+        ],
+        "operationId": "GetMap",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MapDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Maps"
+        ],
+        "operationId": "UpdateMap",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMapCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Maps"
+        ],
+        "operationId": "DeleteMap",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Maps/game/{gameId}": {
+      "get": {
+        "tags": [
+          "Maps"
+        ],
+        "operationId": "GetAllMapsByGame",
+        "parameters": [
+          {
+            "name": "gameId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "page_number",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedListOfMapCleanDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/MediaLogs/media/{mediaId}": {
       "get": {
         "tags": [
@@ -3661,6 +3860,43 @@
         "responses": {
           "200": {
             "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/SpawnPoints": {
+      "post": {
+        "tags": [
+          "SpawnPoints"
+        ],
+        "operationId": "CreateSpawnPoint",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSpawnPointCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdResponseDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -5470,6 +5706,205 @@
           }
         }
       },
+      "CreateMapCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/MapType"
+          },
+          "reference2D": {
+            "type": "string"
+          },
+          "reference3D": {
+            "type": "string"
+          },
+          "gameId": {
+            "type": "string",
+            "format": "guid"
+          }
+        }
+      },
+      "MapType": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "None",
+          "World",
+          "Dungeon"
+        ],
+        "enum": [
+          "None",
+          "World",
+          "Dungeon"
+        ]
+      },
+      "MapDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MapType"
+              }
+            ]
+          },
+          "reference2D": {
+            "type": "string",
+            "nullable": true
+          },
+          "reference3D": {
+            "type": "string",
+            "nullable": true
+          },
+          "spawnPoints": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/SpawnPointCleanDto"
+            }
+          }
+        }
+      },
+      "SpawnPointCleanDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "reference": {
+            "type": "string",
+            "nullable": true
+          },
+          "x": {
+            "type": "string",
+            "nullable": true
+          },
+          "y": {
+            "type": "string",
+            "nullable": true
+          },
+          "z": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "PaginatedListOfMapCleanDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MapCleanDto"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hasPreviousPage": {
+            "type": "boolean"
+          },
+          "hasNextPage": {
+            "type": "boolean"
+          }
+        }
+      },
+      "MapCleanDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MapType"
+              }
+            ]
+          },
+          "reference2D": {
+            "type": "string",
+            "nullable": true
+          },
+          "reference3D": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "UpdateMapCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/MapType"
+          },
+          "reference2D": {
+            "type": "string"
+          },
+          "reference3D": {
+            "type": "string"
+          }
+        }
+      },
       "PaginatedListOfMediaLogDto": {
         "type": "object",
         "additionalProperties": false,
@@ -7146,6 +7581,34 @@
                 "$ref": "#/components/schemas/Address"
               }
             ]
+          }
+        }
+      },
+      "CreateSpawnPointCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "x": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "y": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "z": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "mapId": {
+            "type": "string",
+            "format": "guid"
           }
         }
       },

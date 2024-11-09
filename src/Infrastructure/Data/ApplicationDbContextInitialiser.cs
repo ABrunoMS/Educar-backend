@@ -23,6 +23,7 @@ public static class InitialiserExtensions
 
         await initialiser.SeedAsync();
     }
+    
 }
 
 public class ApplicationDbContextInitialiser

@@ -34,6 +34,8 @@ public interface IApplicationDbContext
     DbSet<Answer> Answers { get; }
     DbSet<Quest> Quests { get; }
     DbSet<QuestProficiency> QuestProficiencies { get; }
+    DbSet<SpawnPoint> SpawnPoints { get; }
+    DbSet<Map> Maps { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

@@ -40,5 +40,11 @@ public class GameConfiguration(DatabaseFacade database) : IEntityTypeConfigurati
             .WithOne(q => q.Game)
             .HasForeignKey(q => q.GameId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder
+            .HasMany(g => g.Maps)
+            .WithOne(q => q.Game)
+            .HasForeignKey(q => q.GameId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

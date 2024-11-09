@@ -42,6 +42,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Answer> Answers => Set<Answer>();
     public DbSet<Quest> Quests => Set<Quest>();
     public DbSet<QuestProficiency> QuestProficiencies => Set<QuestProficiency>();
+    public DbSet<SpawnPoint> SpawnPoints => Set<SpawnPoint>();
+    public DbSet<Map> Maps => Set<Map>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

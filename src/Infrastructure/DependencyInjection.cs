@@ -5,9 +5,11 @@ using Educar.Backend.Infrastructure.Options;
 using Educar.Backend.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
 
 namespace Educar.Backend.Infrastructure;
 
@@ -47,11 +49,20 @@ public static class DependencyInjection
             {
                 options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
 
+                var connectionStringBuilder = new NpgsqlConnectionStringBuilder(connectionString);
+                var searchPaths = connectionStringBuilder.SearchPath?.Split(',');
+
                 options.UseNpgsql(connectionString, sqlOptions =>
                 {
                     sqlOptions.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName);
                     sqlOptions.EnableRetryOnFailure(15, TimeSpan.FromSeconds(30),
                         null);
+
+                    if (searchPaths is { Length: > 0 })
+                    {
+                        var mainSchema = searchPaths[0];
+                        sqlOptions.MigrationsHistoryTable(HistoryRepository.DefaultTableName, mainSchema);
+                    }
                 });
             });
 
