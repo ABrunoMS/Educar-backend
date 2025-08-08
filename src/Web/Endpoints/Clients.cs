@@ -6,6 +6,7 @@ using Educar.Backend.Application.Common.Models;
 using Educar.Backend.Application.Queries.Client;
 using Educar.Backend.Domain.Enums;
 using Microsoft.OpenApi.Extensions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Educar.Backend.Web.Endpoints;
 
@@ -32,12 +33,15 @@ public class Clients : EndpointGroupBase
         return await sender.Send(new GetClientQuery { Id = id });
     }
 
-    public Task<PaginatedList<ClientDto>> GetAllClients(ISender sender, [AsParameters] PaginatedQuery paginatedQuery)
+    public Task<PaginatedList<ClientDto>> GetAllClients(
+        ISender sender,
+        [FromQuery(Name = "PageNumber")] int PageNumber,
+        [FromQuery(Name = "PageSize")] int PageSize)
     {
         var query = new GetClientsPaginatedQuery
         {
-            PageNumber = paginatedQuery.PageNumber,
-            PageSize = paginatedQuery.PageSize
+            PageNumber = PageNumber,
+            PageSize = PageSize
         };
 
         return sender.Send(query);

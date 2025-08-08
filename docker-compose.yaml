@@ -3,10 +3,15 @@ version: '3.7'
 services:
   postgres:
     image: postgres:16.2
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U psqladmin -d educar"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - pg_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: keycloak
+      POSTGRES_DB: educar
       POSTGRES_USER: psqladmin
       POSTGRES_PASSWORD: pgadmin
     ports:
@@ -24,16 +29,17 @@ services:
       KC_HTTP_ENABLED: true
       KC_HOSTNAME_STRICT_HTTPS: false
       KC_HEALTH_ENABLED: true
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres/keycloak
+      KC_DB_URL: jdbc:postgresql://postgres/educar
       KC_DB_USERNAME: psqladmin
       KC_DB_PASSWORD: pgadmin
     ports:
       - 18080:8080
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - educar_network
 

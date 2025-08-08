@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Ardalis.GuardClauses; // Adicionado para o Guard.Against.Null
 
 namespace Educar.Backend.Infrastructure.Data;
 
@@ -16,14 +17,10 @@ public static class InitialiserExtensions
     public static async Task InitialiseDatabaseAsync(this WebApplication app)
     {
         using var scope = app.Services.CreateScope();
-
         var initialiser = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitialiser>();
-
         await initialiser.InitialiseAsync();
-
         await initialiser.SeedAsync();
     }
-    
 }
 
 public class ApplicationDbContextInitialiser
@@ -79,7 +76,24 @@ public class ApplicationDbContextInitialiser
         // Check if there are any clients, if not, create one
         if (!_context.Clients.Any())
         {
-            var clientCommand = new CreateClientCommand(clientName);
+            // CÓDIGO ATUALIZADO AQUI
+            // Criamos o comando preenchendo todos os campos obrigatórios.
+            var clientCommand = new CreateClientCommand
+            {
+                Name = clientName,
+                Description = "Cliente principal do sistema, criado na inicialização.",
+                Partner = "Educar Padrão",
+                Contacts = "admin@educar.com",
+                Contract = "Contrato Master",
+                Validity = "31/12/2099",
+                SignatureDate = "07/08/2025",
+                ImplantationDate = "07/08/2025",
+                TotalAccounts = 999,
+                Secretary = "Secretaria Principal",
+                SubSecretary = "N/A",
+                Regional = "Nacional"
+            };
+            
             var clientCreatedResponse = await _sender.Send(clientCommand, CancellationToken.None);
             clientId = clientCreatedResponse.Id;
         }
@@ -88,7 +102,6 @@ public class ApplicationDbContextInitialiser
         if (!_context.Accounts.Any())
         {
             Guard.Against.Null(clientId, nameof(clientId));
-
             var accountCommand = new CreateAccountCommand("admin-educar", "admin@admin.com", "000", clientId.Value,
                 UserRole.Admin);
             await _sender.Send(accountCommand, CancellationToken.None);

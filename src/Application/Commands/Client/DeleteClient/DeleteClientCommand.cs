@@ -10,7 +10,7 @@ public class DeleteClientCommandHandler(IApplicationDbContext context) : IReques
     public async Task<Unit> Handle(DeleteClientCommand request, CancellationToken cancellationToken)
     {
         var entity = await context.Clients
-            .Include(c => c.Contracts)
+            //.Include(c => c.Contracts)
             .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
         Guard.Against.NotFound(request.Id, entity);
 

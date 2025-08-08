@@ -9,6 +9,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddWebServices();
+builder.Services.AddControllers();
+
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("http://localhost:5000", "http://127.0.0.1:5000")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                      });
+});
 
 var app = builder.Build();
 
@@ -18,6 +31,7 @@ await app.InitialiseDatabaseAsync();
 app.UseHealthChecks("/health");
 
 app.UseHttpsRedirection();
+app.UseCors(MyAllowSpecificOrigins);
 app.UseStaticFiles();
 
 app.UseSwaggerUi(settings =>
@@ -29,6 +43,8 @@ app.UseSwaggerUi(settings =>
 app.MapControllerRoute(
     "default",
     "{controller}/{action=Index}/{id?}");
+
+//app.MapControllers();
 
 app.UseExceptionHandler(options => { });
 

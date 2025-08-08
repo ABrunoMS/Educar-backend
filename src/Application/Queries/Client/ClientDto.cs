@@ -1,4 +1,7 @@
-using Educar.Backend.Application.Queries.Contract;
+using AutoMapper;
+using Educar.Backend.Application.Queries.Contract; // Mantenha se você usar
+using System;
+using System.Collections.Generic;
 
 namespace Educar.Backend.Application.Queries.Client;
 
@@ -7,12 +10,26 @@ public class ClientDto
     public Guid Id { get; set; }
     public string? Name { get; set; }
     public string? Description { get; set; }
-    public List<ContractDto>? Contracts { get; set; }
+    public string? Partner { get; set; }
+    public string? Contacts { get; set; }
+    public string? Contract { get; set; }
+    public string? Validity { get; set; }
+    public string? SignatureDate { get; set; }
+    public string? ImplantationDate { get; set; }
+    public int TotalAccounts { get; set; }
+    public string? Secretary { get; set; }
+    public string? SubSecretary { get; set; }
+    public string? Regional { get; set; }
+    
+    // Se você tiver uma lista de contratos associada, pode manter.
+    // public List<ContractDto>? Contracts { get; set; }
 
     private class Mapping : Profile
     {
         public Mapping()
         {
+            // O AutoMapper mapeará automaticamente os novos campos se os nomes
+            // corresponderem entre a Entidade de Domínio e o ClientDto.
             CreateMap<Domain.Entities.Client, ClientDto>();
         }
     }
