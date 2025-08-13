@@ -2,6 +2,8 @@ using AutoMapper;
 using Educar.Backend.Application.Queries.Contract; // Mantenha se você usar
 using System;
 using System.Collections.Generic;
+using Educar.Backend.Domain.Entities;
+using ClientEntity = Educar.Backend.Domain.Entities.Client;
 
 namespace Educar.Backend.Application.Queries.Client;
 
@@ -17,6 +19,7 @@ public class ClientDto
     public string? SignatureDate { get; set; }
     public string? ImplantationDate { get; set; }
     public int TotalAccounts { get; set; }
+    public int RemainingAccounts { get; set; }
     public string? Secretary { get; set; }
     public string? SubSecretary { get; set; }
     public string? Regional { get; set; }
@@ -30,7 +33,9 @@ public class ClientDto
         {
             // O AutoMapper mapeará automaticamente os novos campos se os nomes
             // corresponderem entre a Entidade de Domínio e o ClientDto.
-            CreateMap<Domain.Entities.Client, ClientDto>();
+            CreateMap<ClientEntity, ClientDto>()
+                .ForMember(dest => dest.RemainingAccounts,
+                           opt => opt.MapFrom(src => src.TotalAccounts - src.Accounts.Count()));
         }
     }
 }

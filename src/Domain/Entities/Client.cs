@@ -1,4 +1,5 @@
 using Educar.Backend.Domain.Common; // Importa o namespace da sua BaseEntity
+using System.Collections.Generic;
 
 namespace Educar.Backend.Domain.Entities;
 
@@ -21,4 +22,5 @@ public class Client : BaseEntity // <-- A herança correta para o seu projeto
     public string? Secretary { get; set; }
     public string? SubSecretary { get; set; }
     public string? Regional { get; set; }
+    public ICollection<Account> Accounts { get; private set; } = new List<Account>();
 }

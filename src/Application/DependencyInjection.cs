@@ -1,6 +1,7 @@
 using System.Reflection;
 using Educar.Backend.Application.Common.Behaviours;
 using Microsoft.Extensions.DependencyInjection;
+using Educar.Backend.Application.Queries.Client;
 
 namespace Educar.Backend.Application;
 
