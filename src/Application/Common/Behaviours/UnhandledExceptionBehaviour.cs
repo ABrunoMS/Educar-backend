@@ -26,7 +26,7 @@ public class UnhandledExceptionBehaviour<TRequest, TResponse> : IPipelineBehavio
             // Do not log ValidationException
             throw;
         }
-        catch (NotFoundException)
+        catch (Educar.Backend.Application.Common.Exceptions.NotFoundException)
         {
             // Do not log NotFoundException
             throw;

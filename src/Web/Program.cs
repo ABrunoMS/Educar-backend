@@ -30,9 +30,13 @@ await app.InitialiseDatabaseAsync();
 
 app.UseHealthChecks("/health");
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseCors(MyAllowSpecificOrigins);
 app.UseStaticFiles();
+
+// Add authentication and authorization middleware
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseSwaggerUi(settings =>
 {

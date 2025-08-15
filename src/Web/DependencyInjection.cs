@@ -57,13 +57,14 @@ public static class DependencyInjection
         {
             options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
             options.SerializerOptions.Converters.Add(new ExpectedAnswerJsonConverter());
-            options.SerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
+            // Removed snake_case policy to use camelCase (default)
         });
 
         services.Configure<JsonOptions>(options =>
         {
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             options.JsonSerializerOptions.Converters.Add(new ExpectedAnswerJsonConverter());
+            // Using camelCase (default) instead of snake_case
         });
 
         services.AddAuthorizationBuilder()

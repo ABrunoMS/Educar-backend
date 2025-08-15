@@ -1,19 +1,19 @@
 using Educar.Backend.Application.Common.Interfaces;
+using Educar.Backend.Application.Common.Models;
 using Educar.Backend.Domain.Events;
+using MediatR;
 
 namespace Educar.Backend.Application.Commands.Address.CreateAddress;
 
-public record CreateAddressCommand(string Street, string City, string State, string PostalCode, string Country)
-    : IRequest<IdResponseDto>
+public record CreateAddressCommand : IRequest<IdResponseDto>
 {
-    public string Street { get; set; } = Street;
-    public string City { get; set; } = City;
-    public string State { get; set; } = State;
-    public string PostalCode { get; set; } = PostalCode;
-    public string Country { get; set; } = Country;
-    public decimal? Lat { get; set; }
-    public decimal? Lng { get; set; }
-    
+    public string Street { get; init; } = string.Empty;
+    public string City { get; init; } = string.Empty;
+    public string State { get; init; } = string.Empty;
+    public string PostalCode { get; init; } = string.Empty;
+    public string Country { get; init; } = string.Empty;
+    public decimal? Lat { get; init; }
+    public decimal? Lng { get; init; }
 }
 
 public class CreateAddressCommandHandler(IApplicationDbContext context)
@@ -21,8 +21,13 @@ public class CreateAddressCommandHandler(IApplicationDbContext context)
 {
     public async Task<IdResponseDto> Handle(CreateAddressCommand request, CancellationToken cancellationToken)
     {
-        var entity = new Domain.Entities.Address(request.Street, request.City, request.State, request.PostalCode,
-            request.Country)
+        var entity = new Domain.Entities.Address(
+            request.Street,
+            request.City,
+            request.State,
+            request.PostalCode,
+            request.Country
+        )
         {
             Lat = request.Lat,
             Lng = request.Lng

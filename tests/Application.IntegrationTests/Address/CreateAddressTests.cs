@@ -20,8 +20,13 @@ public class CreateAddressTests : TestBase
     public async Task GivenValidRequest_ShouldCreateAddress()
     {
         // Arrange
-        var command = new CreateAddressCommand("123 Main St", "Test City", "Test State", "12345", "Test Country")
+        var command = new CreateAddressCommand
         {
+            Street = "123 Main St",
+            City = "Test City",
+            State = "Test State",
+            PostalCode = "12345",
+            Country = "Test Country",
             Lat = 40.712776m,
             Lng = -74.005974m
         };
@@ -48,7 +53,14 @@ public class CreateAddressTests : TestBase
     [Test]
     public void ShouldThrowValidationException_WhenStreetIsEmpty()
     {
-        var command = new CreateAddressCommand("", "Test City", "Test State", "12345", "Test Country");
+        var command = new CreateAddressCommand
+        {
+            Street = "",
+            City = "Test City",
+            State = "Test State",
+            PostalCode = "12345",
+            Country = "Test Country"
+        };
 
         Assert.ThrowsAsync<ValidationException>(async () => await SendAsync(command));
     }
@@ -56,7 +68,14 @@ public class CreateAddressTests : TestBase
     [Test]
     public void ShouldThrowValidationException_WhenCityIsEmpty()
     {
-        var command = new CreateAddressCommand("123 Main St", "", "Test State", "12345", "Test Country");
+        var command = new CreateAddressCommand
+        {
+            Street = "123 Main St",
+            City = "",
+            State = "Test State",
+            PostalCode = "12345",
+            Country = "Test Country"
+        };
 
         Assert.ThrowsAsync<ValidationException>(async () => await SendAsync(command));
     }
@@ -64,7 +83,14 @@ public class CreateAddressTests : TestBase
     [Test]
     public void ShouldThrowValidationException_WhenStateIsEmpty()
     {
-        var command = new CreateAddressCommand("123 Main St", "Test City", "", "12345", "Test Country");
+        var command = new CreateAddressCommand
+        {
+            Street = "123 Main St",
+            City = "Test City",
+            State = "",
+            PostalCode = "12345",
+            Country = "Test Country"
+        };
 
         Assert.ThrowsAsync<ValidationException>(async () => await SendAsync(command));
     }
@@ -72,7 +98,14 @@ public class CreateAddressTests : TestBase
     [Test]
     public void ShouldThrowValidationException_WhenPostalCodeIsEmpty()
     {
-        var command = new CreateAddressCommand("123 Main St", "Test City", "Test State", "", "Test Country");
+        var command = new CreateAddressCommand
+        {
+            Street = "123 Main St",
+            City = "Test City",
+            State = "Test State",
+            PostalCode = "",
+            Country = "Test Country"
+        };
 
         Assert.ThrowsAsync<ValidationException>(async () => await SendAsync(command));
     }
@@ -80,7 +113,14 @@ public class CreateAddressTests : TestBase
     [Test]
     public void ShouldThrowValidationException_WhenCountryIsEmpty()
     {
-        var command = new CreateAddressCommand("123 Main St", "Test City", "Test State", "12345", "");
+        var command = new CreateAddressCommand
+        {
+            Street = "123 Main St",
+            City = "Test City",
+            State = "Test State",
+            PostalCode = "12345",
+            Country = ""
+        };
 
         Assert.ThrowsAsync<ValidationException>(async () => await SendAsync(command));
     }
