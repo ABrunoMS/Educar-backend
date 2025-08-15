@@ -29,7 +29,14 @@ public class UpdateAddressTests : TestBase
     [Test]
     public async Task GivenValidRequest_ShouldUpdateAddress()
     {
-        var createCommand = new CreateAddressCommand("street", "city", "state", "postalCode", "country");
+        var createCommand = new CreateAddressCommand
+        {
+            Street = "street",
+            City = "city",
+            State = "state",
+            PostalCode = "postalCode",
+            Country = "country"
+        };
         var response = await SendAsync(createCommand);
 
         // Arrange

@@ -1,6 +1,7 @@
 using Educar.Backend.Application.Commands.Client.CreateClient;
 using Educar.Backend.Domain.Entities;
 using Educar.Backend.Application.Common.Interfaces;
+using Educar.Backend.Application.Common.Exceptions;
 using Educar.Backend.Infrastructure;
 using Educar.Backend.Infrastructure.Data;
 using Educar.Backend.Infrastructure.Data.Interceptors;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using NotFoundException = Educar.Backend.Application.Common.Exceptions.NotFoundException;
 
 namespace Educar.Backend.Application.IntegrationTests;
 

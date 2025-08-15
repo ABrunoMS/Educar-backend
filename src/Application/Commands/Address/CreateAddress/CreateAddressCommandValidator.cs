@@ -23,5 +23,7 @@ public class CreateAddressCommandValidator : AbstractValidator<CreateAddressComm
         RuleFor(x => x.Country)
             .NotEmpty().WithMessage("Country is required.")
             .MaximumLength(100).WithMessage("Country cannot exceed 100 characters.");
+
+        // Lat and Lng are optional, so no validation needed
     }
 }

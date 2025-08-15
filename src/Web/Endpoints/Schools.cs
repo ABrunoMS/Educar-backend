@@ -6,6 +6,7 @@ using Educar.Backend.Application.Common.Models;
 using Educar.Backend.Application.Queries.School;
 using Educar.Backend.Domain.Enums;
 using Microsoft.OpenApi.Extensions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Educar.Backend.Web.Endpoints;
 
@@ -33,25 +34,30 @@ public class Schools : EndpointGroupBase
         return sender.Send(command);
     }
 
-    public Task<PaginatedList<SchoolDto>> GetAllSchools(ISender sender,
-        [AsParameters] PaginatedQuery paginatedQuery)
+    public Task<PaginatedList<SchoolDto>> GetAllSchools(
+        ISender sender,
+        [FromQuery(Name = "PageNumber")] int PageNumber,
+        [FromQuery(Name = "PageSize")] int PageSize)
     {
         var query = new GetSchoolsPaginatedQuery
         {
-            PageNumber = paginatedQuery.PageNumber,
-            PageSize = paginatedQuery.PageSize
+            PageNumber = PageNumber,
+            PageSize = PageSize
         };
 
         return sender.Send(query);
     }
 
-    public Task<PaginatedList<SchoolDto>> GetAllSchoolsByClient(ISender sender,
-        Guid clientId, [AsParameters] PaginatedQuery paginatedQuery)
+    public Task<PaginatedList<SchoolDto>> GetAllSchoolsByClient(
+        ISender sender,
+        Guid clientId,
+        [FromQuery(Name = "PageNumber")] int PageNumber,
+        [FromQuery(Name = "PageSize")] int PageSize)
     {
         var query = new GetSchoolsByClientPaginatedQuery(clientId)
         {
-            PageNumber = paginatedQuery.PageNumber,
-            PageSize = paginatedQuery.PageSize
+            PageNumber = PageNumber,
+            PageSize = PageSize
         };
 
         return sender.Send(query);

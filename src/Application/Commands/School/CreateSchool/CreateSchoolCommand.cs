@@ -1,5 +1,6 @@
-using Educar.Backend.Application.Commands.Address.CreateAddress;
 using Educar.Backend.Application.Common.Interfaces;
+using Educar.Backend.Application.Common.Exceptions;
+using Educar.Backend.Domain.Entities;
 
 namespace Educar.Backend.Application.Commands.School.CreateSchool;
 
@@ -7,30 +8,19 @@ public record CreateSchoolCommand(string Name, Guid ClientId) : IRequest<IdRespo
 {
     public string Name { get; set; } = Name;
     public string? Description { get; set; }
-    public Domain.Entities.Address? Address { get; set; }
+    public Guid? AddressId { get; set; }
     public Guid ClientId { get; set; } = ClientId;
 }
 
-public class CreateSchoolCommandHandler(IApplicationDbContext context, ISender sender)
+public class CreateSchoolCommandHandler(IApplicationDbContext context)
     : IRequestHandler<CreateSchoolCommand, IdResponseDto>
 {
     public async Task<IdResponseDto> Handle(CreateSchoolCommand request, CancellationToken cancellationToken)
     {
         var client = await context.Clients.FindAsync([request.ClientId], cancellationToken: cancellationToken);
-        if (client == null) throw new NotFoundException(nameof(Client), request.ClientId.ToString());
+        if (client == null) throw new Educar.Backend.Application.Common.Exceptions.NotFoundException(nameof(Client), request.ClientId.ToString());
 
-        Guid? addressId = null;
-        if (request.Address != null)
-        {
-            var createAddressCommand = new CreateAddressCommand(request.Address.Street, request.Address.City,
-                request.Address.State, request.Address.PostalCode, request.Address.Country)
-            {
-                Lat = request.Address.Lat,
-                Lng = request.Address.Lng
-            };
-            var response = await sender.Send(createAddressCommand, cancellationToken);
-            addressId = response.Id;
-        }
+        Guid? addressId = request.AddressId;
 
         var entity = new Domain.Entities.School(request.Name)
         {
