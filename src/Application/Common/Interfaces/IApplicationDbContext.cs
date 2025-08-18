@@ -36,6 +36,7 @@ public interface IApplicationDbContext
     DbSet<QuestProficiency> QuestProficiencies { get; }
     DbSet<SpawnPoint> SpawnPoints { get; }
     DbSet<Map> Maps { get; }
+    DbSet<Secretary> Secretaries { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
