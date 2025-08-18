@@ -44,6 +44,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<QuestProficiency> QuestProficiencies => Set<QuestProficiency>();
     public DbSet<SpawnPoint> SpawnPoints => Set<SpawnPoint>();
     public DbSet<Map> Maps => Set<Map>();
+    public DbSet<Secretary> Secretaries => Set<Secretary>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
