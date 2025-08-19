@@ -17,12 +17,19 @@ public class Classes : EndpointGroupBase
             .RequireAuthorization(UserRole.Admin.GetDisplayName())
             .MapPost(CreateClass)
             .MapPut(UpdateClass, "{id}")
-            .MapDelete(DeleteClass, "{id}");
+            .MapDelete(DeleteClass, "{id}")
+            .MapGet(GetAllClasses);
 
         app.MapGroup(this)
             .RequireAuthorization(UserRole.Student.GetDisplayName())
             .MapGet(GetClass, "{id}")
             .MapGet(GetAllClassesBySchool, "school/{schoolId}");
+            
+    }
+
+    public Task<PaginatedList<ClassDto>> GetAllClasses(ISender sender, [AsParameters] GetClassesPaginatedQuery query)
+    {
+        return sender.Send(query);
     }
 
     public Task<IdResponseDto> CreateClass(ISender sender, CreateClassCommand command)

@@ -30,9 +30,11 @@ await app.InitialiseDatabaseAsync();
 
 app.UseHealthChecks("/health");
 
+app.UseExceptionHandler(options => { });
+
 // app.UseHttpsRedirection();
-app.UseCors(MyAllowSpecificOrigins);
 app.UseStaticFiles();
+app.UseCors(MyAllowSpecificOrigins);
 
 // Add authentication and authorization middleware
 app.UseAuthentication();
@@ -50,7 +52,6 @@ app.MapControllerRoute(
 
 //app.MapControllers();
 
-app.UseExceptionHandler(options => { });
 
 app.Map("/", () => Results.Redirect("/api"));
 app.MapEndpoints();

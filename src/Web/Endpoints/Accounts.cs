@@ -20,6 +20,7 @@ public class Accounts : EndpointGroupBase
             .MapGet(GetAccount, "{id}")
             .MapGet(GetAllAccountsBySchool, "school/{schoolId}")
             .MapGet(GetAllAccountsByClass, "class/{classId}")
+            .MapGet(GetAllAccountsByClient, "client/{clientId}")
             .MapGet(GetAllAccounts)
             .MapPut(UpdateAccount, "{id}")
             .MapDelete(DeleteAccount, "{id}");
@@ -43,6 +44,18 @@ public class Accounts : EndpointGroupBase
         [AsParameters] PaginatedQuery paginatedQuery)
     {
         var query = new GetAccountsPaginatedQuery
+        {
+            PageNumber = paginatedQuery.PageNumber,
+            PageSize = paginatedQuery.PageSize
+        };
+
+        return sender.Send(query);
+    }
+
+    public Task<PaginatedList<CleanAccountDto>> GetAllAccountsByClient(ISender sender,
+        Guid clientId, [AsParameters] PaginatedQuery paginatedQuery)
+    {
+        var query = new GetAccountsByClientPaginatedQuery(clientId)
         {
             PageNumber = paginatedQuery.PageNumber,
             PageSize = paginatedQuery.PageSize
