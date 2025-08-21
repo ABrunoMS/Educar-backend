@@ -25,9 +25,10 @@ public class GetAccountsBySchoolPaginatedQueryHandler : IRequestHandler<GetAccou
     public async Task<PaginatedList<CleanAccountDto>> Handle(GetAccountsBySchoolPaginatedQuery request,
         CancellationToken cancellationToken)
     {
-        return await _context.Accounts
+        return await _context.AccountSchools
+            .Where(asc => asc.SchoolId == request.SchoolId)
+            .Select(asc => asc.Account) 
             .OrderBy(x => x.Name)
-            .Where(x => x.SchoolId == request.SchoolId)
             .ProjectTo<CleanAccountDto>(_mapper.ConfigurationProvider)
             .PaginatedListAsync(request.PageNumber, request.PageSize);
     }

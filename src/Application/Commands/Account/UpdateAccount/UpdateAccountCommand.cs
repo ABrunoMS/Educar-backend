@@ -1,11 +1,12 @@
 using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Domain.Entities;
 using Educar.Backend.Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 using ValidationException = Educar.Backend.Application.Common.Exceptions.ValidationException;
 
 namespace Educar.Backend.Application.Commands.Account.UpdateAccount;
 
-public record UpdateAccountCommand : IRequest<Unit>
+public record UpdateAccountCommand : IRequest
 {
     public Guid Id { get; set; }
     public string? Name { get; set; }
@@ -13,72 +14,87 @@ public record UpdateAccountCommand : IRequest<Unit>
     public decimal AverageScore { get; set; }
     public decimal EventAverageScore { get; set; }
     public int Stars { get; set; }
-    public Guid? SchoolId { get; set; }
+    public IList<Guid> SchoolIds { get; set; } = new List<Guid>();
     public IList<Guid> ClassIds { get; set; } = new List<Guid>();
 }
 
-public class UpdateAccountCommandHandler(IApplicationDbContext context) : IRequestHandler<UpdateAccountCommand, Unit>
+public class UpdateAccountCommandHandler(IApplicationDbContext context) : IRequestHandler<UpdateAccountCommand>
 {
-    public async Task<Unit> Handle(UpdateAccountCommand request, CancellationToken cancellationToken)
+    public async Task Handle(UpdateAccountCommand request, CancellationToken cancellationToken)
     {
         var entity = await context.Accounts
             .Include(a => a.AccountClasses)
+            .Include(a => a.AccountSchools)
             .FirstOrDefaultAsync(a => a.Id == request.Id, cancellationToken);
+        
         Guard.Against.NotFound(request.Id, entity);
 
-        var school = await GetEntityByIdAsync(context.Schools, request.SchoolId, cancellationToken);
+        ValidateNonAdminRole(entity.Role, request.SchoolIds, request.ClassIds);
 
-        ValidateNonAdminRole(entity.Role, request.SchoolId, request.ClassIds);
-
-        UpdateEntity(entity, request, school, context);
+        UpdateEntity(entity, request, context);
 
         await context.SaveChangesAsync(cancellationToken);
-
-        return Unit.Value;
     }
 
-    private async Task<T?> GetEntityByIdAsync<T>(DbSet<T> dbSet, Guid? id, CancellationToken cancellationToken)
-        where T : class
-    {
-        if (id == null || id == Guid.Empty) return null;
-
-        var entity = await dbSet.FindAsync([id], cancellationToken);
-        if (entity == null) throw new NotFoundException(typeof(T).Name, id.ToString()!);
-        return entity;
-    }
-
-    private void ValidateNonAdminRole(UserRole role, Guid? schoolId, IList<Guid> classIds)
+    private void ValidateNonAdminRole(UserRole role, IList<Guid> schoolIds, IList<Guid> classIds)
     {
         if (role == UserRole.Admin) return;
-
         var exception = new ValidationException();
-        if (schoolId == null || schoolId == Guid.Empty)
+        if (schoolIds == null || schoolIds.Count == 0)
         {
-            exception.Errors.Add("SchoolId", ["School ID is required for non-admin roles."]);
+          exception.Errors.Add("SchoolId", ["School ID is required for non-admin roles."]);
         }
-
         if (classIds == null || classIds.Count == 0)
         {
-            exception.Errors.Add("ClassIds", ["At least one Class ID is required for non-admin roles."]);
-        }
-
+          exception.Errors.Add("ClassIds", ["At least one Class ID is required for non-admin roles."]);
+        }  
         if (exception.Errors.Any())
         {
-            throw exception;
+        throw exception;
         }
     }
-
-    private void UpdateEntity(Domain.Entities.Account entity, UpdateAccountCommand request,
-        Domain.Entities.School? school, IApplicationDbContext context)
+    
+    private void UpdateEntity(Domain.Entities.Account entity, UpdateAccountCommand request, IApplicationDbContext context)
     {
+        // 1. Atualiza os campos simples
         if (request.Name != null) entity.Name = request.Name;
         if (request.RegistrationNumber != null) entity.RegistrationNumber = request.RegistrationNumber;
         entity.AverageScore = request.AverageScore;
         entity.EventAverageScore = request.EventAverageScore;
         entity.Stars = request.Stars;
-        entity.School = school;
 
-        // Use IgnoreQueryFilters to get all AccountClasses including soft-deleted ones
+        // 2. LÓGICA DE SOFT DELETE PARA ESCOLAS 
+        var allAccountSchools = context.AccountSchools
+            .IgnoreQueryFilters()
+            .Where(asc => asc.AccountId == entity.Id)
+            .ToList();
+        
+        var currentSchoolIds = allAccountSchools.Where(asc => !asc.IsDeleted).Select(asc => asc.SchoolId).ToList();
+        var newSchoolIds = request.SchoolIds;
+
+        var schoolsToAdd = newSchoolIds.Except(currentSchoolIds).ToList();
+        foreach (var schoolId in schoolsToAdd)
+        {
+            var existingAccountSchool = allAccountSchools.FirstOrDefault(asc => asc.SchoolId == schoolId && asc.IsDeleted);
+            if (existingAccountSchool != null)
+            {
+                existingAccountSchool.IsDeleted = false;
+                existingAccountSchool.DeletedAt = null;
+            }
+            else
+            {
+                entity.AccountSchools.Add(new AccountSchool { SchoolId = schoolId });
+            }
+        }
+
+        var schoolsToRemove = currentSchoolIds.Except(newSchoolIds).ToList();
+        foreach (var accountSchool in allAccountSchools.Where(asc => schoolsToRemove.Contains(asc.SchoolId)))
+        {
+            accountSchool.IsDeleted = true;
+            accountSchool.DeletedAt = DateTimeOffset.UtcNow;
+        }
+
+        // 3. LÓGICA DE SOFT DELETE PARA TURMAS 
         var allAccountClasses = context.AccountClasses
             .IgnoreQueryFilters()
             .Where(ac => ac.AccountId == entity.Id)
@@ -87,7 +103,6 @@ public class UpdateAccountCommandHandler(IApplicationDbContext context) : IReque
         var currentClassIds = allAccountClasses.Where(ac => !ac.IsDeleted).Select(ac => ac.ClassId).ToList();
         var newClassIds = request.ClassIds;
 
-        // Find classes to add
         var classesToAdd = newClassIds.Except(currentClassIds).ToList();
         foreach (var classId in classesToAdd)
         {
@@ -99,14 +114,12 @@ public class UpdateAccountCommandHandler(IApplicationDbContext context) : IReque
             }
             else
             {
-                entity.AccountClasses.Add(new AccountClass { AccountId = entity.Id, ClassId = classId });
+                entity.AccountClasses.Add(new AccountClass { ClassId = classId });
             }
         }
 
-        // Find classes to remove (soft delete)
         var classesToRemove = currentClassIds.Except(newClassIds).ToList();
-        foreach (var accountClass in classesToRemove.Select(classId =>
-                     entity.AccountClasses.First(ac => ac.ClassId == classId)))
+        foreach (var accountClass in allAccountClasses.Where(ac => classesToRemove.Contains(ac.ClassId)))
         {
             accountClass.IsDeleted = true;
             accountClass.DeletedAt = DateTimeOffset.UtcNow;

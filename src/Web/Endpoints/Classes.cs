@@ -6,6 +6,7 @@ using Educar.Backend.Application.Common.Models;
 using Educar.Backend.Application.Queries.Class;
 using Educar.Backend.Domain.Enums;
 using Microsoft.OpenApi.Extensions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Educar.Backend.Web.Endpoints;
 
@@ -23,7 +24,8 @@ public class Classes : EndpointGroupBase
         app.MapGroup(this)
             .RequireAuthorization(UserRole.Student.GetDisplayName())
             .MapGet(GetClass, "{id}")
-            .MapGet(GetAllClassesBySchool, "school/{schoolId}");
+            .MapGet(GetAllClassesBySchool, "schools/{schoolIds}")
+            .MapPost(GetClassesBySchools, "by-schools");
             
     }
 
@@ -65,5 +67,10 @@ public class Classes : EndpointGroupBase
         command.Id = id;
         await sender.Send(command);
         return Results.NoContent();
+    }
+     
+    public async Task<List<ClassDto>> GetClassesBySchools(ISender sender, [FromBody] GetClassesBySchoolsQuery query)
+    {
+        return await sender.Send(query);
     }
 }

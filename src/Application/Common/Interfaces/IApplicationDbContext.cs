@@ -37,6 +37,7 @@ public interface IApplicationDbContext
     DbSet<SpawnPoint> SpawnPoints { get; }
     DbSet<Map> Maps { get; }
     DbSet<Secretary> Secretaries { get; }
+    DbSet<AccountSchool> AccountSchools { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
