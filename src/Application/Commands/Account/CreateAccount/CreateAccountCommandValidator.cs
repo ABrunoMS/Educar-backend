@@ -44,14 +44,15 @@ public class CreateAccountCommandValidator : AbstractValidator<CreateAccountComm
             .NotNull().WithMessage("Role is required.")
             .IsInEnum().WithMessage("Role must be a valid enum value.");
 
-        RuleFor(v => v.SchoolId)
+        RuleFor(v => v.SchoolIds)
             .NotEmpty().WithMessage("School ID is required.")
             .When(v => v.Role != UserRole.Admin).WithMessage("School ID is required for non-admin roles.");
 
-        RuleFor(v => v.ClassIds)
+        /*RuleFor(v => v.ClassIds)
             .NotEmpty().WithMessage("Class IDs are required.")
             .When(v => v.Role != UserRole.Admin).WithMessage("Class IDs are required for non-admin roles.")
             .MustAsync(BeValidClassIds).WithMessage("One or more Class IDs are invalid.");
+        */
     }
 
     public async Task<bool> BeUniqueTitle(string email, CancellationToken cancellationToken)
@@ -70,5 +71,15 @@ public class CreateAccountCommandValidator : AbstractValidator<CreateAccountComm
             .ToListAsync(cancellationToken);
 
         return classIds.All(id => validClassIds.Contains(id));
+    }
+
+        private async Task<bool> BeValidSchoolsForClient(CreateAccountCommand command, List<Guid>? schoolIds, CancellationToken cancellationToken)
+    {
+        if (schoolIds == null || !schoolIds.Any()) return true;
+
+        var validSchoolCount = await _context.Schools
+            .CountAsync(s => schoolIds.Contains(s.Id) && s.ClientId == command.ClientId, cancellationToken);
+        
+        return validSchoolCount == schoolIds.Count;
     }
 }

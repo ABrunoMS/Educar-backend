@@ -8,5 +8,6 @@ public class School(string name) : BaseAuditableEntity
     public Guid? AddressId { get; set; }
     public Client? Client { get; set; }
     public Guid ClientId { get; set; }
-    public List<Account> Accounts { get; set; } = [];
+    //public List<Account> Accounts { get; set; } = [];
+    public IList<AccountSchool> AccountSchools { get; set; } = new List<AccountSchool>();
 }

@@ -17,7 +17,8 @@ public class AccountDto
 
     public ClientCleanDto? Client { get; set; }
     public UserRole Role { get; set; }
-    public SchoolDto? School { get; set; }
+    //public SchoolDto? School { get; set; }
+    public IList<SchoolDto> Schools { get; set; } = new List<SchoolDto>();
     public IList<ClassDto> Classes { get; set; } = new List<ClassDto>();
 
     private class Mapping : Profile
@@ -25,6 +26,9 @@ public class AccountDto
         public Mapping()
         {
             CreateMap<Domain.Entities.Account, AccountDto>()
+                .ForMember(dest => dest.Schools, opt => opt.MapFrom(src => src.AccountSchools
+                    .OrderBy(asc => asc.School.Name) 
+                    .Select(asc => asc.School)))
                 .ForMember(dest => dest.Classes, opt => opt.MapFrom(src => src.AccountClasses
                     .OrderBy(ac => ac.Class.Name)
                     .Take(20) //limit to only 20 results to avoid performance issues

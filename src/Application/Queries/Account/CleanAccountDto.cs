@@ -24,7 +24,7 @@ public class CleanAccountDto
                 .ForMember(dest => dest.ClientName,
                            opt => opt.MapFrom(src => src.Client.Name))
                 .ForMember(dest => dest.SchoolName,
-                           opt => opt.MapFrom(src => src.School != null ? src.School.Name : null));
+                           opt => opt.MapFrom(src => string.Join(", ", src.AccountSchools.Select(asc => asc.School.Name))));
         }
     }
 }
