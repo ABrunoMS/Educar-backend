@@ -11,12 +11,20 @@ public class AccountCreatedEventHandler(
 {
     public /*async*/ Task Handle(AccountCreatedEvent notification, CancellationToken cancellationToken)
     {
+
        // var userId = await identityService.CreateUser(notification.Account.Email, notification.Account.Name,
            // notification.Account.Role, cancellationToken);
 
         //if (userId == Guid.Empty) throw new Exception("Failed to create user");
 
-        var userId = Guid.NewGuid();
+        
+
+
+        /*var userId = await identityService.CreateUser(notification.Account.Email, notification.Account.Name,
+            notification.Account.Role, cancellationToken);
+
+        if (userId == Guid.Empty) throw new Exception("Failed to create user");*/
+         var userId = Guid.NewGuid();
 
         //Saving isn't required here because this entity is managed and hasn't been saved yet at this point
         notification.Account.Id = userId;
