@@ -102,8 +102,15 @@ public class ApplicationDbContextInitialiser
         if (!_context.Accounts.Any())
         {
             Guard.Against.Null(clientId, nameof(clientId));
-            var accountCommand = new CreateAccountCommand("admin-educar", "admin@admin.com", "000", clientId.Value,
-                UserRole.Admin);
+            var accountCommand = new CreateAccountCommand
+            {
+                Name = "admin-educar",
+                Email = "admin@admin.com",
+                RegistrationNumber = "000",
+                ClientId = clientId.Value,
+                Role = UserRole.Admin,
+                Password = _options.DefaultAdminPassword 
+            };
             await _sender.Send(accountCommand, CancellationToken.None);
         }
     }

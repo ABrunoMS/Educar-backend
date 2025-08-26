@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Educar.Backend.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250821152053_AddAccountSchoolManyToMany")]
+    [Migration("20250825172739_AddAccountSchoolManyToMany")]
     partial class AddAccountSchoolManyToMany
     {
         /// <inheritdoc />

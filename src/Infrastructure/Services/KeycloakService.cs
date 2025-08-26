@@ -28,7 +28,7 @@ public class KeycloakService : IIdentityService
         _initDataOptions = configuration.GetInitDataOptions();
     }
 
-    public async Task<Guid> CreateUser(string kcEmail, string name, UserRole role, CancellationToken cancellationToken)
+    public async Task<Guid> CreateUser(string kcEmail, string name, string password, UserRole role, CancellationToken cancellationToken)
     {
         await PopulateToken(cancellationToken);
 
@@ -37,17 +37,17 @@ public class KeycloakService : IIdentityService
         try
         {
             var url = $"{_authOptions.AdminUrl}/users";
-            var randomPassword = GenerateRandomPassword();
+           // var randomPassword = GenerateRandomPassword();
             var creds = new[]
             {
                 new
                 {
-                    temporary = true,
+                    temporary = false,
                     type = "password",
-                    value = randomPassword
+                    value = password
                 }
             };
-            if (role.Equals(UserRole.Admin))
+          /*  if (role.Equals(UserRole.Admin))
             {
                 creds =
                 [
@@ -58,12 +58,13 @@ public class KeycloakService : IIdentityService
                         value = _initDataOptions.DefaultAdminPassword
                     }
                 ];
-            }
+            }*/
 
             var payload = JsonSerializer.Serialize(new
             {
                 username = kcEmail,
                 email = kcEmail,
+                firstName = name,
                 enabled = true,
                 emailVerified = true,
                 credentials = creds

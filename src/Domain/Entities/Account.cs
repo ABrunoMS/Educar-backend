@@ -1,4 +1,5 @@
 using Educar.Backend.Domain.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Educar.Backend.Domain.Entities;
 
@@ -18,4 +19,6 @@ public class Account(string name, string email, string registrationNumber, UserR
     public IList<AccountClass> AccountClasses { get; set; } = new List<AccountClass>();
     public UserRole Role { get; set; } = role;
     public IList<Answer> Answers { get; set; } = new List<Answer>();
+    [NotMapped]
+    public string? Password { get; set; }
 }

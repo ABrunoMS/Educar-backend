@@ -2,23 +2,44 @@ using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Domain.Entities;
 using Educar.Backend.Domain.Enums;
 using Educar.Backend.Domain.Events;
+using System.Text.Json.Serialization;
 
 namespace Educar.Backend.Application.Commands.Account.CreateAccount;
 
-public record CreateAccountCommand(string Name, string Email, string RegistrationNumber, Guid ClientId, UserRole Role)
-    : IRequest<IdResponseDto>
+public record CreateAccountCommand : IRequest<IdResponseDto>
 {
-    public string Name { get; set; } = Name;
-    public string Email { get; set; } = Email;
-    public string RegistrationNumber { get; set; } = RegistrationNumber;
-    public decimal AverageScore { get; set; }
-    public decimal EventAverageScore { get; set; }
-    public int Stars { get; set; }
-    public Guid ClientId { get; set; } = ClientId;
-    public UserRole Role { get; set; } = Role;
-    //public Guid? SchoolId { get; set; }
+    [JsonPropertyName("name")]
+    public string Name { get; init; } = string.Empty;
+
+    [JsonPropertyName("email")]
+    public string Email { get; init; } = string.Empty;
+    
+    [JsonPropertyName("password")] 
+    public string Password { get; init; } = string.Empty;
+
+    [JsonPropertyName("registrationNumber")]
+    public string RegistrationNumber { get; init; } = string.Empty;
+
+    [JsonPropertyName("averageScore")]
+    public decimal AverageScore { get; init; }
+
+    [JsonPropertyName("eventAverageScore")]
+    public decimal EventAverageScore { get; init; }
+
+    [JsonPropertyName("stars")]
+    public int Stars { get; init; }
+
+    [JsonPropertyName("clientId")]
+    public Guid ClientId { get; init; }
+
+    [JsonPropertyName("role")]
+    public UserRole Role { get; init; }
+
+    [JsonPropertyName("schoolIds")]
     public List<Guid>? SchoolIds { get; init; }
-    public List<Guid>? ClassIds { get; set; }
+
+    [JsonPropertyName("classIds")]
+    public List<Guid>? ClassIds { get; init; }
 }
 
 public class CreateAccountCommandHandler(IApplicationDbContext context)
@@ -37,7 +58,8 @@ public class CreateAccountCommandHandler(IApplicationDbContext context)
             EventAverageScore = request.EventAverageScore,
             Stars = request.Stars,
             Client = client,
-            ClientId = request.ClientId
+            ClientId = request.ClientId,
+            Password = request.Password
         };
 
         
