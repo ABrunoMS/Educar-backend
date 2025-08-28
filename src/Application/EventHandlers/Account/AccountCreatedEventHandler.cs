@@ -16,10 +16,17 @@ public class AccountCreatedEventHandler(
             {
                 throw new InvalidOperationException("The password was not provided for the creation of the user in Keycloak.");
             }
+        
+        var lastName = notification.Account.LastName;
+        if (string.IsNullOrEmpty(lastName))
+        {
+            throw new InvalidOperationException("The last name was not provided for the creation of the user in Keycloak.");
+        }
 
         var userId = await identityService.CreateUser(
             notification.Account.Email, 
             notification.Account.Name,
+            lastName,
             password,
             notification.Account.Role, 
             cancellationToken);

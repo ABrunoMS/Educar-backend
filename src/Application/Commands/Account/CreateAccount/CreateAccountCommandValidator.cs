@@ -15,6 +15,10 @@ public class CreateAccountCommandValidator : AbstractValidator<CreateAccountComm
             .MaximumLength(100).WithMessage("Name must not exceed 100 characters.")
             .NotEmpty().WithMessage("Name is required.");
 
+        RuleFor(v => v.LastName)
+            .MaximumLength(100).WithMessage("Last name must not exceed 100 characters.")
+            .NotEmpty().WithMessage("Last name is required.");
+
         RuleFor(v => v.Email)
             .MaximumLength(100).WithMessage("Email must not exceed 100 characters.")
             .NotEmpty().WithMessage("Email is required.")

@@ -11,6 +11,9 @@ public record CreateAccountCommand : IRequest<IdResponseDto>
     [JsonPropertyName("name")]
     public string Name { get; init; } = string.Empty;
 
+    [JsonPropertyName("lastName")]
+    public string? LastName { get; init; }
+
     [JsonPropertyName("email")]
     public string Email { get; init; } = string.Empty;
     
@@ -59,7 +62,8 @@ public class CreateAccountCommandHandler(IApplicationDbContext context)
             Stars = request.Stars,
             Client = client,
             ClientId = request.ClientId,
-            Password = request.Password
+            Password = request.Password,
+            LastName = request.LastName,
         };
 
         
