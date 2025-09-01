@@ -39,5 +39,8 @@ public interface IApplicationDbContext
     DbSet<Secretary> Secretaries { get; }
     DbSet<AccountSchool> AccountSchools { get; }
 
+    DbSet<Subsecretaria> Subsecretarias { get; }
+    DbSet<Regional> Regionais { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
