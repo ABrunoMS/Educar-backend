@@ -28,7 +28,7 @@ public class KeycloakService : IIdentityService
         _initDataOptions = configuration.GetInitDataOptions();
     }
 
-    public async Task<Guid> CreateUser(string kcEmail, string name, string password, UserRole role, CancellationToken cancellationToken)
+    public async Task<Guid> CreateUser(string kcEmail, string name, string lastName, string password, UserRole role, CancellationToken cancellationToken)
     {
         await PopulateToken(cancellationToken);
 
@@ -65,6 +65,7 @@ public class KeycloakService : IIdentityService
                 username = kcEmail,
                 email = kcEmail,
                 firstName = name,
+                lastName = lastName,
                 enabled = true,
                 emailVerified = true,
                 credentials = creds
@@ -81,7 +82,7 @@ public class KeycloakService : IIdentityService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating user in Keycloak");
-            return Guid.Empty;
+            throw;
         }
 
         return userId;

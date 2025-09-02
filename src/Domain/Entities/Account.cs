@@ -21,4 +21,5 @@ public class Account(string name, string email, string registrationNumber, UserR
     public IList<Answer> Answers { get; set; } = new List<Answer>();
     [NotMapped]
     public string? Password { get; set; }
+    public string? LastName { get; set; }
 }
