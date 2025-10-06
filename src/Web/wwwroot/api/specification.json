@@ -49,7 +49,7 @@
         "operationId": "GetAllAccounts",
         "parameters": [
           {
-            "name": "page_number",
+            "name": "PageNumber",
             "in": "query",
             "required": true,
             "schema": {
@@ -59,7 +59,7 @@
             "x-position": 1
           },
           {
-            "name": "page_size",
+            "name": "PageSize",
             "in": "query",
             "required": true,
             "schema": {

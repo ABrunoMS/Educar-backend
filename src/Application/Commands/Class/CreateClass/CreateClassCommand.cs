@@ -10,6 +10,7 @@ public record CreateClassCommand(string Name, string Description, ClassPurpose P
     public string Description { get; set; } = Description;
     public ClassPurpose Purpose { get; set; } = Purpose;
     public Guid SchoolId { get; set; } = SchoolId;
+    public List<string>? Content { get; init; }
 }
 
 public class CreateClassCommandHandler(IApplicationDbContext context)
@@ -22,7 +23,8 @@ public class CreateClassCommandHandler(IApplicationDbContext context)
 
         var entity = new Domain.Entities.Class(request.Name, request.Description, request.Purpose)
         {
-            School = school
+            School = school,
+            Content = request.Content ?? new List<string>()
         };
 
         context.Classes.Add(entity);

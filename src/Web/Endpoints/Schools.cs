@@ -24,6 +24,13 @@ public class Schools : EndpointGroupBase
             .MapDelete(DeleteSchool, "{id}");
     }
 
+    {
+    app.MapGroup(this)
+        .RequireAuthorization(UserRole.Teacher.GetDisplayName())       
+        .MapGet(GetAllSchoolsByClient, "client/{clientId}")
+        .MapGet(GetSchool, "{id}");      
+}
+
     public async Task<SchoolDto> GetSchool(ISender sender, Guid id)
     {
         return await sender.Send(new GetSchoolQuery() { Id = id });

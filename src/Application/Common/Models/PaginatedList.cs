@@ -58,4 +58,8 @@ public class PaginatedList<T>
 
         return new PaginatedList<T>(items, count, pageNumber, pageSize);
     }
+    public static PaginatedList<T> Create(List<T> items, int count, int pageNumber, int pageSize)
+    {
+        return new PaginatedList<T>(items, count, pageNumber, pageSize);
+    }
 }

@@ -16,16 +16,19 @@ public class Classes : EndpointGroupBase
     {
         app.MapGroup(this)
             .RequireAuthorization(UserRole.Admin.GetDisplayName())
-            .MapPost(CreateClass)
-            .MapPut(UpdateClass, "{id}")
-            .MapDelete(DeleteClass, "{id}")
+            .MapPost(CreateClass)              
             .MapGet(GetAllClasses);
-
+        
         app.MapGroup(this)
-            .RequireAuthorization(UserRole.Student.GetDisplayName())
+            .RequireAuthorization(UserRole.Teacher.GetDisplayName())
+            .MapPut(UpdateClass, "{id}")
             .MapGet(GetClass, "{id}")
             .MapGet(GetAllClassesBySchool, "schools/{schoolIds}")
+            .MapDelete(DeleteClass, "{id}")
             .MapPost(GetClassesBySchools, "by-schools");
+
+        
+
             
     }
 
