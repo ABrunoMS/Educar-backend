@@ -17,8 +17,6 @@ public class Accounts : EndpointGroupBase
         app.MapGroup(this)
             .RequireAuthorization(UserRole.Admin.GetDisplayName())
             .MapPost(CreateAccount)
-            .MapGet(GetMyAccount, "me")
-            .MapGet(GetAccount, "{id}")
             .MapGet(GetAllAccountsBySchool, "school/{schoolId}")
             .MapGet(GetAllAccountsByClass, "class/{classId}")
             .MapGet(GetAllAccountsByClient, "client/{clientId}")
@@ -28,6 +26,8 @@ public class Accounts : EndpointGroupBase
 
         app.MapGroup(this)
             .RequireAuthorization(UserRole.Student.GetDisplayName())
+            .MapGet(GetMyAccount, "me")
+            .MapGet(GetAccount, "{id}")
             .MapPut(ForgotPassword, "forgot-password/{email}");
     }
 
