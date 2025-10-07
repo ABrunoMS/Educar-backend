@@ -18,18 +18,14 @@ public class Schools : EndpointGroupBase
             .RequireAuthorization(UserRole.Admin.GetDisplayName())
             .MapPost(CreateSchool)
             .MapGet(GetAllSchools)
-            .MapGet(GetAllSchoolsByClient, "client/{clientId}")
-            .MapGet(GetSchool, "{id}")
             .MapPut(UpdateSchool, "{id}")
             .MapDelete(DeleteSchool, "{id}");
-    }
 
-    {
-    app.MapGroup(this)
-        .RequireAuthorization(UserRole.Teacher.GetDisplayName())       
-        .MapGet(GetAllSchoolsByClient, "client/{clientId}")
-        .MapGet(GetSchool, "{id}");      
-}
+        app.MapGroup(this)
+            .RequireAuthorization(UserRole.Teacher.GetDisplayName())       
+            .MapGet(GetAllSchoolsByClient, "client/{clientId}")
+            .MapGet(GetSchool, "{id}");      
+    }
 
     public async Task<SchoolDto> GetSchool(ISender sender, Guid id)
     {
