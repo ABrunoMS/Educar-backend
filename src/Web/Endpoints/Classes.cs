@@ -13,23 +13,16 @@ namespace Educar.Backend.Web.Endpoints;
 public class Classes : EndpointGroupBase
 {
     public override void Map(WebApplication app)
-    {
+    {       
         app.MapGroup(this)
-            .RequireAuthorization(UserRole.Admin.GetDisplayName())
-            .MapPost(CreateClass)              
-            .MapGet(GetAllClasses);
-        
-        app.MapGroup(this)
-            .RequireAuthorization(UserRole.Teacher.GetDisplayName())
+            .RequireAuthorization(UserRole.Teacher.ToString())
             .MapPut(UpdateClass, "{id}")
             .MapGet(GetClass, "{id}")
             .MapGet(GetAllClassesBySchool, "schools/{schoolIds}")
             .MapDelete(DeleteClass, "{id}")
-            .MapPost(GetClassesBySchools, "by-schools");
-
-        
-
-            
+            .MapPost(GetClassesBySchools, "by-schools")
+            .MapPost(CreateClass)              
+            .MapGet(GetAllClasses);            
     }
 
     public Task<PaginatedList<ClassDto>> GetAllClasses(ISender sender, [AsParameters] GetClassesPaginatedQuery query)
