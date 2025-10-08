@@ -18,6 +18,7 @@ public class AccountDto
     public ClientCleanDto? Client { get; set; }
     public UserRole Role { get; set; }
     //public SchoolDto? School { get; set; }
+    public IList<string> Roles { get; set; } = new List<string>();
     public IList<SchoolDto> Schools { get; set; } = new List<SchoolDto>();
     public IList<ClassDto> Classes { get; set; } = new List<ClassDto>();
 
@@ -26,6 +27,7 @@ public class AccountDto
         public Mapping()
         {
             CreateMap<Domain.Entities.Account, AccountDto>()
+                .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => new List<string> { src.Role.ToString() }))
                 .ForMember(dest => dest.Schools, opt => opt.MapFrom(src => src.AccountSchools
                     .OrderBy(asc => asc.School.Name) 
                     .Select(asc => asc.School)))

@@ -8,6 +8,7 @@ public record GetAccountsBySchoolPaginatedQuery(Guid SchoolId) : IRequest<Pagina
 {
     public int PageNumber { get; init; } = 1;
     public int PageSize { get; init; } = 10;
+    public string? Search { get; init; }
 }
 
 public class GetAccountsBySchoolPaginatedQueryHandler : IRequestHandler<GetAccountsBySchoolPaginatedQuery,
@@ -25,6 +26,17 @@ public class GetAccountsBySchoolPaginatedQueryHandler : IRequestHandler<GetAccou
     public async Task<PaginatedList<CleanAccountDto>> Handle(GetAccountsBySchoolPaginatedQuery request,
         CancellationToken cancellationToken)
     {
+        var query = _context.AccountSchools
+        .Where(asc => asc.SchoolId == request.SchoolId)
+        .Select(asc => asc.Account);
+
+        if (!string.IsNullOrEmpty(request.Search))
+        {
+            // Filtra por nome OU email que contenham o texto da busca (ignorando maiúsculas/minúsculas)
+            query = query.Where(a => 
+                a.Name.ToLower().Contains(request.Search.ToLower())
+                );
+        }
         return await _context.AccountSchools
             .Where(asc => asc.SchoolId == request.SchoolId)
             .Select(asc => asc.Account) 
