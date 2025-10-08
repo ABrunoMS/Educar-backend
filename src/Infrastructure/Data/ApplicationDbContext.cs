@@ -47,6 +47,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Secretary> Secretaries => Set<Secretary>();
     public DbSet<AccountSchool> AccountSchools => Set<AccountSchool>();
 
+    public DbSet<Subsecretaria> Subsecretarias => Set<Subsecretaria>();
+    public DbSet<Regional> Regionais => Set<Regional>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyCustomConfigurationsFromAssembly(Assembly.GetExecutingAssembly(), Database);
