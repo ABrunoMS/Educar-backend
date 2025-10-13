@@ -23,6 +23,8 @@ public class ClientDto
     public string? Secretary { get; set; }
     public string? SubSecretary { get; set; }
     public string? Regional { get; set; }
+    public List<string>? SelectedProducts { get; set; }
+    public List<string>? SelectedContents { get; set; }
     
     // Se você tiver uma lista de contratos associada, pode manter.
     // public List<ContractDto>? Contracts { get; set; }

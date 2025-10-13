@@ -43,6 +43,12 @@ public record CreateClientCommand : IRequest<IdResponseDto>
 
     [JsonPropertyName("regional")]
     public string Regional { get; init; } = string.Empty;
+
+    [JsonPropertyName("selectedProducts")]
+    public List<string>? SelectedProducts { get; init; }
+
+    [JsonPropertyName("selectedContents")]
+    public List<string>? SelectedContents { get; init; }
 }
 
 // Nenhuma mudança aqui
@@ -64,6 +70,8 @@ public class CreateClientCommandHandler(IApplicationDbContext context)
             Secretary = request.Secretary,
             SubSecretary = request.SubSecretary,
             Regional = request.Regional,
+            SelectedProducts = request.SelectedProducts ?? new List<string>(),
+            SelectedContents = request.SelectedContents ?? new List<string>()
         };
 
         context.Clients.Add(entity);
