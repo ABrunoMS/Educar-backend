@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Educar.Backend.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Educar.Backend.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251014032845_AddAverageScoreToAccounts")]
+    partial class AddAverageScoreToAccounts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,7 +110,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("accounts", (string)null);
+                    b.ToTable("accounts");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.AccountClass", b =>
@@ -132,7 +135,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("ClassId");
 
-                    b.ToTable("account_classes", (string)null);
+                    b.ToTable("account_classes");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.AccountSchool", b =>
@@ -157,7 +160,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("SchoolId");
 
-                    b.ToTable("account_schools", (string)null);
+                    b.ToTable("account_schools");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Address", b =>
@@ -231,7 +234,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("addresses", (string)null);
+                    b.ToTable("addresses");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Answer", b =>
@@ -288,7 +291,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("QuestStepContentId");
 
-                    b.ToTable("answers", (string)null);
+                    b.ToTable("answers");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Class", b =>
@@ -350,7 +353,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("SchoolId");
 
-                    b.ToTable("classes", (string)null);
+                    b.ToTable("classes");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Client", b =>
@@ -429,7 +432,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("clients", (string)null);
+                    b.ToTable("clients");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Contract", b =>
@@ -506,7 +509,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("GameId");
 
-                    b.ToTable("contracts", (string)null);
+                    b.ToTable("contracts");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Dialogue", b =>
@@ -557,7 +560,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("NpcId");
 
-                    b.ToTable("dialogues", (string)null);
+                    b.ToTable("dialogues");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Game", b =>
@@ -618,7 +621,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("games", (string)null);
+                    b.ToTable("games");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.GameNpc", b =>
@@ -643,7 +646,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("NpcId");
 
-                    b.ToTable("game_npcs", (string)null);
+                    b.ToTable("game_npcs");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.GameProficiencyGroup", b =>
@@ -668,7 +671,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("ProficiencyGroupId");
 
-                    b.ToTable("game_proficiency_groups", (string)null);
+                    b.ToTable("game_proficiency_groups");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.GameSubject", b =>
@@ -693,7 +696,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("game_subjects", (string)null);
+                    b.ToTable("game_subjects");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Grade", b =>
@@ -740,7 +743,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("grades", (string)null);
+                    b.ToTable("grades");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Item", b =>
@@ -823,7 +826,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("DismantleId");
 
-                    b.ToTable("items", (string)null);
+                    b.ToTable("items");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Map", b =>
@@ -891,7 +894,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("GameId");
 
-                    b.ToTable("maps", (string)null);
+                    b.ToTable("maps");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Media", b =>
@@ -966,7 +969,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("medias", (string)null);
+                    b.ToTable("medias");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.MediaLog", b =>
@@ -1028,7 +1031,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("MediaId");
 
-                    b.ToTable("media_logs", (string)null);
+                    b.ToTable("media_logs");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Npc", b =>
@@ -1088,7 +1091,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("npcs", (string)null);
+                    b.ToTable("npcs");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.NpcItem", b =>
@@ -1113,7 +1116,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("ItemId");
 
-                    b.ToTable("npc_items", (string)null);
+                    b.ToTable("npc_items");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Proficiency", b =>
@@ -1166,7 +1169,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("proficiencies", (string)null);
+                    b.ToTable("proficiencies");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.ProficiencyGroup", b =>
@@ -1213,7 +1216,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("proficiency_groups", (string)null);
+                    b.ToTable("proficiency_groups");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.ProficiencyGroupProficiency", b =>
@@ -1238,7 +1241,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("ProficiencyId");
 
-                    b.ToTable("proficiency_group_proficiencies", (string)null);
+                    b.ToTable("proficiency_group_proficiencies");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Quest", b =>
@@ -1332,7 +1335,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("quests", (string)null);
+                    b.ToTable("quests");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.QuestProficiency", b =>
@@ -1357,7 +1360,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("ProficiencyId");
 
-                    b.ToTable("quest_proficiencies", (string)null);
+                    b.ToTable("quest_proficiencies");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.QuestStep", b =>
@@ -1428,7 +1431,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("QuestId");
 
-                    b.ToTable("quest_steps", (string)null);
+                    b.ToTable("quest_steps");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.QuestStepContent", b =>
@@ -1494,7 +1497,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("QuestStepId");
 
-                    b.ToTable("quest_step_contents", (string)null);
+                    b.ToTable("quest_step_contents");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.QuestStepItem", b =>
@@ -1519,7 +1522,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("ItemId");
 
-                    b.ToTable("quest_step_items", (string)null);
+                    b.ToTable("quest_step_items");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.QuestStepMedia", b =>
@@ -1544,7 +1547,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("MediaId");
 
-                    b.ToTable("quest_step_medias", (string)null);
+                    b.ToTable("quest_step_medias");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.QuestStepNpc", b =>
@@ -1569,7 +1572,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("NpcId");
 
-                    b.ToTable("quest_step_npcs", (string)null);
+                    b.ToTable("quest_step_npcs");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Regional", b =>
@@ -1593,7 +1596,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("SubsecretariaId");
 
-                    b.ToTable("regionals", (string)null);
+                    b.ToTable("regionals");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.School", b =>
@@ -1650,7 +1653,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("ClientId");
 
-                    b.ToTable("schools", (string)null);
+                    b.ToTable("schools");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Secretary", b =>
@@ -1708,7 +1711,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("secretaries", (string)null);
+                    b.ToTable("secretaries");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.SpawnPoint", b =>
@@ -1773,7 +1776,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasIndex("MapId");
 
-                    b.ToTable("spawn_points", (string)null);
+                    b.ToTable("spawn_points");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Subject", b =>
@@ -1820,7 +1823,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("subjects", (string)null);
+                    b.ToTable("subjects");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Subsecretaria", b =>
@@ -1838,7 +1841,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("subsecretarias", (string)null);
+                    b.ToTable("subsecretarias");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Account", b =>
