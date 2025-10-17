@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Educar.Backend.Infrastructure.Data.Migrations
+namespace Educar.Backend.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -1562,6 +1562,30 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.ToTable("quest_step_npcs");
                 });
 
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Regional", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("nome");
+
+                    b.Property<Guid>("SubsecretariaId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("subsecretaria_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubsecretariaId");
+
+                    b.ToTable("regionals");
+                });
+
             modelBuilder.Entity("Educar.Backend.Domain.Entities.School", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1787,6 +1811,24 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("subjects");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Subsecretaria", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("nome");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("subsecretarias");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Account", b =>
@@ -2163,6 +2205,17 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("QuestStep");
                 });
 
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Regional", b =>
+                {
+                    b.HasOne("Educar.Backend.Domain.Entities.Subsecretaria", "Subsecretaria")
+                        .WithMany("Regionais")
+                        .HasForeignKey("SubsecretariaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Subsecretaria");
+                });
+
             modelBuilder.Entity("Educar.Backend.Domain.Entities.School", b =>
                 {
                     b.HasOne("Educar.Backend.Domain.Entities.Address", "Address")
@@ -2303,6 +2356,11 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("GameSubjects");
 
                     b.Navigation("Quests");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.Subsecretaria", b =>
+                {
+                    b.Navigation("Regionais");
                 });
 #pragma warning restore 612, 618
         }
