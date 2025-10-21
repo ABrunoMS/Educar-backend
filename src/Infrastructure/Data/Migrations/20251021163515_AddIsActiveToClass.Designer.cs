@@ -10,11 +10,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Educar.Backend.Infrastructure.Migrations
+namespace Educar.Backend.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251008202741_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251021163515_AddIsActiveToClass")]
+    partial class AddIsActiveToClass
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -322,6 +322,10 @@ namespace Educar.Backend.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("description");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
@@ -348,6 +352,14 @@ namespace Educar.Backend.Infrastructure.Migrations
                     b.Property<Guid>("SchoolId")
                         .HasColumnType("uuid")
                         .HasColumnName("school_id");
+
+                    b.Property<string>("SchoolShift")
+                        .HasColumnType("text")
+                        .HasColumnName("school_shift");
+
+                    b.Property<string>("SchoolYear")
+                        .HasColumnType("text")
+                        .HasColumnName("school_year");
 
                     b.HasKey("Id");
 
@@ -403,6 +415,16 @@ namespace Educar.Backend.Infrastructure.Migrations
                     b.Property<string>("Secretary")
                         .HasColumnType("text")
                         .HasColumnName("secretary");
+
+                    b.Property<List<string>>("SelectedContents")
+                        .IsRequired()
+                        .HasColumnType("text[]")
+                        .HasColumnName("selected_contents");
+
+                    b.Property<List<string>>("SelectedProducts")
+                        .IsRequired()
+                        .HasColumnType("text[]")
+                        .HasColumnName("selected_products");
 
                     b.Property<string>("SignatureDate")
                         .HasColumnType("text")
