@@ -16,6 +16,35 @@ public static class AuthorizationExtensions
         if (realmAccessAsDict == null || !realmAccessAsDict.TryGetValue("roles", out var roles)) return false;
 
         var lowerCaseRoles = roles.Select(role => role.ToLower()).ToList();
-        return roleNames.Any(roleName => lowerCaseRoles.Contains(roleName.ToString().ToLower()));
+
+        // return roleNames.Any(roleName => lowerCaseRoles.Contains(roleName.ToString().ToLower())); ISSO ERA ANTES
+        
+        if (lowerCaseRoles.Contains(UserRole.Admin.ToString().ToLower()))
+            return true;
+
+
+        if (roleNames.Any(roleName => lowerCaseRoles.Contains(roleName.ToString().ToLower())))
+            return true;
+
+
+        foreach (var roleName in roleNames)
+        {
+            switch (roleName)
+            {
+                case UserRole.Teacher:
+                    if (lowerCaseRoles.Contains(UserRole.TeacherEducar.ToString().ToLower()) ||
+                        lowerCaseRoles.Contains(UserRole.Distribuidor.ToString().ToLower()) ||
+                        lowerCaseRoles.Contains(UserRole.AgenteComercial.ToString().ToLower()))
+                        return true;
+                    break;
+                    
+                case UserRole.Secretario:
+                    if (lowerCaseRoles.Contains(UserRole.AgenteComercial.ToString().ToLower()))
+                        return true;
+                    break;
+            }
+        }
+
+        return false;
     }
 }

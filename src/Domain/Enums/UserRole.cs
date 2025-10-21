@@ -3,7 +3,11 @@ namespace Educar.Backend.Domain.Enums;
 public enum UserRole
 {
     Admin,
+    AgenteComercial,
+    Diretor,
+    Distribuidor,
+    Secretario,
     Teacher,
-    Student,
-    Diretor
+    TeacherEducar,
+    Student
 }
