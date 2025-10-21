@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Educar.Backend.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Educar.Backend.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251003121600_AddContentToClass")]
+    partial class AddContentToClass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -400,16 +403,6 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Property<string>("Secretary")
                         .HasColumnType("text")
                         .HasColumnName("secretary");
-
-                    b.Property<List<string>>("SelectedContents")
-                        .IsRequired()
-                        .HasColumnType("text[]")
-                        .HasColumnName("selected_contents");
-
-                    b.Property<List<string>>("SelectedProducts")
-                        .IsRequired()
-                        .HasColumnType("text[]")
-                        .HasColumnName("selected_products");
 
                     b.Property<string>("SignatureDate")
                         .HasColumnType("text")
@@ -1572,30 +1565,6 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.ToTable("quest_step_npcs");
                 });
 
-            modelBuilder.Entity("Educar.Backend.Domain.Entities.Regional", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("nome");
-
-                    b.Property<Guid>("SubsecretariaId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("subsecretaria_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SubsecretariaId");
-
-                    b.ToTable("regionals");
-                });
-
             modelBuilder.Entity("Educar.Backend.Domain.Entities.School", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1821,24 +1790,6 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("subjects");
-                });
-
-            modelBuilder.Entity("Educar.Backend.Domain.Entities.Subsecretaria", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("nome");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("subsecretarias");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Account", b =>
@@ -2215,17 +2166,6 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("QuestStep");
                 });
 
-            modelBuilder.Entity("Educar.Backend.Domain.Entities.Regional", b =>
-                {
-                    b.HasOne("Educar.Backend.Domain.Entities.Subsecretaria", "Subsecretaria")
-                        .WithMany("Regionais")
-                        .HasForeignKey("SubsecretariaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Subsecretaria");
-                });
-
             modelBuilder.Entity("Educar.Backend.Domain.Entities.School", b =>
                 {
                     b.HasOne("Educar.Backend.Domain.Entities.Address", "Address")
@@ -2366,11 +2306,6 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("GameSubjects");
 
                     b.Navigation("Quests");
-                });
-
-            modelBuilder.Entity("Educar.Backend.Domain.Entities.Subsecretaria", b =>
-                {
-                    b.Navigation("Regionais");
                 });
 #pragma warning restore 612, 618
         }
