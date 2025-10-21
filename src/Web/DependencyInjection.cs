@@ -68,17 +68,60 @@ public static class DependencyInjection
         });
 
         services.AddAuthorizationBuilder()
+            // Admin tem acesso total
             .AddPolicy(UserRole.Admin.GetDisplayName(), policy =>
-                policy.RequireAssertion(context => context.User.HasRoles([UserRole.Admin])));
+                policy.RequireAssertion(context => context.User.HasRoles([UserRole.Admin])))
 
-        services.AddAuthorizationBuilder()
+            // Secretário - Permissões de visualização que AgenteComercial herda
+            .AddPolicy(UserRole.Secretario.GetDisplayName(), policy =>
+                policy.RequireAssertion(context => context.User.HasRoles([
+                    UserRole.Secretario,
+                    UserRole.AgenteComercial,
+                    UserRole.Admin
+                ])))
+
+            // Diretor - Permissões específicas para sua escola
+            .AddPolicy(UserRole.Diretor.GetDisplayName(), policy =>
+                policy.RequireAssertion(context => context.User.HasRoles([
+                    UserRole.Diretor,
+                    UserRole.Admin
+                ])))
+
             .AddPolicy(UserRole.Teacher.GetDisplayName(), policy =>
-                policy.RequireAssertion(context => context.User.HasRoles([UserRole.Teacher, UserRole.Admin])));
+                policy.RequireAssertion(context => context.User.HasRoles([
+                    UserRole.Teacher,
+                    UserRole.TeacherEducar, // Herda Teacher + tem permissões extras
+                    UserRole.Distribuidor,   // Tem exatamente as mesmas permissões
+                    UserRole.AgenteComercial, // Tem as mesmas permissões de criação/edição
+                    UserRole.Admin
+                ])))
 
-        services.AddAuthorizationBuilder()
+            .AddPolicy(UserRole.TeacherEducar.GetDisplayName(), policy =>
+                policy.RequireAssertion(context => context.User.HasRoles([
+                    UserRole.TeacherEducar,
+                    UserRole.Admin
+                ])))
+
+            // AgenteComercial - Tem visualização do Secretario + permissões do Teacher
+            .AddPolicy(UserRole.AgenteComercial.GetDisplayName(), policy =>
+                policy.RequireAssertion(context => context.User.HasRoles([
+                    UserRole.AgenteComercial,
+                    UserRole.Admin
+                ])))
+
+            // Distribuidor - Tem exatamente as mesmas permissões que Teacher
+            .AddPolicy(UserRole.Distribuidor.GetDisplayName(), policy =>
+                policy.RequireAssertion(context => context.User.HasRoles([
+                    UserRole.Distribuidor,
+                    UserRole.Admin
+                ])))
+
+            // Student - Permissões básicas
             .AddPolicy(UserRole.Student.GetDisplayName(), policy =>
-                policy.RequireAssertion(context =>
-                    context.User.HasRoles([UserRole.Student, UserRole.Teacher, UserRole.Admin])));
+                policy.RequireAssertion(context => context.User.HasRoles([
+                    UserRole.Student,
+                    UserRole.Admin
+                ])));
 
         return services;
     }
