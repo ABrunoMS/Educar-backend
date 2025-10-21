@@ -11,6 +11,12 @@ public record UpdateClassCommand : IRequest<Unit>
     public string? Description { get; set; }
     public ClassPurpose? Purpose { get; set; }
     public List<Guid> AccountIds { get; set; } = [];
+    public bool? IsActive { get; set; }
+    public string? SchoolYear { get; set; }
+    public string? SchoolShift { get; set; }
+    public List<string>? Content { get; set; }
+    public List<Guid>? TeacherIds { get; set; }
+    public List<Guid>? StudentIds { get; set; }
 }
 
 public class UpdateClassCommandHandler(IApplicationDbContext context) : IRequestHandler<UpdateClassCommand, Unit>
@@ -26,6 +32,10 @@ public class UpdateClassCommandHandler(IApplicationDbContext context) : IRequest
         if (request.Description != null) entity.Description = request.Description;
         if (request.Purpose != null && !request.Purpose.Equals(ClassPurpose.None))
             entity.Purpose = request.Purpose.Value;
+        if (request.IsActive.HasValue) entity.IsActive = request.IsActive.Value;
+        if (request.SchoolYear != null) entity.SchoolYear = request.SchoolYear;
+        if (request.SchoolShift != null) entity.SchoolShift = request.SchoolShift;
+        if (request.Content != null) entity.Content = request.Content;
 
         // Handle AccountClasses
         var allAccountClasses = context.AccountClasses
@@ -34,7 +44,17 @@ public class UpdateClassCommandHandler(IApplicationDbContext context) : IRequest
             .ToList();
 
         var currentAccountIds = allAccountClasses.Where(ac => !ac.IsDeleted).Select(ac => ac.AccountId).ToList();
-        var newAccountIds = request.AccountIds;
+        
+        // Combina TeacherIds, StudentIds e AccountIds
+        var newAccountIds = new List<Guid>();
+        if (request.TeacherIds?.Any() == true)
+            newAccountIds.AddRange(request.TeacherIds);
+        if (request.StudentIds?.Any() == true)
+            newAccountIds.AddRange(request.StudentIds);
+        if (request.AccountIds?.Any() == true)
+            newAccountIds.AddRange(request.AccountIds);
+        
+        newAccountIds = newAccountIds.Distinct().ToList();
 
         // Find accounts to add
         var accountsToAdd = newAccountIds.Except(currentAccountIds).ToList();

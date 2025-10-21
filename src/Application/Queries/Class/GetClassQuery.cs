@@ -21,7 +21,9 @@ public class GetClassQueryHandler : IRequestHandler<GetClassQuery, ClassDto>
     public async Task<ClassDto> Handle(GetClassQuery request, CancellationToken cancellationToken)
     {
         var entity = await _context.Classes
-            .ProjectTo<ClassDto>(_mapper.ConfigurationProvider)
+            .Include(c => c.School)
+            .Include(c => c.AccountClasses)
+                .ThenInclude(ac => ac.Account)
             .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
 
         if (entity == null) throw new NotFoundException(nameof(Domain.Entities.Class), request.Id.ToString());
