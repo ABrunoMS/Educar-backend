@@ -1,4 +1,4 @@
-using Educar.Backend.Application.Common.Interfaces;
+/*using Educar.Backend.Application.Common.Interfaces;
 
 namespace Educar.Backend.Application.Commands.Game.CreateGame;
 
@@ -32,4 +32,4 @@ public class CreateGameCommandValidator : AbstractValidator<CreateGameCommand>
         return await _context.Games
             .AllAsync(l => l.Name != name, cancellationToken);
     }
-}
+}*/

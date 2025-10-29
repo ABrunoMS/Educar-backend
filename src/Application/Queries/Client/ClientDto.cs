@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using Educar.Backend.Domain.Entities;
 using ClientEntity = Educar.Backend.Domain.Entities.Client;
+using Educar.Backend.Application.Queries.Product; 
+using Educar.Backend.Application.Queries.Content;
 
 namespace Educar.Backend.Application.Queries.Client;
 
@@ -23,8 +25,8 @@ public class ClientDto
     public string? Secretary { get; set; }
     public string? SubSecretary { get; set; }
     public string? Regional { get; set; }
-    public List<string>? SelectedProducts { get; set; }
-    public List<string>? SelectedContents { get; set; }
+    public IList<ProductDto> Products { get; set; } = new List<ProductDto>();
+    public IList<ContentDto> Contents { get; set; } = new List<ContentDto>();
     
     // Se você tiver uma lista de contratos associada, pode manter.
     // public List<ContractDto>? Contracts { get; set; }
@@ -33,11 +35,18 @@ public class ClientDto
     {
         public Mapping()
         {
-            // O AutoMapper mapeará automaticamente os novos campos se os nomes
-            // corresponderem entre a Entidade de Domínio e o ClientDto.
+            
             CreateMap<ClientEntity, ClientDto>()
                 .ForMember(dest => dest.RemainingAccounts,
-                           opt => opt.MapFrom(src => src.TotalAccounts - src.Accounts.Count()));
+                           opt => opt.MapFrom(src => src.TotalAccounts - src.Accounts.Count()))
+
+                .ForMember(dest => dest.Products,
+                           opt => opt.MapFrom(src => src.ClientProducts.Select(cp => cp.Product)))
+                
+                
+                .ForMember(dest => dest.Contents,
+                           opt => opt.MapFrom(src => src.ClientContents.Select(cc => cc.Content)));
+        
         }
     }
 }

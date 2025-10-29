@@ -1,4 +1,4 @@
-using Educar.Backend.Application.Commands;
+/*using Educar.Backend.Application.Commands;
 using Educar.Backend.Application.Commands.Game.CreateGame;
 using Educar.Backend.Application.Commands.Game.DeleteGame;
 using Educar.Backend.Application.Commands.Game.UpdateGame;
@@ -55,4 +55,4 @@ public class Games : EndpointGroupBase
         await sender.Send(command);
         return Results.NoContent();
     }
-}
+}*/

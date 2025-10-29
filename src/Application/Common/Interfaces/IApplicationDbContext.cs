@@ -41,6 +41,15 @@ public interface IApplicationDbContext
 
     DbSet<Subsecretaria> Subsecretarias { get; }
     DbSet<Regional> Regionais { get; }
+    DbSet<Product> Products { get; }
+    DbSet<Content> Contents { get; }
+    DbSet<ProductContent> ProductContents { get; }
+    DbSet<ClientProduct> ClientProducts { get; }
+    DbSet<ClientContent> ClientContents { get; }
+    DbSet<ContractProduct> ContractProducts { get; }
+    DbSet<ContractContent> ContractContents { get; }
+    DbSet<ClassProduct> ClassProducts { get; }
+    DbSet<ClassContent> ClassContents { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

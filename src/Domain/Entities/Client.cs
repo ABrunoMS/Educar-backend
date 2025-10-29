@@ -22,7 +22,7 @@ public class Client : BaseEntity // <-- A herança correta para o seu projeto
     public string? Secretary { get; set; }
     public string? SubSecretary { get; set; }
     public string? Regional { get; set; }
-    public List<string> SelectedProducts { get; set; } = new();
-    public List<string> SelectedContents { get; set; } = new();
+    public IList<ClientProduct> ClientProducts { get; private set; } = new List<ClientProduct>();
+    public IList<ClientContent> ClientContents { get; private set; } = new List<ClientContent>();
     public ICollection<Account> Accounts { get; private set; } = new List<Account>();
 }

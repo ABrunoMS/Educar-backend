@@ -1,6 +1,7 @@
 using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Application.Common.Mappings;
 using Educar.Backend.Application.Common.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Educar.Backend.Application.Queries.Class;
 

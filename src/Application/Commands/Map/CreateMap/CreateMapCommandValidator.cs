@@ -1,4 +1,4 @@
-using Educar.Backend.Domain.Enums;
+/*using Educar.Backend.Domain.Enums;
 
 namespace Educar.Backend.Application.Commands.Map.CreateMap;
 
@@ -22,4 +22,4 @@ public class CreateMapCommandValidator : AbstractValidator<CreateMapCommand>
         RuleFor(v => v.Reference2D).NotEmpty().WithMessage("Reference2D is required.").MaximumLength(255);
         RuleFor(v => v.Reference3D).NotEmpty().WithMessage("Reference3D is required.").MaximumLength(255);
     }
-}
+}*/

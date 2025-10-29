@@ -1,4 +1,4 @@
-using Educar.Backend.Application.Commands;
+/*using Educar.Backend.Application.Commands;
 using Educar.Backend.Application.Commands.School.DeleteSchool;
 using Educar.Backend.Application.Commands.School.UpdateSchool;
 using Educar.Backend.Application.Commands.SpawnPoint.CreateSpawnPoint;
@@ -69,4 +69,4 @@ public class SpawnPoints : EndpointGroupBase
         await sender.Send(command);
         return Results.NoContent();
     }
-}
+}*/

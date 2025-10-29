@@ -6,9 +6,16 @@ public class CreateContractCommandValidator : AbstractValidator<CreateContractCo
 {
     public CreateContractCommandValidator()
     {
-        RuleFor(v => v.ClientId).NotEmpty().WithMessage("ClientId is required.");
+        RuleFor(v => v.ClientId)
+            .NotEmpty().WithMessage("ClientId is required.")
+            .When(v => v.ClientId.HasValue);
         
-        RuleFor(v => v.GameId).NotEmpty().WithMessage("GameId is required.");
+        RuleFor(x => x.ProductIds) 
+            .NotEmpty()
+            .WithMessage("Pelo menos um 'ProductId' deve ser fornecido na lista.");
+
+        RuleFor(v => v.ContentIds)
+            .NotEmpty().WithMessage("Pelo menos um conteúdo deve ser selecionado.");
 
         RuleFor(v => v.ContractDurationInYears)
             .GreaterThan(0).WithMessage("ContractDurationInYears must be greater than 0.");

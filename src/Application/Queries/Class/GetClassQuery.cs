@@ -1,4 +1,5 @@
 using Educar.Backend.Application.Common.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Educar.Backend.Application.Queries.Class;
 
@@ -24,7 +25,13 @@ public class GetClassQueryHandler : IRequestHandler<GetClassQuery, ClassDto>
             .Include(c => c.School)
             .Include(c => c.AccountClasses)
                 .ThenInclude(ac => ac.Account)
+            .Include(c => c.ClassProducts)
+                .ThenInclude(cp => cp.Product)
+            .Include(c => c.ClassContents)
+                .ThenInclude(cc => cc.Content)
+            
             .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
+
 
         if (entity == null) throw new NotFoundException(nameof(Domain.Entities.Class), request.Id.ToString());
 

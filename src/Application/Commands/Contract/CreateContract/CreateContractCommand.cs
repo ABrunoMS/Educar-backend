@@ -1,14 +1,18 @@
 using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Domain.Enums;
+using Educar.Backend.Domain.Entities;
+using Educar.Backend.Application.Queries;
+using Microsoft.EntityFrameworkCore;
+using ClientEntity = Educar.Backend.Domain.Entities.Client;
 
 namespace Educar.Backend.Application.Commands.Contract.CreateContract;
 
 public record CreateContractCommand : IRequest<IdResponseDto>
 {
-    public CreateContractCommand(Guid clientId, Guid gameId)
+    public CreateContractCommand(Guid clientId)
     {
         ClientId = clientId;
-        GameId = gameId;
+        
     }
 
     public int ContractDurationInYears { get; init; }
@@ -18,8 +22,9 @@ public record CreateContractCommand : IRequest<IdResponseDto>
     public int? RemainingAccounts { get; init; }
     public string? DeliveryReport { get; init; }
     public ContractStatus Status { get; init; }
-    public Guid ClientId { get; init; }
-    public Guid GameId { get; init; }
+    public Guid? ClientId { get; init; }
+    public List<Guid> ProductIds { get; init; } = new();
+    public List<Guid>? ContentIds { get; init; } = new();
 }
 
 public class CreateContractCommandHandler : IRequestHandler<CreateContractCommand, IdResponseDto>
@@ -33,13 +38,18 @@ public class CreateContractCommandHandler : IRequestHandler<CreateContractComman
 
     public async Task<IdResponseDto> Handle(CreateContractCommand request, CancellationToken cancellationToken)
     {
-        var client = await _context.Clients.FindAsync([request.ClientId], cancellationToken: cancellationToken);
-        // Guard.Against.Null(client, message: $"Client {request.ClientId} not found.");
-        if (client == null) throw new NotFoundException(nameof(Client), request.ClientId.ToString());
+        ClientEntity? client = null;
+        // 1. Busca o Client apenas se um ID foi fornecido
+        if (request.ClientId.HasValue)
+        {
+            client = await _context.Clients.FindAsync(new object[] { request.ClientId.Value }, cancellationToken);
+            if (client == null) throw new NotFoundException(nameof(Client), request.ClientId.Value.ToString());
+        }
 
-        var game = await _context.Games.FindAsync([request.GameId], cancellationToken: cancellationToken);
-        if (game == null) throw new NotFoundException(nameof(Game), request.GameId.ToString());
+        //var product = await _context.Products.FindAsync(new object[] { request.ProductId }, cancellationToken);
+        //if (product == null) throw new NotFoundException(nameof(Product), request.ProductId.ToString());
 
+        
         var entity = new Domain.Entities.Contract(
             request.ContractDurationInYears,
             request.ContractSigningDate,
@@ -48,11 +58,32 @@ public class CreateContractCommandHandler : IRequestHandler<CreateContractComman
             request.Status
         )
         {
-            RemainingAccounts = request.RemainingAccounts ?? request.TotalAccounts,
+            // 4. Calcula RemainingAccounts
+            RemainingAccounts = request.TotalAccounts,
             DeliveryReport = request.DeliveryReport,
-            Client = client,
-            Game = game
+            Client = client, // Atribui o Client (pode ser nulo)
+            
         };
+
+
+       if (request.ProductIds != null && request.ProductIds.Any())
+        {
+            
+            foreach (var productId in request.ProductIds)
+            {
+                
+                entity.ContractProducts.Add(new ContractProduct { ProductId = productId });
+            }
+        }
+
+        if (request.ContentIds != null && request.ContentIds.Any())
+        {
+            foreach (var contentId in request.ContentIds)
+            {
+                
+                entity.ContractContents.Add(new ContractContent { ContentId = contentId });
+            }
+        }
 
         _context.Contracts.Add(entity);
 

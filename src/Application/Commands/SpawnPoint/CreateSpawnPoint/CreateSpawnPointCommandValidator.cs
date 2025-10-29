@@ -1,4 +1,4 @@
-namespace Educar.Backend.Application.Commands.SpawnPoint.CreateSpawnPoint;
+/*namespace Educar.Backend.Application.Commands.SpawnPoint.CreateSpawnPoint;
 
 public class CreateSpawnPointCommandValidator : AbstractValidator<CreateSpawnPointCommand>
 {
@@ -23,4 +23,4 @@ public class CreateSpawnPointCommandValidator : AbstractValidator<CreateSpawnPoi
         RuleFor(v => v.MapId)
             .NotEmpty().WithMessage("MapId is required.");
     }
-}
+}*/

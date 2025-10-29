@@ -1,4 +1,4 @@
-using Educar.Backend.Application.Common.Interfaces;
+/*using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Domain.Entities;
 
 namespace Educar.Backend.Application.Commands.Game.UpdateGame;
@@ -150,4 +150,4 @@ public class UpdateGameCommandHandler(IApplicationDbContext context) : IRequestH
             gameProficiencyGroup.DeletedAt = DateTimeOffset.UtcNow;
         }
     }
-}
+}*/

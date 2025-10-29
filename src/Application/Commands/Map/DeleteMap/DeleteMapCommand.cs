@@ -1,4 +1,4 @@
-using Educar.Backend.Application.Commands.Game.DeleteGame;
+/*using Educar.Backend.Application.Commands.Game.DeleteGame;
 using Educar.Backend.Application.Common.Interfaces;
 
 namespace Educar.Backend.Application.Commands.Map.DeleteMap;
@@ -20,4 +20,4 @@ public class DeleteGameCommandHandler(IApplicationDbContext context) : IRequestH
 
         return Unit.Value;
     }
-}
+}*/

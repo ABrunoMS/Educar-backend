@@ -6,29 +6,46 @@ namespace Educar.Backend.Infrastructure.Data.Extensions;
 
 public static class ModelBuilderExtensions
 {
-    public static void ApplyCustomConfigurationsFromAssembly(this ModelBuilder modelBuilder, Assembly assembly,
+    public static void ApplyCustomConfigurationsFromAssembly(
+        this ModelBuilder modelBuilder,
+        Assembly assembly,
         DatabaseFacade database)
     {
-        // Get all types in the assembly that implement IEntityTypeConfiguration<> and are not abstract or interfaces
         var configurations = assembly.GetTypes()
             .Where(t => t.GetInterfaces().Any(i =>
-                            i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEntityTypeConfiguration<>)) &&
+                            i.IsGenericType &&
+                            i.GetGenericTypeDefinition() == typeof(IEntityTypeConfiguration<>)) &&
                         t is { IsAbstract: false, IsInterface: false })
             .ToList();
 
-        // Iterate through the configurations and apply each one to the modelBuilder
         foreach (var configurationType in configurations)
         {
-            // Create an instance of the configuration type, passing the database facade to the constructor
-            var instance = Activator.CreateInstance(configurationType, database);
+            object? instance;
 
-            // Get the ApplyConfiguration method from ModelBuilder
-            var applyConfigurationMethod = typeof(ModelBuilder)
-                .GetMethod("ApplyConfiguration", BindingFlags.Instance | BindingFlags.Public)
-                ?.MakeGenericMethod(configurationType.GetInterfaces().First().GenericTypeArguments.First());
+            // 🔍 tenta encontrar um construtor que receba DatabaseFacade
+            var ctorWithDb = configurationType
+                .GetConstructors()
+                .FirstOrDefault(c =>
+                {
+                    var parameters = c.GetParameters();
+                    return parameters.Length == 1 && parameters[0].ParameterType == typeof(DatabaseFacade);
+                });
 
-            // Invoke the ApplyConfiguration method with the instance of the configuration
-            applyConfigurationMethod?.Invoke(modelBuilder, [instance]);
+            // cria a instância de acordo com o construtor disponível
+            instance = ctorWithDb != null
+                ? Activator.CreateInstance(configurationType, database)
+                : Activator.CreateInstance(configurationType);
+
+            // aplica a configuração normalmente
+            var entityType = configurationType.GetInterfaces()
+                .First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEntityTypeConfiguration<>))
+                .GenericTypeArguments.First();
+
+            var applyConfigMethod = typeof(ModelBuilder)
+                .GetMethod(nameof(ModelBuilder.ApplyConfiguration))
+                ?.MakeGenericMethod(entityType);
+
+            applyConfigMethod?.Invoke(modelBuilder, new[] { instance! });
         }
     }
 }

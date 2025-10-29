@@ -46,9 +46,17 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Map> Maps => Set<Map>();
     public DbSet<Secretary> Secretaries => Set<Secretary>();
     public DbSet<AccountSchool> AccountSchools => Set<AccountSchool>();
-
     public DbSet<Subsecretaria> Subsecretarias => Set<Subsecretaria>();
     public DbSet<Regional> Regionais => Set<Regional>();
+    public DbSet<Product> Products => Set<Product>();
+    public DbSet<Content> Contents => Set<Content>();
+    public DbSet<ContractProduct> ContractProducts => Set<ContractProduct>();
+    public DbSet<ProductContent> ProductContents => Set<ProductContent>();
+    public DbSet<ContractContent> ContractContents => Set<ContractContent>();
+    public DbSet<ClientProduct> ClientProducts => Set<ClientProduct>();
+    public DbSet<ClientContent> ClientContents => Set<ClientContent>();
+    public DbSet<ClassProduct> ClassProducts => Set<ClassProduct>();
+    public DbSet<ClassContent> ClassContents => Set<ClassContent>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -11,5 +11,13 @@ public class ClientConfiguration(DatabaseFacade database) : IEntityTypeConfigura
     public void Configure(EntityTypeBuilder<Client> builder)
     {
         builder.Property(t => t.Name).IsRequired();
+
+        builder.HasMany(c => c.ClientProducts)
+            .WithOne(cp => cp.Client)
+            .HasForeignKey(cp => cp.ClientId);
+
+        builder.HasMany(c => c.ClientContents)
+            .WithOne(cc => cc.Client)
+            .HasForeignKey(cc => cc.ClientId);
     }
 }

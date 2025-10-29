@@ -1,4 +1,4 @@
-using Educar.Backend.Application.Common.Interfaces;
+/*using Educar.Backend.Application.Common.Interfaces;
 
 namespace Educar.Backend.Application.Commands.SpawnPoint.CreateSpawnPoint;
 
@@ -39,4 +39,4 @@ public class CreateSpawnPointCommandHandler(IApplicationDbContext context)
 
         return new IdResponseDto(entity.Id);
     }
-}
+}*/
