@@ -1,11 +1,14 @@
 using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Application.Common.Models;
+using Educar.Backend.Domain.Entities;
 using MediatR;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore; 
+using System.Collections.Generic; 
 
 namespace Educar.Backend.Application.Commands.Client.CreateClient;
 
-// Nenhuma mudança aqui
+
 public record CreateClientCommand : IRequest<IdResponseDto>
 {
     [JsonPropertyName("name")]
@@ -45,10 +48,10 @@ public record CreateClientCommand : IRequest<IdResponseDto>
     public string Regional { get; init; } = string.Empty;
 
     [JsonPropertyName("selectedProducts")]
-    public List<string>? SelectedProducts { get; init; }
+    public List<Guid>? ProductIds { get; init; }
 
     [JsonPropertyName("selectedContents")]
-    public List<string>? SelectedContents { get; init; }
+    public List<Guid>? ContentIds { get; init; }
 }
 
 // Nenhuma mudança aqui
@@ -70,9 +73,27 @@ public class CreateClientCommandHandler(IApplicationDbContext context)
             Secretary = request.Secretary,
             SubSecretary = request.SubSecretary,
             Regional = request.Regional,
-            SelectedProducts = request.SelectedProducts ?? new List<string>(),
-            SelectedContents = request.SelectedContents ?? new List<string>()
         };
+
+        // Adiciona os Produtos selecionados
+        if (request.ProductIds != null && request.ProductIds.Any())
+        {
+            foreach (var productId in request.ProductIds)
+            {
+                // (Validação se o productId existe pode ser adicionada no Validator)
+                entity.ClientProducts.Add(new ClientProduct { ProductId = productId });
+            }
+        }
+
+        // Adiciona os Conteúdos selecionados
+        if (request.ContentIds != null && request.ContentIds.Any())
+        {
+            foreach (var contentId in request.ContentIds)
+            {
+                // (Validação de compatibilidade pode ser adicionada no Validator)
+                entity.ClientContents.Add(new ClientContent { ContentId = contentId });
+            }
+        }
 
         context.Clients.Add(entity);
         await context.SaveChangesAsync(cancellationToken);

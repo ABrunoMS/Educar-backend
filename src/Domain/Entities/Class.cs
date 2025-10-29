@@ -9,9 +9,10 @@ public class Class(string name, string description, ClassPurpose purpose) : Base
     public ClassPurpose Purpose { get; set; } = purpose;
     public Guid SchoolId { get; set; }
     public School School { get; set; } = null!;
-    public List<string>? Content { get; set; } = new();
     public IList<AccountClass> AccountClasses { get; set; } = new List<AccountClass>();
     public bool IsActive { get; set; } = true;
     public string? SchoolYear { get; set; }
     public string? SchoolShift { get; set; }
+    public IList<ClassProduct> ClassProducts { get; private set; } = new List<ClassProduct>();
+    public IList<ClassContent> ClassContents { get; private set; } = new List<ClassContent>();
 }

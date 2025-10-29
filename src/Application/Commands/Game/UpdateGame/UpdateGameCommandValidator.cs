@@ -1,4 +1,4 @@
-using Educar.Backend.Application.Common.Interfaces;
+/*using Educar.Backend.Application.Common.Interfaces;
 
 namespace Educar.Backend.Application.Commands.Game.UpdateGame;
 
@@ -36,4 +36,4 @@ public class UpdateGameCommandValidator : AbstractValidator<UpdateGameCommand>
             .Where(g => g.Id != command.Id) // Exclude the current game
             .AllAsync(g => g.Name != name, cancellationToken); // Check for uniqueness
     }
-}
+}*/

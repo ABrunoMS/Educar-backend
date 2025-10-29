@@ -1,4 +1,4 @@
-using Educar.Backend.Application.Common.Interfaces;
+/*using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Domain.Enums;
 
 namespace Educar.Backend.Application.Commands.Map.UpdateMap;
@@ -41,4 +41,4 @@ public class UpdateMapCommandHandler(IApplicationDbContext context)
 
         return Unit.Value;
     }
-}
+}*/

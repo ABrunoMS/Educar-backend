@@ -1,5 +1,6 @@
 using AutoMapper.QueryableExtensions;
 using Educar.Backend.Application.Common.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Educar.Backend.Application.Queries.Class;
 

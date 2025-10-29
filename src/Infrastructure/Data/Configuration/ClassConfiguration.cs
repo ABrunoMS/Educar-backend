@@ -21,5 +21,17 @@ public class ClassConfiguration(DatabaseFacade database) : IEntityTypeConfigurat
             .WithOne(c => c.Class)
             .HasForeignKey(c => c.ClassId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        builder
+            .HasMany(c => c.ClassProducts)
+            .WithOne(cp => cp.Class)
+            .HasForeignKey(cp => cp.ClassId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder
+            .HasMany(c => c.ClassContents)
+            .WithOne(cc => cc.Class)
+            .HasForeignKey(cc => cc.ClassId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

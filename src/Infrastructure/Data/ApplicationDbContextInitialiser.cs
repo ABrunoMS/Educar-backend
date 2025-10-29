@@ -8,7 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Ardalis.GuardClauses; // Adicionado para o Guard.Against.Null
+using Ardalis.GuardClauses;
+using Educar.Backend.Application.Common.Interfaces;
+using Educar.Backend.Domain.Entities; 
 
 namespace Educar.Backend.Infrastructure.Data;
 
@@ -70,17 +72,16 @@ public class ApplicationDbContextInitialiser
 
     public async Task TrySeedAsync()
     {
-        Guid? clientId = null;
-        var clientName = "Educar";
+        // 1. Seed de Produtos e Conteúdos 
+        await SeedProductsAndContentsAsync();
 
-        // Check if there are any clients, if not, create one
-        if (!_context.Clients.Any())
+        // 2. Seed do Cliente Padrão (Secretaria)
+        Guid? clientId = null;
+        if (!await _context.Clients.AnyAsync())
         {
-            // CÓDIGO ATUALIZADO AQUI
-            // Criamos o comando preenchendo todos os campos obrigatórios.
             var clientCommand = new CreateClientCommand
             {
-                Name = clientName,
+                Name = "Educar",
                 Description = "Cliente principal do sistema, criado na inicialização.",
                 Partner = "Educar Padrão",
                 Contacts = "admin@educar.com",
@@ -91,27 +92,90 @@ public class ApplicationDbContextInitialiser
                 TotalAccounts = 999,
                 Secretary = "Secretaria Principal",
                 SubSecretary = "N/A",
-                Regional = "Nacional"
+                Regional = "Nacional",
+                ProductIds = await _context.Products.Select(p => p.Id).ToListAsync(),
+                ContentIds = await _context.Contents.Select(c => c.Id).ToListAsync()
             };
             
             var clientCreatedResponse = await _sender.Send(clientCommand, CancellationToken.None);
             clientId = clientCreatedResponse.Id;
+            _logger.LogInformation("Cliente padrão 'Educar' criado.");
         }
 
-        // If there are no accounts, create an admin account
-        if (!_context.Accounts.Any())
+        // 3. Seed do Usuário Admin
+        if (!await _context.Accounts.AnyAsync(a => a.Role == UserRole.Admin))
         {
-            Guard.Against.Null(clientId, nameof(clientId));
+            
+            if (clientId == null)
+            {
+                clientId = await _context.Clients.Select(c => c.Id).FirstOrDefaultAsync();
+                Guard.Against.Default(clientId, nameof(clientId), "Nenhum cliente (secretaria) encontrado para associar o admin.");
+            }
+
             var accountCommand = new CreateAccountCommand
             {
                 Name = "admin-educar",
+                LastName = "Educar", 
                 Email = "admin@admin.com",
                 RegistrationNumber = "000",
                 ClientId = clientId.Value,
                 Role = UserRole.Admin,
-                Password = _options.DefaultAdminPassword 
+                Password = _options.DefaultAdminPassword,
+                SchoolIds = new List<Guid>(), 
+                ClassIds = new List<Guid>() 
             };
             await _sender.Send(accountCommand, CancellationToken.None);
+            _logger.LogInformation("Usuário Administrador padrão criado.");
         }
+    }
+
+    private async Task SeedProductsAndContentsAsync()
+    {
+        if (await _context.Products.AnyAsync())
+        {
+            return;
+        }
+
+        _logger.LogInformation("Iniciando o seed de Produtos e Conteúdos...");
+
+        // 1. Criar as entidades de Conteúdo
+        var cBNCC = new Content("BNCC");
+        var cSAEB = new Content("SAEB");
+        var cENEM = new Content("ENEM");
+        var cJornadaDoTrabalho = new Content("JornadaDoTrabalho");
+        var cEducacaoFinanceira = new Content("EducacaoFinanceira");
+        var cEmpreendedorismo = new Content("Empreendedorismo");
+
+        var allContents = new List<Content> { cBNCC, cSAEB, cENEM, cJornadaDoTrabalho, cEducacaoFinanceira, cEmpreendedorismo };
+        await _context.Contents.AddRangeAsync(allContents);
+
+        // 2. Criar as entidades de Produto
+        var pOdisseiaE = new Product("OdisseiaEducacional");
+        var pOdisseiaD = new Product("OdisseiaDungeons");
+        var pJornadaSaber = new Product("JornadaSaber");
+        var pTrilhaParaOFuturo = new Product("TrilhaParaOFuturo");
+        var pJornadaDoTrabalho = new Product("JornadaDoTrabalho");
+        var pRealidadeMagica = new Product("RealidadeMagica");
+
+        // 3. Associar as Regras de Compatibilidade (criando as relações ProductContent)
+        
+        foreach(var content in allContents)
+        {
+            pOdisseiaE.ProductContents.Add(new ProductContent { Content = content });
+            pOdisseiaD.ProductContents.Add(new ProductContent { Content = content });
+        }
+
+        pJornadaSaber.ProductContents.Add(new ProductContent { Content = cENEM });
+        pJornadaSaber.ProductContents.Add(new ProductContent { Content = cSAEB });
+        pTrilhaParaOFuturo.ProductContents.Add(new ProductContent { Content = cEducacaoFinanceira });
+        pTrilhaParaOFuturo.ProductContents.Add(new ProductContent { Content = cEmpreendedorismo });
+        pJornadaDoTrabalho.ProductContents.Add(new ProductContent { Content = cJornadaDoTrabalho });
+        pRealidadeMagica.ProductContents.Add(new ProductContent { Content = cBNCC });
+
+        await _context.Products.AddRangeAsync(pOdisseiaE, pOdisseiaD, pJornadaSaber, pTrilhaParaOFuturo, pJornadaDoTrabalho, pRealidadeMagica);
+        
+        
+        await _context.SaveChangesAsync();
+        _logger.LogInformation("Produtos, Conteúdos e Regras de Compatibilidade criados com sucesso.");
     }
 }

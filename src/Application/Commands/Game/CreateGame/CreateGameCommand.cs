@@ -1,4 +1,4 @@
-using Educar.Backend.Application.Common.Interfaces;
+/*using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Domain.Entities;
 
 namespace Educar.Backend.Application.Commands.Game.CreateGame;
@@ -69,4 +69,4 @@ public class CreateGameCommandHandler(IApplicationDbContext context)
 
         return new IdResponseDto(entity.Id);
     }
-}
+}*/

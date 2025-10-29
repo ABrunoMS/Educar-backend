@@ -1,4 +1,4 @@
-using Educar.Backend.Application.Common.Interfaces;
+/*using Educar.Backend.Application.Common.Interfaces;
 using ValidationException = Educar.Backend.Application.Common.Exceptions.ValidationException;
 
 namespace Educar.Backend.Application.Commands.Game.DeleteGame;
@@ -30,4 +30,4 @@ public class DeleteGameCommandHandler(IApplicationDbContext context) : IRequestH
 
         return Unit.Value;
     }
-}
+}*/

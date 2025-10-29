@@ -17,8 +17,8 @@ public class Contract(
     public int? RemainingAccounts { get; set; }
     public string? DeliveryReport { get; set; }
     public ContractStatus Status { get; set; } = status;
-    public Guid ClientId { get; set; }
-    public Client Client { get; set; } = null!;
-    public Guid GameId { get; set; }
-    public Game Game { get; set; } = null!;
+    public Guid? ClientId { get; set; }
+    public Client? Client { get; set; } = null!;
+    public IList<ContractProduct> ContractProducts { get; private set; } = new List<ContractProduct>();
+    public IList<ContractContent> ContractContents { get; private set; } = new List<ContractContent>();
 }

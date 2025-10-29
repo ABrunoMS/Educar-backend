@@ -1,4 +1,4 @@
-using Educar.Backend.Application.Commands;
+/*using Educar.Backend.Application.Commands;
 using Educar.Backend.Application.Commands.Map.CreateMap;
 using Educar.Backend.Application.Commands.Map.DeleteMap;
 using Educar.Backend.Application.Commands.Map.UpdateMap;
@@ -56,4 +56,4 @@ public class Maps : EndpointGroupBase
         await sender.Send(command);
         return Results.NoContent();
     }
-}
+}*/
