@@ -26,9 +26,12 @@ public class Accounts : EndpointGroupBase
             .MapDelete(DeleteAccount, "{id}");
 
         app.MapGroup(this)
-            .RequireAuthorization(UserRole.Student.GetDisplayName())
-            .MapGet(GetMyAccount, "me")
-            .MapPut(ForgotPassword, "forgot-password/{email}");
+            .RequireAuthorization()
+            .MapGet(GetMyAccount, "me");
+
+        app.MapGroup(this)
+       .AllowAnonymous() // <-- Permite acesso sem login
+       .MapPut(ForgotPassword, "forgot-password/{email}");
     }
 
     public Task<IdResponseDto> CreateAccount(ISender sender, CreateAccountCommand command)
