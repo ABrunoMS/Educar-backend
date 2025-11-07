@@ -18,9 +18,9 @@ public class QuestConfiguration(DatabaseFacade database) : IEntityTypeConfigurat
         builder.Property(t => t.MaxPlayers).IsRequired();
         builder.Property(t => t.TotalQuestSteps).IsRequired();
         builder.Property(t => t.CombatDifficulty).IsRequired().HasConversion<string>();
-        builder.Property(t => t.GameId).IsRequired();
-        builder.Property(t => t.SubjectId).IsRequired();
-        builder.Property(t => t.GradeId).IsRequired();
+        builder.Property(t => t.GameId).IsRequired(false);
+        builder.Property(t => t.SubjectId).IsRequired(false);
+        builder.Property(t => t.GradeId).IsRequired(false);
 
         builder
             .HasMany(a => a.QuestProficiencies)

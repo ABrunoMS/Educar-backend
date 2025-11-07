@@ -13,9 +13,9 @@ public record CreateQuestCommand(
     int MaxPlayers,
     int TotalQuestSteps,
     CombatDifficulty CombatDifficulty,
-    Guid GameId,
-    Guid GradeId,
-    Guid SubjectId,
+    Guid? GameId,
+    Guid? GradeId,
+    Guid? SubjectId,
     Guid? QuestDependencyId = null,
     IList<Guid>? ProficiencyIds = null) : IRequest<IdResponseDto>;
 
@@ -25,12 +25,25 @@ public class CreateQuestCommandHandler(IApplicationDbContext context)
     public async Task<IdResponseDto> Handle(CreateQuestCommand request, CancellationToken cancellationToken)
     {
         // Validate and retrieve the related entities
-        var game = await GetEntityByIdAsync(context.Games, request.GameId, nameof(Domain.Entities.Game),
-            cancellationToken);
-        var grade = await GetEntityByIdAsync(context.Grades, request.GradeId, nameof(Domain.Entities.Grade),
-            cancellationToken);
-        var subject = await GetEntityByIdAsync(context.Subjects, request.SubjectId, nameof(Domain.Entities.Subject),
-            cancellationToken);
+
+        // Domain.Entities.Game? game = null;
+        // Domain.Entities.Grade? grade = null;
+        // Domain.Entities.Subject? subject = null;
+
+        // if (request.GameId.HasValue && request.GameId != Guid.Empty){
+        //     game = await GetEntityByIdAsync(context.Games, request.GameId, nameof(Domain.Entities.Game),
+        //     cancellationToken);
+        // }
+        
+        // if (request.GradeId.HasValue && request.GradeId != Guid.Empty) {
+        //     grade = await GetEntityByIdAsync(context.Grades, request.GradeId, nameof(Domain.Entities.Grade),
+        //     cancellationToken);
+        // }
+
+        // if (request.SubjectId.HasValue && request.SubjectId != Guid.Empty) {
+        //     subject = await GetEntityByIdAsync(context.Subjects, request.SubjectId, nameof(Domain.Entities.Subject),
+        //     cancellationToken);
+        // }
 
         Domain.Entities.Quest? questDependency = null;
         if (request.QuestDependencyId.HasValue)
@@ -51,9 +64,9 @@ public class CreateQuestCommandHandler(IApplicationDbContext context)
             request.TotalQuestSteps,
             request.CombatDifficulty)
         {
-            Game = game,
-            Grade = grade,
-            Subject = subject,
+        //     Game = game,
+        //     Grade = grade,
+        //     Subject = subject,
             QuestDependency = questDependency
         };
 
