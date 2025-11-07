@@ -11,7 +11,7 @@ public class ExpectedAnswerJsonConverter : JsonConverter<IAnswer>
         using var jsonDoc = JsonDocument.ParseValue(ref reader);
         var root = jsonDoc.RootElement;
 
-        if (!root.TryGetProperty("question_type", out var questionTypeElement))
+        if (!root.TryGetProperty("questionType", out var questionTypeElement))
             throw new JsonException("Missing discriminator field 'questionType'");
         var questionType = Enum.Parse<QuestionType>(questionTypeElement.GetString() ?? string.Empty);
 

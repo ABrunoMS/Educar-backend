@@ -32,20 +32,20 @@ public class
     {
         var query = _context.Quests.AsQueryable();
 
-        if (request.GameId is not null)
-        {
-            query = query.Where(q => q.GameId == request.GameId);
-        }
+        // if (request.GameId is not null)
+        // {
+        //     query = query.Where(q => q.GameId == request.GameId);
+        // }
 
-        if (request.GradeId is not null)
-        {
-            query = query.Where(q => q.GradeId == request.GradeId);
-        }
+        // if (request.GradeId is not null)
+        // {
+        //     query = query.Where(q => q.GradeId == request.GradeId);
+        // }
 
-        if (request.SubjectId is not null)
-        {
-            query = query.Where(q => q.SubjectId == request.SubjectId);
-        }
+        // if (request.SubjectId is not null)
+        // {
+        //     query = query.Where(q => q.SubjectId == request.SubjectId);
+        // }
 
         return await query
             .OrderBy(q => q.Name)

@@ -31,8 +31,8 @@ public class CreateQuestCommandValidator : AbstractValidator<CreateQuestCommand>
             .IsInEnum().WithMessage("CombatDifficulty must be a valid CombatDifficulty.")
             .NotEqual(CombatDifficulty.None).WithMessage("CombatDifficulty is required.");
 
-        RuleFor(v => v.GameId).NotEmpty().WithMessage("GameId is required.");
-        RuleFor(v => v.SubjectId).NotEmpty().WithMessage("SubjectId is required.");
-        RuleFor(v => v.GradeId).NotEmpty().WithMessage("GradeId is required.");
+        // RuleFor(v => v.GameId).NotEmpty().WithMessage("GameId is required.");
+        // RuleFor(v => v.SubjectId).NotEmpty().WithMessage("SubjectId is required.");
+        // RuleFor(v => v.GradeId).NotEmpty().WithMessage("GradeId is required.");
     }
 }
