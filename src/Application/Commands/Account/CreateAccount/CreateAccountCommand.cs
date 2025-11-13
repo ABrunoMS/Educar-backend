@@ -93,4 +93,3 @@ public class CreateAccountCommandHandler(IApplicationDbContext context)
         return new IdResponseDto(entity.Id);
     }
 }
-

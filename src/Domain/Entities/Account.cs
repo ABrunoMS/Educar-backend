@@ -7,10 +7,10 @@ public class Account(string name, string email, string registrationNumber, UserR
 {
     public string Name { get; set; } = name;
     public string Email { get; set; } = email;
-    public string RegistrationNumber { get; set; } = registrationNumber;
-    public decimal AverageScore { get; set; }
-    public decimal EventAverageScore { get; set; }
-    public int Stars { get; set; }
+    public string? RegistrationNumber { get; set; } = registrationNumber;
+    public decimal? AverageScore { get; set; }
+    public decimal? EventAverageScore { get; set; }
+    public int? Stars { get; set; }
     public Guid ClientId { get; set; }
     public Client Client { get; set; } = null!;
     public IList<AccountSchool> AccountSchools { get; set; } = new List<AccountSchool>();
