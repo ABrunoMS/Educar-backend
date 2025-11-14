@@ -13,7 +13,7 @@ public class QuestDto
     public Guid Id { get; set; }
     public string? Name { get; set; }
     public string? Description { get; set; }
-    public QuestUsageTemplate? UsageTemplate { get; set; }
+    public bool? UsageTemplate { get; set; }
     public QuestType? Type { get; set; }
     public int? MaxPlayers { get; set; }
     public int? TotalQuestSteps { get; set; }
