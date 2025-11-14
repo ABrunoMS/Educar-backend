@@ -8,7 +8,7 @@ namespace Educar.Backend.Application.Commands.Quest.CreateQuest;
 public record CreateQuestCommand(
     string Name,
     string Description,
-    QuestUsageTemplate UsageTemplate,
+    bool UsageTemplate,
     QuestType Type,
     int MaxPlayers,
     int TotalQuestSteps,

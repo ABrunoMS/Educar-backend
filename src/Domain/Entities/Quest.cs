@@ -5,7 +5,7 @@ namespace Educar.Backend.Domain.Entities;
 public class Quest(
     string name,
     string description,
-    QuestUsageTemplate usageTemplate,
+    bool usageTemplate,
     QuestType type,
     int maxPlayers,
     int totalQuestSteps,
@@ -14,7 +14,8 @@ public class Quest(
 {
     public string Name { get; set; } = name;
     public string Description { get; set; } = description;
-    public QuestUsageTemplate UsageTemplate { get; set; } = usageTemplate;
+    // public QuestUsageTemplate UsageTemplate { get; set; } = usageTemplate;
+    public bool UsageTemplate { get; set; } = usageTemplate;
     public QuestType Type { get; set; } = type;
     public int MaxPlayers { get; set; } = maxPlayers;
     public int TotalQuestSteps { get; set; } = totalQuestSteps;

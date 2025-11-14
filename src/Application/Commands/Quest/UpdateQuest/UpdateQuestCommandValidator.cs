@@ -20,9 +20,7 @@ public class UpdateQuestCommandValidator : AbstractValidator<UpdateQuestCommand>
         RuleFor(x => x.Description)
             .NotEmpty().WithMessage("Description is required.");
 
-        RuleFor(v => v.UsageTemplate)
-            .IsInEnum().WithMessage("UsageTemplate must be valid.")
-            .NotEqual(QuestUsageTemplate.None).WithMessage("UsageTemplate is required.");
+        RuleFor(v => v.UsageTemplate).NotNull().WithMessage("UsageTemplate is required.");
 
         RuleFor(v => v.Type)
             .IsInEnum().WithMessage("Type must be valid.")
@@ -40,8 +38,8 @@ public class UpdateQuestCommandValidator : AbstractValidator<UpdateQuestCommand>
             .IsInEnum().WithMessage("CombatDifficulty must be a valid CombatDifficulty.")
             .NotEqual(CombatDifficulty.None).WithMessage("CombatDifficulty is required.");
 
-        RuleFor(v => v.SubjectId).NotEmpty().WithMessage("SubjectId is required.");
-        RuleFor(v => v.GradeId).NotEmpty().WithMessage("GradeId is required.");
+        // RuleFor(v => v.SubjectId).NotEmpty().WithMessage("SubjectId is required.");
+        // RuleFor(v => v.GradeId).NotEmpty().WithMessage("GradeId is required.");
     }
 
     private async Task<bool> BeGreaterThanOrEqualToCurrentSteps(UpdateQuestCommand command, int? newTotalQuestSteps,

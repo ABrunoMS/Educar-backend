@@ -13,9 +13,7 @@ public class CreateQuestCommandValidator : AbstractValidator<CreateQuestCommand>
         RuleFor(x => x.Description)
             .NotEmpty().WithMessage("Description is required.");
 
-        RuleFor(v => v.UsageTemplate)
-            .IsInEnum().WithMessage("UsageTemplate must be valid.")
-            .NotEqual(QuestUsageTemplate.None).WithMessage("UsageTemplate is required.");
+        RuleFor(v => v.UsageTemplate).NotNull().WithMessage("UsageTemplate is required.");
 
         RuleFor(v => v.Type)
             .IsInEnum().WithMessage("Type must be valid.")

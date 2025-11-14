@@ -13,7 +13,7 @@ public class QuestConfiguration(DatabaseFacade database) : IEntityTypeConfigurat
     {
         builder.Property(t => t.Name).IsRequired().HasMaxLength(150);
         builder.Property(t => t.Description).IsRequired();
-        builder.Property(t => t.UsageTemplate).IsRequired().HasConversion<string>();
+        builder.Property(t => t.UsageTemplate).IsRequired();
         builder.Property(t => t.Type).IsRequired().HasConversion<string>();
         builder.Property(t => t.MaxPlayers).IsRequired();
         builder.Property(t => t.TotalQuestSteps).IsRequired();
