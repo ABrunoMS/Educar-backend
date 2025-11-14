@@ -25,8 +25,8 @@ public class CreateAccountCommandValidator : AbstractValidator<CreateAccountComm
             .MustAsync(BeUniqueTitle).WithMessage("'{PropertyName}' must be unique.")
             .EmailAddress().WithMessage("A valid email is required.");
 
-        RuleFor(v => v.RegistrationNumber)
-            .NotEmpty().WithMessage("Registration number is required.");
+        // RuleFor(v => v.RegistrationNumber)
+        //     .NotEmpty().WithMessage("Registration number is required.");
 
         RuleFor(v => v.AverageScore)
             .InclusiveBetween(0, 999.99m).WithMessage("Average score must be between 0 and 999.99.")
