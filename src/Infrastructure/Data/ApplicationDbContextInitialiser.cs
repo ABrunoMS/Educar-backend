@@ -2,6 +2,7 @@ using Educar.Backend.Application.Commands.Account.CreateAccount;
 using Educar.Backend.Application.Commands.Client.CreateClient;
 using Educar.Backend.Domain.Enums;
 using Educar.Backend.Infrastructure.Options;
+using Educar.Backend.Infrastructure.Data.Seeders;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -72,6 +73,9 @@ public class ApplicationDbContextInitialiser
 
     public async Task TrySeedAsync()
     {
+        // 0. Seed de BNCC a partir do CSV
+        await SeedBnccAsync();
+
         // 1. Seed de Produtos e Conteúdos 
         await SeedProductsAndContentsAsync();
 
@@ -177,5 +181,14 @@ public class ApplicationDbContextInitialiser
         
         await _context.SaveChangesAsync();
         _logger.LogInformation("Produtos, Conteúdos e Regras de Compatibilidade criados com sucesso.");
+    }
+
+    private async Task SeedBnccAsync()
+    {
+        var csvPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Seeds", "bncc.csv");
+        
+        
+        var seeder = new BnccSeeder(_context, _logger);
+        await seeder.SeedFromCsvAsync(csvPath);
     }
 }

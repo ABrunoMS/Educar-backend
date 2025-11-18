@@ -11,7 +11,7 @@ public class BnccConfiguration(DatabaseFacade database) : IEntityTypeConfigurati
 
     public void Configure(EntityTypeBuilder<Bncc> builder)
     {
-        builder.Property(t => t.Description).IsRequired().HasMaxLength(500);
+        builder.Property(t => t.Description).IsRequired().HasMaxLength(2000); 
         builder.Property(t => t.IsActive).IsRequired();
 
         builder
