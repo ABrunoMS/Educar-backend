@@ -58,6 +58,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<ClassProduct> ClassProducts => Set<ClassProduct>();
     public DbSet<ClassContent> ClassContents => Set<ClassContent>();
 
+    public DbSet<Bncc> Bnccs => Set<Bncc>();
+    public DbSet<BnccQuest> BnccQuests => Set<BnccQuest>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyCustomConfigurationsFromAssembly(Assembly.GetExecutingAssembly(), Database);

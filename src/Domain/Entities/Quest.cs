@@ -30,4 +30,5 @@ public class Quest(
     public Quest? QuestDependency { get; set; }
     public IList<QuestStep> QuestSteps { get; set; } = new List<QuestStep>();
     public IList<QuestProficiency> QuestProficiencies { get; set; } = new List<QuestProficiency>();
+    public IList<BnccQuest> BnccQuests { get; set; } = new List<BnccQuest>();
 }

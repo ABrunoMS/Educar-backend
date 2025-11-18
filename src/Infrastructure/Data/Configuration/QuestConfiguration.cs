@@ -33,5 +33,11 @@ public class QuestConfiguration(DatabaseFacade database) : IEntityTypeConfigurat
             .WithOne(qs => qs.Quest)
             .HasForeignKey(qs => qs.QuestId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder
+            .HasMany(q => q.BnccQuests)
+            .WithOne(bq => bq.Quest)
+            .HasForeignKey(bq => bq.QuestId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
