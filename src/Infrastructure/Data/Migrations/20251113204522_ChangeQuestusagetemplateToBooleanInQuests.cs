@@ -12,10 +12,15 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
         {
 
             migrationBuilder.Sql(@"
-                ALTER TABLE ""quests"" 
-                ALTER COLUMN ""usage_template"" TYPE boolean 
-                USING usage_template::boolean;
-            ");
+                ALTER TABLE ""quests""
+        ALTER COLUMN ""usage_template"" TYPE boolean
+        USING (
+            CASE
+                WHEN ""usage_template"" = 'Global' THEN true
+                ELSE false
+            END
+        )::boolean;
+    ");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
