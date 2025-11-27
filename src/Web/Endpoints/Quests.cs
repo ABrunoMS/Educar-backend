@@ -40,6 +40,7 @@ public class Quests : EndpointGroupBase
         [FromQuery(Name = "game_id")] Guid? GameId,
         [FromQuery(Name = "grade_id")] Guid? GradeId,
         [FromQuery(Name = "subject_id")] Guid? SubjectId,
+        [FromQuery] bool UsageTemplate,
         [AsParameters] PaginatedQuery paginatedQuery)
     {
         var query = new GetQuestsByGameGradeSubjectPaginatedQuery
@@ -48,7 +49,8 @@ public class Quests : EndpointGroupBase
             PageSize = paginatedQuery.PageSize,
             GameId = GameId,
             GradeId = GradeId,
-            SubjectId = SubjectId
+            SubjectId = SubjectId,
+            UsageTemplate = UsageTemplate
         };
 
         return sender.Send(query);
