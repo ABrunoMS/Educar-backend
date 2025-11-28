@@ -51,5 +51,8 @@ public interface IApplicationDbContext
     DbSet<ClassProduct> ClassProducts { get; }
     DbSet<ClassContent> ClassContents { get; }
 
+    DbSet<Bncc> Bnccs { get; }
+    DbSet<BnccQuest> BnccQuests { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
