@@ -14,10 +14,10 @@ public class GetQuestsByGameGradeSubjectPaginatedQuery : IRequest<PaginatedList<
 {
     public int PageNumber { get; init; } = 1;
     public int PageSize { get; init; } = 10;
-
     public Guid? GameId { get; init; }
     public Guid? GradeId { get; init; }
     public Guid? SubjectId { get; init; }
+    public bool UsageTemplate { get; init; }
 }
 
 public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<GetQuestsByGameGradeSubjectPaginatedQuery,
@@ -43,6 +43,11 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
         var query = _context.Quests.AsNoTracking();
 
         
+        
+        query = query.Where(q => q.UsageTemplate == request.UsageTemplate);
+        
+
+        
         // Pega o cargo e o ID do usuário logado (através do token JWT)
         var userRoles =_currentUser.Roles ?? new List<string>();
         var userIdString = _currentUser.Id;
@@ -56,28 +61,19 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
 
     // Se o usuário for um "Teacher" E NÃO for um "Admin"
     if (userRoles.Contains(teacherRoleName) && !userRoles.Contains(adminRoleName))
-    {
-            if (string.IsNullOrEmpty(userIdString))
+        {
+            
+            bool isSearchingTemplates = request.UsageTemplate == true;
+
+            if (!isSearchingTemplates) 
             {
-                _logger.LogError("Usuário é Teacher, mas o ID (UserID) está nulo ou vazio. Filtro não aplicado.");
+                // Só aplica o filtro de dono se NÃO for uma busca por templates
+                if (!string.IsNullOrEmpty(userIdString))
+                {
+                    query = query.Where(q => q.CreatedBy == userIdString);
+                }
             }
-            else
-            {
-          _logger.LogInformation("CONDIÇÃO (IF) VERDADEIRA: Usuário é Teacher (mas não Admin). Aplicando filtro.");
-                
-                // --- 2. CORREÇÃO PRINCIPAL ---
-                // Compara a propriedade 'CreatedBy' (string) com o 'userIdString' (string)
-        query = query.Where(q => q.CreatedBy == userIdString); 
-            }
-    }
-    else if (userRoles.Contains(adminRoleName))
-    {
-      _logger.LogWarning("CONDIÇÃO (IF) FALSA: Usuário é Admin. O filtro de Teacher NÃO será aplicado.");
-    }
-    else
-    {
-      _logger.LogWarning("CONDIÇÃO (IF) FALSA: Usuário não é Teacher nem Admin. O filtro de Teacher NÃO será aplicado.");
-    }
+        }
 
         // if (request.GameId is not null)
         // {
