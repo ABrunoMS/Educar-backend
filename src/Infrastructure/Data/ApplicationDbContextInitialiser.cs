@@ -79,6 +79,9 @@ public class ApplicationDbContextInitialiser
         // 1. Seed de Produtos e Conteúdos 
         await SeedProductsAndContentsAsync();
 
+        // 1.1. Seed de Matérias e Séries (NOVO)
+        await SeedSubjectsAndGradesAsync();
+
         // 2. Seed do Cliente Padrão (Secretaria)
         Guid? clientId = null;
         if (!await _context.Clients.AnyAsync())
@@ -182,6 +185,63 @@ public class ApplicationDbContextInitialiser
         await _context.SaveChangesAsync();
         _logger.LogInformation("Produtos, Conteúdos e Regras de Compatibilidade criados com sucesso.");
     }
+
+     private async Task SeedSubjectsAndGradesAsync()
+{
+    // Verificação de Idempotência: Se já houver matérias ou séries, não faz nada.
+    if (await _context.Subjects.AnyAsync() || await _context.Grades.AnyAsync())
+    {
+        return;
+    }
+
+    _logger.LogInformation("Iniciando o seed de Matérias (Subjects) e Séries (Grades)...");
+
+    // 1. Criar lista de Matérias (Subjects)
+    var subjects = new List<Subject>
+    {
+        new Subject("Arte", "Arte"),
+        new Subject("Biologia", "Biologia"),
+        new Subject("Ciências", "Ciências"),
+        new Subject("Educação física", "Educação física"),
+        new Subject("Ensino religioso", "Ensino religioso"),
+        new Subject("Filosofia", "Filosofia"),
+        new Subject("Física", "Física"),
+        new Subject("Geografia", "Geografia"),
+        new Subject("História", "História"),
+        new Subject("Língua estrangeira", "Língua estrangeira"),
+        new Subject("Língua Portuguesa", "Língua Portuguesa"),
+        new Subject("Matemática", "Matemática"),
+        new Subject("Química", "Química"),
+        new Subject("Sociologia", "Sociologia")
+    };
+
+    await _context.Subjects.AddRangeAsync(subjects);
+
+    // 2. Criar lista de Séries (Grades)
+    var grades = new List<Grade>
+    {
+        new Grade("1° EF1", "1° EF1"),
+        new Grade("2° EF1", "2° EF1"),
+        new Grade("3° EF1", "3° EF1"),
+        new Grade("4° EF1", "4° EF1"),
+        new Grade("5° EF1", "5° EF1"),
+        new Grade("6° EF2", "6° EF2"),
+        new Grade("7° EF2", "7° EF2"),
+        new Grade("8° EF2", "8° EF2"),
+        new Grade("9° EF2", "9° EF2"),
+        new Grade("1° EM", "1° EM"),
+        new Grade("2° EM", "2° EM"),
+        new Grade("3° EM", "3° EM")
+    };
+
+    await _context.Grades.AddRangeAsync(grades);
+
+    // 3. Salvar no Banco
+    await _context.SaveChangesAsync();
+    
+    _logger.LogInformation("Matérias e Séries criadas com sucesso (Nome e Descrição preenchidos).");
+}
+
 
     private async Task SeedBnccAsync()
     {
