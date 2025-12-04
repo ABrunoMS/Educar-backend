@@ -1,10 +1,14 @@
 using Educar.Backend.Application.Common.Interfaces;
-using Educar.Backend.Domain.Common;
+using Educar.Backend.Application.Common.Models;
+using Educar.Backend.Domain.Common; // Para NotFoundException
 using Educar.Backend.Domain.Entities;
 using Educar.Backend.Domain.Enums;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Educar.Backend.Application.Commands.Quest.CreateQuest;
 
+// O Comando (Request)
 public record CreateQuestCommand(
     string Name,
     string Description,
@@ -17,44 +21,31 @@ public record CreateQuestCommand(
     Guid? GradeId,
     Guid? SubjectId,
     Guid? QuestDependencyId = null,
-    IList<Guid>? ProficiencyIds = null) : IRequest<IdResponseDto>;
+    IList<Guid>? BnccIds = null // Nome correto da propriedade
+) : IRequest<IdResponseDto>;
 
+// O Handler (Lógica)
 public class CreateQuestCommandHandler(IApplicationDbContext context)
     : IRequestHandler<CreateQuestCommand, IdResponseDto>
 {
     public async Task<IdResponseDto> Handle(CreateQuestCommand request, CancellationToken cancellationToken)
     {
-        // Validate and retrieve the related entities
-
-        // Domain.Entities.Game? game = null;
-        // Domain.Entities.Grade? grade = null;
-        // Domain.Entities.Subject? subject = null;
-
-        // if (request.GameId.HasValue && request.GameId != Guid.Empty){
-        //     game = await GetEntityByIdAsync(context.Games, request.GameId, nameof(Domain.Entities.Game),
-        //     cancellationToken);
-        // }
-        
-        // if (request.GradeId.HasValue && request.GradeId != Guid.Empty) {
-        //     grade = await GetEntityByIdAsync(context.Grades, request.GradeId, nameof(Domain.Entities.Grade),
-        //     cancellationToken);
-        // }
-
-        // if (request.SubjectId.HasValue && request.SubjectId != Guid.Empty) {
-        //     subject = await GetEntityByIdAsync(context.Subjects, request.SubjectId, nameof(Domain.Entities.Subject),
-        //     cancellationToken);
-        // }
-
+        // 1. Validação de Dependência de Quest (Mantida)
         Domain.Entities.Quest? questDependency = null;
         if (request.QuestDependencyId.HasValue)
         {
-            questDependency = await GetEntityByIdAsync<Domain.Entities.Quest>(context.Quests,
-                request.QuestDependencyId.Value, nameof(Domain.Entities.Quest), cancellationToken);
+            questDependency = await GetEntityByIdAsync<Domain.Entities.Quest>(
+                context.Quests,
+                request.QuestDependencyId.Value, 
+                nameof(Domain.Entities.Quest), 
+                cancellationToken);
         }
 
-        var proficiencyEntities = await GetProficienciesByIdsAsync(context, request.ProficiencyIds, cancellationToken);
+        // 2. Buscar as entidades BNCC
+        // Correção: Usando a variável 'bnccEntities' (camelCase) corretamente
+        var bnccEntities = await GetBnccsByIdsAsync(context, request.BnccIds, cancellationToken);
 
-        // Create the Quest entity
+        // 3. Criar a Entidade Quest
         var quest = new Domain.Entities.Quest(
             request.Name,
             request.Description,
@@ -64,24 +55,31 @@ public class CreateQuestCommandHandler(IApplicationDbContext context)
             request.TotalQuestSteps,
             request.CombatDifficulty)
         {
-        //     Game = game,
-        //     Grade = grade,
-        //     Subject = subject,
+            GradeId = request.GradeId,
+            SubjectId = request.SubjectId,
             QuestDependency = questDependency
         };
 
-        // Associate the Proficiencies with the Quest
-        foreach (var proficiencyEntity in proficiencyEntities)
+        // 4. Associar BNCCs à Quest
+        // Correção: Iterando sobre a variável correta 'bnccEntities'
+        foreach (var bnccEntity in bnccEntities)
         {
-            quest.QuestProficiencies.Add(new QuestProficiency { Quest = quest, Proficiency = proficiencyEntity });
+            // Adiciona na tabela de junção BnccQuests
+            quest.BnccQuests.Add(new BnccQuest 
+            { 
+                Quest = quest, 
+                Bncc = bnccEntity 
+            });
         }
 
+        // 5. Salvar
         context.Quests.Add(quest);
         await context.SaveChangesAsync(cancellationToken);
 
         return new IdResponseDto(quest.Id);
     }
 
+    // Método Auxiliar Genérico (Mantido)
     private async Task<TEntity> GetEntityByIdAsync<TEntity>(DbSet<TEntity> dbSet, Guid id, string entityName,
         CancellationToken cancellationToken) where TEntity : BaseAuditableEntity
     {
@@ -90,23 +88,29 @@ public class CreateQuestCommandHandler(IApplicationDbContext context)
         return entity;
     }
 
-    private async Task<List<Domain.Entities.Proficiency>> GetProficienciesByIdsAsync(
+    // Método Auxiliar Específico para BNCC (Corrigido)
+    private async Task<List<Domain.Entities.Bncc>> GetBnccsByIdsAsync(
         IApplicationDbContext context,
-        IList<Guid>? proficiencyIds,
+        IList<Guid>? bnccIds, // Nome do parâmetro corrigido
         CancellationToken cancellationToken)
     {
-        if (proficiencyIds is not { Count: > 0 }) return [];
+        // Verifica se a lista é nula ou vazia
+        if (bnccIds is not { Count: > 0 }) return new List<Domain.Entities.Bncc>();
 
-        var proficiencyEntities = await context.Proficiencies
-            .Where(p => proficiencyIds.Contains(p.Id))
+        // Busca no banco
+        var bnccEntities = await context.Bnccs
+            .Where(p => bnccIds.Contains(p.Id))
             .ToListAsync(cancellationToken);
 
-        var missingProficiencyIds = proficiencyIds.Except(proficiencyEntities.Select(p => p.Id)).ToList();
-        if (missingProficiencyIds.Count != 0)
+        // Verifica se algum ID não foi encontrado
+        var missingIds = bnccIds.Except(bnccEntities.Select(p => p.Id)).ToList();
+        
+        // Correção do erro CS0019: missingIds é uma List, então .Count é propriedade (sem parênteses)
+        if (missingIds.Count != 0)
         {
-            throw new NotFoundException(nameof(Domain.Entities.Proficiency), string.Join(", ", missingProficiencyIds));
+            throw new NotFoundException(nameof(Domain.Entities.Bncc), string.Join(", ", missingIds));
         }
 
-        return proficiencyEntities;
+        return bnccEntities;
     }
 }

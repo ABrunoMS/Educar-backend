@@ -15,7 +15,7 @@ public class Subjects : EndpointGroupBase
     public override void Map(WebApplication app)
     {
         app.MapGroup(this)
-            .RequireAuthorization(UserRole.Teacher.GetDisplayName())
+            
             .MapPost(CreateSubject)
             .MapGet(GetSubject, "{id}")
             .MapGet(GetAllSubjects)
