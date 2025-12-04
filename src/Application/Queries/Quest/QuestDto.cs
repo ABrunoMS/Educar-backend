@@ -32,7 +32,7 @@ public class QuestDto
             CreateMap<Domain.Entities.Quest, QuestDto>()
                 .ForMember(dest => dest.QuestSteps, opt => opt.MapFrom(src => src.QuestSteps))
                 .ForMember(dest => dest.Proficiencies,
-                    opt => opt.MapFrom(src => src.QuestProficiencies.Select(ni => ni.Proficiency)));
+                    opt => opt.MapFrom(src => src.BnccQuests.Select(bq => bq.Bncc)));
         }
     }
 }

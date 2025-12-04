@@ -14,7 +14,7 @@ public class Grades : EndpointGroupBase
     public override void Map(WebApplication app)
     {
         app.MapGroup(this)
-            .RequireAuthorization(UserRole.Teacher.GetDisplayName())
+            
             .MapPost(CreateGrade)
             .MapGet(GetGrade, "{id}")
             .MapGet(GetAllGrades)

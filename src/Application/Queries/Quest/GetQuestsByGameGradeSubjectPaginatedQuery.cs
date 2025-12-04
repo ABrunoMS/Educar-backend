@@ -40,7 +40,10 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
     public async Task<PaginatedList<QuestCleanDto>> Handle(GetQuestsByGameGradeSubjectPaginatedQuery request,
         CancellationToken cancellationToken)
     {
-        var query = _context.Quests.AsNoTracking();
+        IQueryable<Domain.Entities.Quest> query = _context.Quests
+          .AsNoTracking()
+          .Include(q => q.Subject) 
+          .Include(q => q.Grade);
 
         
         
