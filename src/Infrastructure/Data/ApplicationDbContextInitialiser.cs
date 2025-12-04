@@ -107,7 +107,7 @@ public class ApplicationDbContextInitialiser
         }
 
         // 3. Seed do Usuário Admin
-        if (!await _context.Accounts.AnyAsync(a => a.Role == UserRole.Admin))
+       /* if (!await _context.Accounts.AnyAsync(a => a.Role == UserRole.Admin))
         {
             
             if (clientId == null)
@@ -116,7 +116,7 @@ public class ApplicationDbContextInitialiser
                 Guard.Against.Default(clientId, nameof(clientId), "Nenhum cliente (secretaria) encontrado para associar o admin.");
             }
 
-            var accountCommand = new CreateAccountCommand
+          var accountCommand = new CreateAccountCommand
             {
                 Name = "admin-educar",
                 LastName = "Educar", 
@@ -131,6 +131,7 @@ public class ApplicationDbContextInitialiser
             await _sender.Send(accountCommand, CancellationToken.None);
             _logger.LogInformation("Usuário Administrador padrão criado.");
         }
+        */
     }
 
     private async Task SeedProductsAndContentsAsync()
