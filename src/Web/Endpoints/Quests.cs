@@ -40,6 +40,7 @@ public class Quests : EndpointGroupBase
         [FromQuery(Name = "game_id")] Guid? GameId,
         [FromQuery(Name = "grade_id")] Guid? GradeId,
         [FromQuery(Name = "subject_id")] Guid? SubjectId,
+        [FromQuery(Name = "search")] string? Search,
         [FromQuery] bool UsageTemplate,
         [AsParameters] PaginatedQuery paginatedQuery)
     {
@@ -50,6 +51,7 @@ public class Quests : EndpointGroupBase
             GameId = GameId,
             GradeId = GradeId,
             SubjectId = SubjectId,
+            Search = Search,
             UsageTemplate = UsageTemplate
         };
 
