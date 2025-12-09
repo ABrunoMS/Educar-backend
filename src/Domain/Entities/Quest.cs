@@ -6,20 +6,20 @@ public class Quest(
     string name,
     string description,
     bool usageTemplate,
-    QuestType type,
-    int maxPlayers,
-    int totalQuestSteps,
-    CombatDifficulty combatDifficulty)
+    QuestType? type,
+    int? maxPlayers,
+    int? totalQuestSteps,
+    CombatDifficulty? combatDifficulty)
     : BaseAuditableEntity
 {
     public string Name { get; set; } = name;
     public string Description { get; set; } = description;
     // public QuestUsageTemplate UsageTemplate { get; set; } = usageTemplate;
     public bool UsageTemplate { get; set; } = usageTemplate;
-    public QuestType Type { get; set; } = type;
-    public int MaxPlayers { get; set; } = maxPlayers;
-    public int TotalQuestSteps { get; set; } = totalQuestSteps;
-    public CombatDifficulty CombatDifficulty { get; set; } = combatDifficulty;
+    public QuestType? Type { get; set; } = type;
+    public int? MaxPlayers { get; set; } = maxPlayers;
+    public int? TotalQuestSteps { get; set; } = totalQuestSteps;
+    public CombatDifficulty? CombatDifficulty { get; set; } = combatDifficulty;
     public Guid? GameId { get; set; }
     public Game? Game { get; set; }
     public Guid? GradeId { get; set; }
