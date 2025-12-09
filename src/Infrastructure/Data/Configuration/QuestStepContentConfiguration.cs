@@ -11,9 +11,9 @@ public class QuestStepContentConfiguration(DatabaseFacade database) : IEntityTyp
     public void Configure(EntityTypeBuilder<QuestStepContent> builder)
     {
         builder.Property(t => t.Description).IsRequired();
-        builder.Property(t => t.QuestionType).IsRequired().HasConversion<string>();
-        builder.Property(t => t.QuestStepContentType).IsRequired().HasConversion<string>();
-        builder.Property(t => t.Weight).IsRequired().HasColumnType("decimal(5,2)");
+        builder.Property(t => t.QuestionType).HasConversion<string>();
+        builder.Property(t => t.QuestStepContentType).HasConversion<string>();
+        builder.Property(t => t.Weight).HasColumnType("decimal(5,2)");
         builder.Property(t => t.QuestStepId).IsRequired();
         builder.ConfigureJsonProperty(nameof(QuestStepContent.ExpectedAnswers), database).IsRequired();
         
