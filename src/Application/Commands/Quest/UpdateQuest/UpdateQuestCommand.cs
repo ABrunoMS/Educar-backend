@@ -1,9 +1,13 @@
 using Educar.Backend.Application.Common.Interfaces;
+using Educar.Backend.Domain.Common; // Para NotFoundException
 using Educar.Backend.Domain.Entities;
 using Educar.Backend.Domain.Enums;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Educar.Backend.Application.Commands.Quest.UpdateQuest;
 
+// O Comando (Request)
 public record UpdateQuestCommand : IRequest<Unit>
 {
     public Guid Id { get; set; }
@@ -14,11 +18,16 @@ public record UpdateQuestCommand : IRequest<Unit>
     public int? MaxPlayers { get; set; }
     public int? TotalQuestSteps { get; set; }
     public CombatDifficulty? CombatDifficulty { get; set; }
+    
+    // IDs de relacionamento
     public Guid? GradeId { get; set; }
     public Guid? SubjectId { get; set; }
     public Guid? QuestDependencyId { get; set; }
-    public IList<Guid>? ProficiencyIds { get; set; }
+    
+    
+    public IList<Guid>? BnccIds { get; set; } 
 }
+
 
 public class UpdateQuestCommandHandler : IRequestHandler<UpdateQuestCommand, Unit>
 {
@@ -32,13 +41,16 @@ public class UpdateQuestCommandHandler : IRequestHandler<UpdateQuestCommand, Uni
     public async Task<Unit> Handle(UpdateQuestCommand request, CancellationToken cancellationToken)
     {
         var entity = await _context.Quests
-            .Include(q => q.QuestProficiencies)
+           
+            .Include(q => q.BnccQuests) 
             .FirstOrDefaultAsync(q => q.Id == request.Id, cancellationToken);
+            
         Guard.Against.NotFound(request.Id, entity);
 
         UpdateQuestProperties(entity, request);
 
-        await UpdateQuestProficiencies(_context, entity, request.ProficiencyIds, cancellationToken);
+        
+        await UpdateBnccRelationships(_context, entity, request.BnccIds, cancellationToken);
 
         await _context.SaveChangesAsync(cancellationToken);
 
@@ -54,86 +66,90 @@ public class UpdateQuestCommandHandler : IRequestHandler<UpdateQuestCommand, Uni
         if (request.MaxPlayers.HasValue) entity.MaxPlayers = request.MaxPlayers.Value;
         if (request.TotalQuestSteps.HasValue) entity.TotalQuestSteps = request.TotalQuestSteps.Value;
         if (request.CombatDifficulty.HasValue) entity.CombatDifficulty = request.CombatDifficulty.Value;
+        if (request.GradeId.HasValue) entity.GradeId = request.GradeId.Value;
+        if (request.SubjectId.HasValue) entity.SubjectId = request.SubjectId.Value;
 
-        if (request.GradeId.HasValue)
+        if (request.QuestDependencyId.HasValue)
         {
-            var grade = _context.Grades.Find(request.GradeId.Value);
-            Guard.Against.NotFound(request.GradeId.Value, grade);
-            entity.Grade = grade;
+          
+             var dep = _context.Quests.Find(request.QuestDependencyId.Value);
+             if(dep != null) entity.QuestDependency = dep;
         }
-
-        if (request.SubjectId.HasValue)
-        {
-            var subject = _context.Subjects.Find(request.SubjectId.Value);
-            Guard.Against.NotFound(request.SubjectId.Value, subject);
-            entity.Subject = subject;
-        }
-
-        if (!request.QuestDependencyId.HasValue) return;
-
-        var questDependency = _context.Quests.Find(request.QuestDependencyId.Value);
-        Guard.Against.NotFound(request.QuestDependencyId.Value, questDependency);
-        entity.QuestDependency = questDependency;
     }
 
-    private async Task UpdateQuestProficiencies(IApplicationDbContext context, Domain.Entities.Quest entity,
-        IList<Guid>? proficiencyIds, CancellationToken cancellationToken)
+   
+   private async Task UpdateBnccRelationships(
+    IApplicationDbContext context, 
+    Domain.Entities.Quest entity,
+    IList<Guid>? bnccIds, 
+    CancellationToken cancellationToken)
+{
+    // Se for null, não faz nada (mantém o que está). 
+    if (bnccIds == null) return;
+
+    // 1. Validar se os IDs enviados existem na tabela mestre de BNCCs
+    
+    var existingBnccs = await context.Bnccs
+        .AsNoTracking() 
+        .Where(b => bnccIds.Contains(b.Id) && !b.IsDeleted)
+        .Select(b => b.Id) // Trazemos apenas os IDs para comparar
+        .ToListAsync(cancellationToken);
+
+    var missingIds = bnccIds.Except(existingBnccs).ToList();
+    if (missingIds.Any())
     {
-        if (proficiencyIds == null || proficiencyIds.Count == 0)
-        {
-            return;
-        }
-
-        var proficiencyEntities = await context.Proficiencies
-            .Where(p => proficiencyIds.Contains(p.Id))
-            .ToListAsync(cancellationToken);
-
-        var missingProficiencyIds = proficiencyIds.Except(proficiencyEntities.Select(p => p.Id)).ToList();
-        if (missingProficiencyIds.Any())
-        {
-            throw new NotFoundException(nameof(Proficiency), string.Join(", ", missingProficiencyIds));
-        }
-
-        var allQuestProficiencies = await context.QuestProficiencies
-            .IgnoreQueryFilters()
-            .Where(qp => qp.QuestId == entity.Id)
-            .ToListAsync(cancellationToken);
-
-        UpdateProficiencyRelationships(entity, allQuestProficiencies, proficiencyEntities, proficiencyIds);
+        throw new NotFoundException(nameof(Domain.Entities.Bncc), string.Join(", ", missingIds));
     }
 
-    private void UpdateProficiencyRelationships(Domain.Entities.Quest entity,
-        List<QuestProficiency> allQuestProficiencies,
-        List<Domain.Entities.Proficiency> proficiencyEntities, IList<Guid> proficiencyIds)
-    {
-        var currentProficiencyIds = allQuestProficiencies.Where(qp => !qp.IsDeleted)
-            .Select(qp => qp.ProficiencyId).ToList();
-        var proficienciesToAdd = proficiencyIds.Except(currentProficiencyIds).ToList();
-        var proficienciesToRemove = currentProficiencyIds.Except(proficiencyIds).ToList();
+    
+    var currentRelationships = entity.BnccQuests.ToList(); 
 
-        foreach (var proficiencyId in proficienciesToAdd)
+    // IDs que estão atualmente vinculados (ativos ou inativos)
+    var currentBnccIds = currentRelationships.Select(r => r.BnccId).ToList();
+
+    // 3. Calcular Delta
+    var idsToAdd = bnccIds.Except(currentBnccIds).ToList();
+    
+   
+    var idsToRemove = currentRelationships
+        .Where(x => !x.IsDeleted && !bnccIds.Contains(x.BnccId))
+        .Select(x => x.BnccId)
+        .ToList();
+
+    // 4. Adicionar ou Reativar
+    foreach (var id in idsToAdd)
+    {
+        // Verifica se já existe o relacionamento (mesmo que deletado) na memória
+        var existingRel = currentRelationships.FirstOrDefault(r => r.BnccId == id);
+        
+        if (existingRel != null)
         {
-            var existingQuestProficiency =
-                allQuestProficiencies.FirstOrDefault(qp =>
-                    qp.ProficiencyId == proficiencyId && qp.IsDeleted);
-            if (existingQuestProficiency != null)
+            
+            if (existingRel.IsDeleted)
             {
-                existingQuestProficiency.IsDeleted = false;
-                existingQuestProficiency.DeletedAt = null;
-            }
-            else
-            {
-                var proficiencyEntity = proficiencyEntities.First(p => p.Id == proficiencyId);
-                entity.QuestProficiencies.Add(new QuestProficiency
-                    { QuestId = entity.Id, ProficiencyId = proficiencyEntity.Id });
+                existingRel.IsDeleted = false;
+                existingRel.DeletedAt = null;
+                
             }
         }
-
-        foreach (var questProficiency in proficienciesToRemove.Select(proficiencyId =>
-                     allQuestProficiencies.First(qp => qp.ProficiencyId == proficiencyId)))
+        else
         {
-            questProficiency.IsDeleted = true;
-            questProficiency.DeletedAt = DateTimeOffset.UtcNow;
+            
+            entity.BnccQuests.Add(new BnccQuest 
+            { 
+                QuestId = entity.Id, 
+                BnccId = id 
+                
+            });
         }
     }
+
+    // 5. Remover (Soft Delete)
+    foreach (var id in idsToRemove)
+    {
+        var rel = currentRelationships.First(r => r.BnccId == id);
+        rel.IsDeleted = true;
+        rel.DeletedAt = DateTimeOffset.UtcNow; 
+    }
+}
 }
