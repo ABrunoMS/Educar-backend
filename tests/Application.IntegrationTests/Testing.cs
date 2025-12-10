@@ -103,10 +103,7 @@ public partial class Testing
             Validity = "31/12/2099",
             SignatureDate = "08/08/2025",
             ImplantationDate = "08/08/2025",
-            TotalAccounts = 1,
-            Secretary = "Secretaria de Teste",
-            SubSecretary = "Sub de Teste",
-            Regional = "Regional de Teste"
+            TotalAccounts = 1
         };
         
         // Envia o comando usando o método SendAsync que já existe

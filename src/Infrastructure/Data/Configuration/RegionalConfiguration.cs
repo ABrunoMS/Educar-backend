@@ -12,20 +12,20 @@ public class RegionalConfiguration(DatabaseFacade database) : IEntityTypeConfigu
 
     public void Configure(EntityTypeBuilder<Regional> builder)
     {
-        // Define a chave primária
         builder.HasKey(r => r.Id);
 
-        // Define que a propriedade Nome é obrigatória e tem tamanho máximo
-        // (Use 'Name' em vez de 'Nome' para seguir a convenção do C#)
-        builder.Property(r => r.Nome)
+        builder.Property(r => r.Name)
             .HasMaxLength(100)
             .IsRequired();
 
-        // Define a relação com Subsecretaria
-        // Isso assume que sua entidade 'Subsecretaria' tem uma lista 'public List<Regional> Regionais'
         builder.HasOne(r => r.Subsecretaria)
             .WithMany(s => s.Regionais)
             .HasForeignKey(r => r.SubsecretariaId)
-            .OnDelete(DeleteBehavior.Cascade); // <-- Ponto de Atenção
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(r => r.Schools)
+            .WithOne(s => s.Regional)
+            .HasForeignKey(s => s.RegionalId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

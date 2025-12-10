@@ -8,6 +8,20 @@ using System.Collections.Generic;
 
 namespace Educar.Backend.Application.Commands.Client.CreateClient;
 
+public record CreateSubsecretariaDto
+{
+    [JsonPropertyName("name")]
+    public string Name { get; init; } = string.Empty;
+
+    [JsonPropertyName("regionais")]
+    public List<CreateRegionalDto>? Regionais { get; init; }
+}
+
+public record CreateRegionalDto
+{
+    [JsonPropertyName("name")]
+    public string Name { get; init; } = string.Empty;
+}
 
 public record CreateClientCommand : IRequest<IdResponseDto>
 {
@@ -38,14 +52,8 @@ public record CreateClientCommand : IRequest<IdResponseDto>
     [JsonPropertyName("totalAccounts")]
     public int TotalAccounts { get; init; }
 
-    [JsonPropertyName("secretary")]
-    public string Secretary { get; init; } = string.Empty;
-
-    [JsonPropertyName("subSecretary")]
-    public string SubSecretary { get; init; } = string.Empty;
-
-    [JsonPropertyName("regional")]
-    public string Regional { get; init; } = string.Empty;
+    [JsonPropertyName("subsecretarias")]
+    public List<CreateSubsecretariaDto>? Subsecretarias { get; init; }
 
     [JsonPropertyName("selectedProducts")]
     public List<Guid>? ProductIds { get; init; }
@@ -70,10 +78,36 @@ public class CreateClientCommandHandler(IApplicationDbContext context)
             SignatureDate = request.SignatureDate,
             ImplantationDate = request.ImplantationDate,
             TotalAccounts = request.TotalAccounts,
-            Secretary = request.Secretary,
-            SubSecretary = request.SubSecretary,
-            Regional = request.Regional,
         };
+
+        // Cria as Subsecretarias e Regionais
+        if (request.Subsecretarias != null && request.Subsecretarias.Any())
+        {
+            foreach (var subsecretariaDto in request.Subsecretarias)
+            {
+                var subsecretaria = new Domain.Entities.Subsecretaria
+                {
+                    Name = subsecretariaDto.Name,
+                    Client = entity
+                };
+
+                // Cria as Regionais para esta Subsecretaria
+                if (subsecretariaDto.Regionais != null && subsecretariaDto.Regionais.Any())
+                {
+                    foreach (var regionalDto in subsecretariaDto.Regionais)
+                    {
+                        var regional = new Domain.Entities.Regional
+                        {
+                            Name = regionalDto.Name,
+                            Subsecretaria = subsecretaria
+                        };
+                        subsecretaria.Regionais.Add(regional);
+                    }
+                }
+
+                entity.Subsecretarias.Add(subsecretaria);
+            }
+        }
 
         // Adiciona os Produtos selecionados
         if (request.ProductIds != null && request.ProductIds.Any())

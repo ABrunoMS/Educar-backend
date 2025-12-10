@@ -6,9 +6,9 @@ public class CreateRegionalCommandValidator : AbstractValidator<CreateRegionalCo
 {
     public CreateRegionalCommandValidator()
     {
-        RuleFor(x => x.Nome)
-            .NotEmpty().WithMessage("Nome é obrigatório.")
-            .MaximumLength(100).WithMessage("Nome deve ter no máximo 100 caracteres.");
+        RuleFor(x => x.Name)
+            .NotEmpty().WithMessage("Name is required.")
+            .MaximumLength(100).WithMessage("Name must be at most 100 characters.");
 
         RuleFor(x => x.SubsecretariaId)
             .NotEmpty().WithMessage("SubsecretariaId é obrigatório.");

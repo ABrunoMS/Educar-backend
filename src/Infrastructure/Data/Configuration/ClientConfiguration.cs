@@ -19,5 +19,10 @@ public class ClientConfiguration(DatabaseFacade database) : IEntityTypeConfigura
         builder.HasMany(c => c.ClientContents)
             .WithOne(cc => cc.Client)
             .HasForeignKey(cc => cc.ClientId);
+
+        builder.HasMany(c => c.Subsecretarias)
+            .WithOne(s => s.Client)
+            .HasForeignKey(s => s.ClientId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

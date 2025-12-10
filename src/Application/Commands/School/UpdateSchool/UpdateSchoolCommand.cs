@@ -8,6 +8,7 @@ public record UpdateSchoolCommand : IRequest<Unit>
     public Guid Id { get; set; }
     public string? Name { get; set; }
     public string? Description { get; set; }
+    public Guid? RegionalId { get; set; }
     public Domain.Entities.Address? Address { get; set; }
 }
 
@@ -23,6 +24,14 @@ public class UpdateSchoolCommandHandler(IApplicationDbContext context, ISender s
 
         if (request.Name != null) entity.Name = request.Name;
         if (request.Description != null) entity.Description = request.Description;
+        if (request.RegionalId.HasValue)
+        {
+            var regional = await context.Regionais.FindAsync([request.RegionalId.Value], cancellationToken: cancellationToken);
+            if (regional != null)
+            {
+                entity.RegionalId = request.RegionalId.Value;
+            }
+        }
 
         if (request.Address != null)
         {

@@ -3,6 +3,7 @@ using System;
 using Educar.Backend.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Educar.Backend.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251209193601_AddClientIdToSubsecretariaAndUpdateRelationships")]
+    partial class AddClientIdToSubsecretariaAndUpdateRelationships
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1865,11 +1868,11 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("last_modified_by");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("name");
+                        .HasColumnName("nome");
 
                     b.Property<Guid>("SubsecretariaId")
                         .HasColumnType("uuid")
@@ -1930,17 +1933,11 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.Property<Guid>("RegionalId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("regional_id");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AddressId");
 
                     b.HasIndex("ClientId");
-
-                    b.HasIndex("RegionalId");
 
                     b.ToTable("schools");
                 });
@@ -2150,11 +2147,11 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("last_modified_by");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("name");
+                        .HasColumnName("nome");
 
                     b.Property<Guid?>("SecretaryId")
                         .HasColumnType("uuid")
@@ -2705,17 +2702,9 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Educar.Backend.Domain.Entities.Regional", "Regional")
-                        .WithMany("Schools")
-                        .HasForeignKey("RegionalId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Address");
 
                     b.Navigation("Client");
-
-                    b.Navigation("Regional");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.SpawnPoint", b =>
@@ -2890,11 +2879,6 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
             modelBuilder.Entity("Educar.Backend.Domain.Entities.QuestStepContent", b =>
                 {
                     b.Navigation("Answers");
-                });
-
-            modelBuilder.Entity("Educar.Backend.Domain.Entities.Regional", b =>
-                {
-                    b.Navigation("Schools");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.School", b =>

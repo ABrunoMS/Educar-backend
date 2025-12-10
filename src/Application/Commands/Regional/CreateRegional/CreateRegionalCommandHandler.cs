@@ -14,7 +14,7 @@ public class CreateRegionalCommandHandler : IRequestHandler<CreateRegionalComman
 
     public async Task<Guid> Handle(CreateRegionalCommand request, CancellationToken cancellationToken)
     {
-    var entity = new Educar.Backend.Domain.Entities.Regional { Id = Guid.NewGuid(), Nome = request.Nome, SubsecretariaId = request.SubsecretariaId };
+    var entity = new Educar.Backend.Domain.Entities.Regional { Id = Guid.NewGuid(), Name = request.Name, SubsecretariaId = request.SubsecretariaId };
         _context.Regionais.Add(entity);
         await _context.SaveChangesAsync(cancellationToken);
         return entity.Id;

@@ -14,7 +14,7 @@ public class CreateSubsecretariaCommandHandler : IRequestHandler<CreateSubsecret
 
     public async Task<Guid> Handle(CreateSubsecretariaCommand request, CancellationToken cancellationToken)
     {
-    var entity = new Educar.Backend.Domain.Entities.Subsecretaria { Id = Guid.NewGuid(), Nome = request.Nome };
+    var entity = new Educar.Backend.Domain.Entities.Subsecretaria { Id = Guid.NewGuid(), Name = request.Name };
         _context.Subsecretarias.Add(entity);
         await _context.SaveChangesAsync(cancellationToken);
         return entity.Id;

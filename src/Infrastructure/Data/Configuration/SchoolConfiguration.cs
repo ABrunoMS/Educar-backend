@@ -13,5 +13,11 @@ public class SchoolConfiguration(DatabaseFacade database) : IEntityTypeConfigura
     {
         builder.Property(t => t.Name).IsRequired();
         builder.Property(t => t.ClientId).IsRequired();
+        builder.Property(t => t.RegionalId).IsRequired();
+
+        builder.HasOne(s => s.Regional)
+            .WithMany(r => r.Schools)
+            .HasForeignKey(s => s.RegionalId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

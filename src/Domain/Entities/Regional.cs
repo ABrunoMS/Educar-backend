@@ -1,11 +1,11 @@
-using System;
+using Educar.Backend.Domain.Common;
 
 namespace Educar.Backend.Domain.Entities;
 
-public class Regional
+public class Regional : BaseAuditableEntity
 {
-    public Guid Id { get; set; }
-    public string Nome { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
     public Guid SubsecretariaId { get; set; }
     public Subsecretaria? Subsecretaria { get; set; }
+    public ICollection<School> Schools { get; private set; } = new List<School>();
 }

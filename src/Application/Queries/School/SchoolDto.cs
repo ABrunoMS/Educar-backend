@@ -1,6 +1,7 @@
 using Educar.Backend.Application.Queries.Account;
 using Educar.Backend.Application.Queries.Address;
 using Educar.Backend.Application.Queries.Client;
+using Educar.Backend.Application.Queries.Regional;
 
 namespace Educar.Backend.Application.Queries.School;
 
@@ -11,6 +12,8 @@ public class SchoolDto
     public string? Description { get; set; }
     public AddressDto? Address { get; set; }
     public ClientCleanDto? Client { get; set; }
+    public Guid RegionalId { get; set; }
+    public RegionalDto? Regional { get; set; }
 
     private class Mapping : Profile
     {

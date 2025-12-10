@@ -8,4 +8,5 @@ public class Secretary : BaseAuditableEntity
     public string? Description { get; set; }
     public string? Code { get; set; }
     public bool IsActive { get; set; } = true;
+    public ICollection<Subsecretaria> Subsecretarias { get; private set; } = new List<Subsecretaria>();
 }
