@@ -14,9 +14,9 @@ public class QuestStepConfiguration(DatabaseFacade database) : IEntityTypeConfig
         builder.Property(t => t.Name).IsRequired();
         builder.Property(t => t.Description).IsRequired();
         builder.Property(t => t.Order).IsRequired();
-        builder.Property(t => t.NpcType).IsRequired().HasConversion<string>();
-        builder.Property(t => t.NpcBehaviour).IsRequired().HasConversion<string>();
-        builder.Property(t => t.QuestStepType).IsRequired().HasConversion<string>();
+        builder.Property(t => t.NpcType).HasConversion<string>();
+        builder.Property(t => t.NpcBehaviour).HasConversion<string>();
+        builder.Property(t => t.QuestStepType).HasConversion<string>();
         builder.Property(t => t.QuestId).IsRequired();
         
         builder

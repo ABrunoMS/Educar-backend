@@ -17,6 +17,7 @@ public class GetQuestsByGameGradeSubjectPaginatedQuery : IRequest<PaginatedList<
     public Guid? GameId { get; init; }
     public Guid? GradeId { get; init; }
     public Guid? SubjectId { get; init; }
+    public string? Search { get; init; }
     public bool UsageTemplate { get; init; }
 }
 
@@ -78,20 +79,26 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
             }
         }
 
-        // if (request.GameId is not null)
-        // {
-        //     query = query.Where(q => q.GameId == request.GameId);
-        // }
+        if (request.GameId is not null)
+        {
+            query = query.Where(q => q.GameId == request.GameId);
+        }
 
-        // if (request.GradeId is not null)
-        // {
-        //     query = query.Where(q => q.GradeId == request.GradeId);
-        // }
+        if (request.GradeId is not null)
+        {
+            query = query.Where(q => q.GradeId == request.GradeId);
+        }
 
-        // if (request.SubjectId is not null)
-        // {
-        //     query = query.Where(q => q.SubjectId == request.SubjectId);
-        // }
+        if (request.SubjectId is not null)
+        {
+            query = query.Where(q => q.SubjectId == request.SubjectId);
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Search))
+        {
+            var searchLower = request.Search.ToLower();
+            query = query.Where(q => q.Name.ToLower().Contains(searchLower));
+        }
 
         return await query
             .OrderBy(q => q.Name)
