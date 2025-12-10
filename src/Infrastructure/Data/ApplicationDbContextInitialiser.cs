@@ -97,9 +97,6 @@ public class ApplicationDbContextInitialiser
                 SignatureDate = "07/08/2025",
                 ImplantationDate = "07/08/2025",
                 TotalAccounts = 999,
-                Secretary = "Secretaria Principal",
-                SubSecretary = "N/A",
-                Regional = "Nacional",
                 ProductIds = await _context.Products.Select(p => p.Id).ToListAsync(),
                 ContentIds = await _context.Contents.Select(c => c.Id).ToListAsync()
             };

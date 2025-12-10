@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
+using Educar.Backend.Domain.Common;
 
 namespace Educar.Backend.Domain.Entities;
 
-public class Subsecretaria
+public class Subsecretaria : BaseAuditableEntity
 {
-    public Guid Id { get; set; }
-    public string Nome { get; set; } = string.Empty;
-    public ICollection<Regional> Regionais { get; set; } = new List<Regional>();
+    public string Name { get; set; } = string.Empty;
+    public Guid ClientId { get; set; }
+    public Client? Client { get; set; }
+    public ICollection<Regional> Regionais { get; private set; } = new List<Regional>();
 }

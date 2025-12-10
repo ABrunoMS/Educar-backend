@@ -15,12 +15,16 @@ public class SubsecretariaConfiguration(DatabaseFacade database) : IEntityTypeCo
     {
         builder.HasKey(x => x.Id);
 
-        // Use 'Name' em vez de 'Nome' para seguir a convenção de nomenclatura do C#
-        builder.Property(x => x.Nome).IsRequired().HasMaxLength(100);
+        builder.Property(x => x.Name).IsRequired().HasMaxLength(100);
+
+        builder.HasOne(x => x.Client)
+            .WithMany(c => c.Subsecretarias)
+            .HasForeignKey(x => x.ClientId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(x => x.Regionais)
             .WithOne(x => x.Subsecretaria)
             .HasForeignKey(x => x.SubsecretariaId)
-            .OnDelete(DeleteBehavior.Cascade); // Usando Restrict para mais segurança
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

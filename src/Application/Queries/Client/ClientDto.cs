@@ -6,6 +6,7 @@ using Educar.Backend.Domain.Entities;
 using ClientEntity = Educar.Backend.Domain.Entities.Client;
 using Educar.Backend.Application.Queries.Product; 
 using Educar.Backend.Application.Queries.Content;
+using Educar.Backend.Application.Queries.Subsecretaria;
 
 namespace Educar.Backend.Application.Queries.Client;
 
@@ -22,9 +23,7 @@ public class ClientDto
     public string? ImplantationDate { get; set; }
     public int TotalAccounts { get; set; }
     public int RemainingAccounts { get; set; }
-    public string? Secretary { get; set; }
-    public string? SubSecretary { get; set; }
-    public string? Regional { get; set; }
+    public IList<SubsecretariaDto> Subsecretarias { get; set; } = new List<SubsecretariaDto>();
     public IList<ProductDto> Products { get; set; } = new List<ProductDto>();
     public IList<ContentDto> Contents { get; set; } = new List<ContentDto>();
     

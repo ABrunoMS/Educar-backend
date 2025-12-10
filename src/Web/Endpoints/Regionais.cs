@@ -1,24 +1,28 @@
-
 using Educar.Backend.Application.Queries.Regional;
-using Educar.Backend.Domain.Entities;
 using Educar.Backend.Infrastructure.Data;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 namespace Educar.Backend.Web.Endpoints;
 
-public static class Regionais
+public class Regionais : EndpointGroupBase
 {
-    public static void MapRegionalEndpoints(this IEndpointRouteBuilder endpoints)
+    public override void Map(WebApplication app)
     {
-        endpoints.MapPost("/regionais", async ([FromBody] RegionalDto dto, ApplicationDbContext db) =>
-        {
-            var entity = new Regional { Id = Guid.NewGuid(), Nome = dto.Nome, SubsecretariaId = dto.SubsecretariaId };
-            db.Regionais.Add(entity);
-            await db.SaveChangesAsync();
-            return Results.Created($"/regionais/{entity.Id}", entity);
-        });
+        app.MapGroup(this)
+            .MapGet(GetAllRegionais);
+    }
 
-        endpoints.MapGet("/regionais", async (ApplicationDbContext  db) =>
-            await db.Regionais.ToListAsync());
+    public async Task<IResult> GetAllRegionais(ApplicationDbContext db)
+    {
+        var regionais = await db.Regionais
+            .Select(r => new RegionalDto
+            {
+                Id = r.Id,
+                Name = r.Name,
+                SubsecretariaId = r.SubsecretariaId
+            })
+            .ToListAsync();
+        
+        return Results.Ok(regionais);
     }
 }

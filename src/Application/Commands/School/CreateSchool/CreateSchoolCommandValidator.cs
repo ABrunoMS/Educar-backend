@@ -9,5 +9,8 @@ public class CreateSchoolCommandValidator : AbstractValidator<CreateSchoolComman
 
         RuleFor(x => x.ClientId)
             .NotEmpty().WithMessage("ClientId is required.");
+
+        RuleFor(x => x.RegionalId)
+            .NotEmpty().WithMessage("RegionalId is required.");
     }
 }

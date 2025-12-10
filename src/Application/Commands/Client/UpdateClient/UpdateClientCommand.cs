@@ -21,11 +21,9 @@ public record UpdateClientCommand : IRequest<Unit>
     public string? SignatureDate { get; init; }
     public string? ImplantationDate { get; init; }
     public int? TotalAccounts { get; init; }
-    public string? Secretary { get; init; }
+    public List<Guid>? SubsecretariaIds { get; init; }
     public List<Guid>? ProductIds { get; init; }
     public List<Guid>? ContentIds { get; init; }
-    public string? SubSecretary { get; set; }
-    public string? Regional { get; set; }
 }
 
 public class UpdateClientCommandHandler(IApplicationDbContext context) : IRequestHandler<UpdateClientCommand, Unit>
@@ -36,6 +34,7 @@ public class UpdateClientCommandHandler(IApplicationDbContext context) : IReques
         var entity = await context.Clients
             .Include(c => c.ClientProducts)
             .Include(c => c.ClientContents)
+            .Include(c => c.Subsecretarias)
             .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
 
         Guard.Against.NotFound(request.Id, entity);
@@ -50,9 +49,35 @@ public class UpdateClientCommandHandler(IApplicationDbContext context) : IReques
         entity.SignatureDate = request.SignatureDate ?? entity.SignatureDate;
         entity.ImplantationDate = request.ImplantationDate ?? entity.ImplantationDate;
         entity.TotalAccounts = request.TotalAccounts ?? entity.TotalAccounts;
-        entity.Secretary = request.Secretary ?? entity.Secretary;
-        entity.SubSecretary = request.SubSecretary ?? entity.SubSecretary;
-        entity.Regional = request.Regional ?? entity.Regional;
+        
+        // Atualiza Subsecretarias
+        if (request.SubsecretariaIds != null)
+        {
+            // Remove antigas
+            var currentSubsecretariaIds = entity.Subsecretarias.Select(s => s.Id).ToList();
+            var idsToRemove = currentSubsecretariaIds.Except(request.SubsecretariaIds).ToList();
+            var subsecretariasToRemove = entity.Subsecretarias.Where(s => idsToRemove.Contains(s.Id)).ToList();
+            foreach (var subsecretaria in subsecretariasToRemove)
+            {
+                subsecretaria.ClientId = Guid.Empty; // Remove associação
+                entity.Subsecretarias.Remove(subsecretaria);
+            }
+
+            // Adiciona novas
+            var idsToAdd = request.SubsecretariaIds.Except(currentSubsecretariaIds).ToList();
+            if (idsToAdd.Any())
+            {
+                var subsecretariasToAdd = await context.Subsecretarias
+                    .Where(s => idsToAdd.Contains(s.Id))
+                    .ToListAsync(cancellationToken);
+                
+                foreach (var subsecretaria in subsecretariasToAdd)
+                {
+                    subsecretaria.ClientId = entity.Id;
+                    entity.Subsecretarias.Add(subsecretaria);
+                }
+            }
+        }
 
         // 3. Atualiza as tabelas de ligação (Products)
         if (request.ProductIds != null)
