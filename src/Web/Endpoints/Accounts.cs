@@ -17,6 +17,7 @@ public class Accounts : EndpointGroupBase
         app.MapGroup(this)
             .RequireAuthorization(UserRole.Admin.GetDisplayName())
             .MapGet(GetAccount, "{id}")
+            .MapGet(GetAccountsByRole, "role/{role}")
             .MapGet(GetAllAccountsBySchool, "school/{schoolId}")
             .MapGet(GetAllAccountsByClass, "class/{classId}")
             .MapGet(GetAllAccountsByClient, "client/{clientId}")
@@ -43,6 +44,19 @@ public class Accounts : EndpointGroupBase
     {
         return await sender.Send(new GetAccountQuery { Id = id });
     }
+
+    public Task<PaginatedList<CleanAccountDto>> GetAccountsByRole(ISender sender, UserRole role,
+        [AsParameters] PaginatedQuery paginatedQuery)
+    {
+        var query = new GetAccountsByRolePaginatedQuery
+        {
+            Role = role,
+            PageNumber = paginatedQuery.PageNumber,
+            PageSize = paginatedQuery.PageSize
+        };
+        return sender.Send(query);
+    }
+
 
     public Task<PaginatedList<CleanAccountDto>> GetAllAccounts(ISender sender,
         [AsParameters] PaginatedQuery paginatedQuery)
