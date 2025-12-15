@@ -1,6 +1,7 @@
 using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Application.Common.Mappings;
 using Educar.Backend.Application.Common.Models;
+using Educar.Backend.Domain.Enums;
 
 namespace Educar.Backend.Application.Queries.Account;
 
@@ -8,7 +9,7 @@ public record GetAccountsPaginatedQuery : IRequest<PaginatedList<CleanAccountDto
 {
     public int PageNumber { get; init; } = 1;
     public int PageSize { get; init; } = 10;
-   // public string? Search { get; init; };
+    public string? Role { get; init; }
 }
 
 public class GetAccountsPaginatedQueryHandler : IRequestHandler<GetAccountsPaginatedQuery, PaginatedList<CleanAccountDto>>
@@ -25,7 +26,15 @@ public class GetAccountsPaginatedQueryHandler : IRequestHandler<GetAccountsPagin
     public async Task<PaginatedList<CleanAccountDto>> Handle(GetAccountsPaginatedQuery request,
         CancellationToken cancellationToken)
     {
-        return await _context.Accounts
+        var query = _context.Accounts.AsQueryable();
+
+        // Filtro por Role
+        if (!string.IsNullOrEmpty(request.Role) && Enum.TryParse<UserRole>(request.Role, true, out var roleEnum))
+        {
+            query = query.Where(a => a.Role == roleEnum);
+        }
+
+        return await query
             .OrderBy(x => x.Email)
             .ProjectTo<CleanAccountDto>(_mapper.ConfigurationProvider)
             .PaginatedListAsync(request.PageNumber, request.PageSize);
