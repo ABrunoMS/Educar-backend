@@ -21,7 +21,10 @@ public class CleanAccountDto
            
             CreateMap<AccountEntity, CleanAccountDto>()
                 .ForMember(dest => dest.ClientName,
-                           opt => opt.MapFrom(src => src.Client.Name))
+                           // CORREÇÃO: Adicionamos o '?' (ou verificação de null)
+                           // Se src.Client for nulo, ele retorna null em vez de dar erro
+                           opt => opt.MapFrom(src => src.Client != null ? src.Client.Name : null))
+                           
                 .ForMember(dest => dest.SchoolName,
                            opt => opt.MapFrom(src => string.Join(", ", src.AccountSchools.Select(asc => asc.School.Name))));
         }
