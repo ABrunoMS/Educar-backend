@@ -41,16 +41,16 @@ public class CreateAccountCommandValidator : AbstractValidator<CreateAccountComm
         RuleFor(v => v.Stars)
             .InclusiveBetween(0, 5).WithMessage("Stars must be between 0 and 5.");
 
-        //RuleFor(v => v.ClientId)
-           // .NotEmpty().WithMessage("Client ID is required.");
+        RuleFor(v => v.ClientId)
+            .NotEmpty().WithMessage("Client ID is required.");
 
         RuleFor(v => v.Role)
             .NotNull().WithMessage("Role is required.")
             .IsInEnum().WithMessage("Role must be a valid enum value.");
 
-       // RuleFor(v => v.SchoolIds)
-         //   .NotEmpty().WithMessage("School ID is required.")
-          //  .When(v => v.Role != UserRole.Admin).WithMessage("School ID is required for non-admin roles.");
+        RuleFor(v => v.SchoolIds)
+            .NotEmpty().WithMessage("School ID is required.")
+            .When(v => v.Role != UserRole.Admin).WithMessage("School ID is required for non-admin roles.");
 
         /*RuleFor(v => v.ClassIds)
             .NotEmpty().WithMessage("Class IDs are required.")
