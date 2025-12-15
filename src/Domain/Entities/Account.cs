@@ -11,8 +11,8 @@ public class Account(string name, string email, string registrationNumber, UserR
     public decimal? AverageScore { get; set; }
     public decimal? EventAverageScore { get; set; }
     public int? Stars { get; set; }
-    public Guid ClientId { get; set; }
-    public Client Client { get; set; } = null!;
+    public Guid? ClientId { get; set; }
+    public Client? Client { get; set; } = null!;
     public IList<AccountSchool> AccountSchools { get; set; } = new List<AccountSchool>();
     //public Guid? SchoolId { get; set; }
     //public School? School { get; set; }

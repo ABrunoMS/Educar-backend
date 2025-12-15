@@ -33,7 +33,7 @@ public record CreateAccountCommand : IRequest<IdResponseDto>
     public int Stars { get; init; }
 
     [JsonPropertyName("clientId")]
-    public Guid ClientId { get; init; }
+    public Guid? ClientId { get; init; }
 
     [JsonPropertyName("role")]
     public UserRole Role { get; init; }
@@ -51,17 +51,24 @@ public class CreateAccountCommandHandler(IApplicationDbContext context)
     public async Task<IdResponseDto> Handle(CreateAccountCommand request, CancellationToken cancellationToken)
     {
         
-        var client = await context.Clients.FindAsync(new object[] { request.ClientId }, cancellationToken: cancellationToken);
-        if (client == null) throw new NotFoundException(nameof(Client), request.ClientId.ToString());
-        
+        Domain.Entities.Client? client = null;
+
+        if (request.ClientId.HasValue)
+        {
+            client = await context.Clients.FindAsync(new object[] { request.ClientId.Value }, cancellationToken: cancellationToken);
+            if (client == null) throw new NotFoundException(nameof(Client), request.ClientId.Value.ToString());
+        }
 
         var entity = new Domain.Entities.Account(request.Name, request.Email, request.RegistrationNumber, request.Role)
         {
             AverageScore = request.AverageScore,
             EventAverageScore = request.EventAverageScore,
             Stars = request.Stars,
-            Client = client,
-            ClientId = request.ClientId,
+            
+            // --- MUDANÇA: Passa null se não houver cliente ---
+            Client = client, 
+            ClientId = request.ClientId, 
+            
             Password = request.Password,
             LastName = request.LastName,
         };
