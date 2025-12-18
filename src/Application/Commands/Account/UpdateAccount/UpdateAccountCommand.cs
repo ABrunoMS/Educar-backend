@@ -14,6 +14,7 @@ public record UpdateAccountCommand : IRequest
     public decimal AverageScore { get; set; }
     public decimal EventAverageScore { get; set; }
     public int Stars { get; set; }
+    public UserRole? Role { get; set; }
     public IList<Guid> SchoolIds { get; set; } = new List<Guid>();
     public IList<Guid> ClassIds { get; set; } = new List<Guid>();
 }
@@ -59,6 +60,7 @@ public class UpdateAccountCommandHandler(IApplicationDbContext context) : IReque
         // 1. Atualiza os campos simples
         if (request.Name != null) entity.Name = request.Name;
         if (request.RegistrationNumber != null) entity.RegistrationNumber = request.RegistrationNumber;
+        if (request.Role.HasValue) entity.Role = request.Role.Value;
         entity.AverageScore = request.AverageScore;
         entity.EventAverageScore = request.EventAverageScore;
         entity.Stars = request.Stars;
