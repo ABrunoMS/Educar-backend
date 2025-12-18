@@ -29,30 +29,30 @@ public class UpdateAccountCommandHandler(IApplicationDbContext context) : IReque
         
         Guard.Against.NotFound(request.Id, entity);
 
-        ValidateNonAdminRole(entity.Role, request.SchoolIds, request.ClassIds);
+        // ValidateNonAdminRole(entity.Role, request.SchoolIds, request.ClassIds);
 
         UpdateEntity(entity, request, context);
 
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    private void ValidateNonAdminRole(UserRole role, IList<Guid> schoolIds, IList<Guid> classIds)
-    {
-        if (role == UserRole.Admin) return;
-        var exception = new ValidationException();
-        if (schoolIds == null || schoolIds.Count == 0)
-        {
-          exception.Errors.Add("SchoolId", ["School ID is required for non-admin roles."]);
-        }
-        if (classIds == null || classIds.Count == 0)
-        {
-          exception.Errors.Add("ClassIds", ["At least one Class ID is required for non-admin roles."]);
-        }  
-        if (exception.Errors.Any())
-        {
-        throw exception;
-        }
-    }
+    // private void ValidateNonAdminRole(UserRole role, IList<Guid> schoolIds, IList<Guid> classIds)
+    // {
+    //     if (role == UserRole.Admin) return;
+    //     var exception = new ValidationException();
+    //     if (schoolIds == null || schoolIds.Count == 0)
+    //     {
+    //       exception.Errors.Add("SchoolId", ["School ID is required for non-admin roles."]);
+    //     }
+    //     if (classIds == null || classIds.Count == 0)
+    //     {
+    //       exception.Errors.Add("ClassIds", ["At least one Class ID is required for non-admin roles."]);
+    //     }  
+    //     if (exception.Errors.Any())
+    //     {
+    //     throw exception;
+    //     }
+    // }
     
     private void UpdateEntity(Domain.Entities.Account entity, UpdateAccountCommand request, IApplicationDbContext context)
     {
