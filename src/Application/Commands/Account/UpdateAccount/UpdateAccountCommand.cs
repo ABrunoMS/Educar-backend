@@ -2,6 +2,7 @@ using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Domain.Entities;
 using Educar.Backend.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using FluentValidation.Results;
 using ValidationException = Educar.Backend.Application.Common.Exceptions.ValidationException;
 
 namespace Educar.Backend.Application.Commands.Account.UpdateAccount;
@@ -10,11 +11,13 @@ public record UpdateAccountCommand : IRequest
 {
     public Guid Id { get; set; }
     public string? Name { get; set; }
+    public string? LastName { get; set; }
     public string? RegistrationNumber { get; set; }
     public decimal AverageScore { get; set; }
     public decimal EventAverageScore { get; set; }
     public int Stars { get; set; }
     public UserRole? Role { get; set; }
+    public Guid? ClientId { get; set; }
     public IList<Guid> SchoolIds { get; set; } = new List<Guid>();
     public IList<Guid> ClassIds { get; set; } = new List<Guid>();
 }
@@ -30,37 +33,88 @@ public class UpdateAccountCommandHandler(IApplicationDbContext context) : IReque
         
         Guard.Against.NotFound(request.Id, entity);
 
-        // ValidateNonAdminRole(entity.Role, request.SchoolIds, request.ClassIds);
+        // Validar ClientId e relacionamentos
+        await ValidateClientAndRelationships(request, entity, context, cancellationToken);
 
         UpdateEntity(entity, request, context);
 
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    // private void ValidateNonAdminRole(UserRole role, IList<Guid> schoolIds, IList<Guid> classIds)
-    // {
-    //     if (role == UserRole.Admin) return;
-    //     var exception = new ValidationException();
-    //     if (schoolIds == null || schoolIds.Count == 0)
-    //     {
-    //       exception.Errors.Add("SchoolId", ["School ID is required for non-admin roles."]);
-    //     }
-    //     if (classIds == null || classIds.Count == 0)
-    //     {
-    //       exception.Errors.Add("ClassIds", ["At least one Class ID is required for non-admin roles."]);
-    //     }  
-    //     if (exception.Errors.Any())
-    //     {
-    //     throw exception;
-    //     }
-    // }
+    private async Task ValidateClientAndRelationships(
+        UpdateAccountCommand request, 
+        Domain.Entities.Account entity,
+        IApplicationDbContext context, 
+        CancellationToken cancellationToken)
+    {
+        var failures = new List<ValidationFailure>();
+        
+        // Determinar o ClientId a ser usado (novo ou atual)
+        var clientIdToValidate = request.ClientId ?? entity.ClientId;
+        
+        // Se está tentando atualizar o ClientId, validar se ele existe
+        if (request.ClientId.HasValue && request.ClientId.Value != entity.ClientId)
+        {
+            var clientExists = await context.Clients.AnyAsync(c => c.Id == request.ClientId.Value, cancellationToken);
+            if (!clientExists)
+            {
+                failures.Add(new ValidationFailure("ClientId", "O Client informado não existe."));
+            }
+        }
+        
+        // Validar se as Schools pertencem ao Client
+        if (request.SchoolIds != null && request.SchoolIds.Any() && clientIdToValidate.HasValue)
+        {
+            var schools = await context.Schools
+                .Where(s => request.SchoolIds.Contains(s.Id))
+                .ToListAsync(cancellationToken);
+            
+            var invalidSchools = schools.Where(s => s.ClientId != clientIdToValidate.Value).ToList();
+            if (invalidSchools.Any())
+            {
+                var invalidSchoolIds = string.Join(", ", invalidSchools.Select(s => s.Id));
+                failures.Add(new ValidationFailure("SchoolIds", 
+                    $"As seguintes escolas não pertencem ao Client especificado: {invalidSchoolIds}"));
+            }
+        }
+        
+        // Validar se as Classes pertencem às Schools informadas
+        if (request.ClassIds != null && request.ClassIds.Any())
+        {
+            var classes = await context.Classes
+                .Include(c => c.School)
+                .Where(c => request.ClassIds.Contains(c.Id))
+                .ToListAsync(cancellationToken);
+            
+            // Se não há SchoolIds no request, usar as schools atuais da conta
+            var schoolIdsToValidate = (request.SchoolIds != null && request.SchoolIds.Any()) 
+                ? request.SchoolIds 
+                : entity.AccountSchools.Where(asc => !asc.IsDeleted).Select(asc => asc.SchoolId).ToList();
+            
+            var invalidClasses = classes.Where(c => !schoolIdsToValidate.Contains(c.SchoolId)).ToList();
+            if (invalidClasses.Any())
+            {
+                var invalidClassDetails = string.Join(", ", 
+                    invalidClasses.Select(c => $"{c.Id} (School: {c.School.Name})"));
+                failures.Add(new ValidationFailure("ClassIds", 
+                    $"As seguintes turmas não pertencem às escolas especificadas: {invalidClassDetails}"));
+            }
+        }
+        
+        if (failures.Any())
+        {
+            throw new ValidationException(failures);
+        }
+    }
     
     private void UpdateEntity(Domain.Entities.Account entity, UpdateAccountCommand request, IApplicationDbContext context)
     {
         // 1. Atualiza os campos simples
         if (request.Name != null) entity.Name = request.Name;
+        if (request.LastName != null) entity.LastName = request.LastName;
         if (request.RegistrationNumber != null) entity.RegistrationNumber = request.RegistrationNumber;
         if (request.Role.HasValue) entity.Role = request.Role.Value;
+        if (request.ClientId.HasValue) entity.ClientId = request.ClientId.Value;
         entity.AverageScore = request.AverageScore;
         entity.EventAverageScore = request.EventAverageScore;
         entity.Stars = request.Stars;
