@@ -1,6 +1,7 @@
 using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Application.Common.Exceptions;
 using Educar.Backend.Domain.Entities;
+using FluentValidation.Results;
 
 namespace Educar.Backend.Application.Commands.School.CreateSchool;
 
@@ -21,8 +22,21 @@ public class CreateSchoolCommandHandler(IApplicationDbContext context)
         var client = await context.Clients.FindAsync([request.ClientId], cancellationToken: cancellationToken);
         if (client == null) throw new Educar.Backend.Application.Common.Exceptions.NotFoundException(nameof(Client), request.ClientId.ToString());
 
-        var regional = await context.Regionais.FindAsync([request.RegionalId], cancellationToken: cancellationToken);
+        // Primeiro, validar se a Regional existe
+        var regional = await context.Regionais
+            .Include(r => r.Subsecretaria)
+            .FirstOrDefaultAsync(r => r.Id == request.RegionalId, cancellationToken);
         if (regional == null) throw new Educar.Backend.Application.Common.Exceptions.NotFoundException(nameof(Regional), request.RegionalId.ToString());
+
+        // Depois de confirmar que a Regional é válida, validar se pertence ao Client correto
+        if (regional.Subsecretaria?.ClientId != request.ClientId)
+        {
+            var failures = new List<ValidationFailure>
+            {
+                new ValidationFailure("RegionalId", "A Regional informada não pertence ao Client especificado.")
+            };
+            throw new Educar.Backend.Application.Common.Exceptions.ValidationException(failures);
+        }
 
         Guid? addressId = request.AddressId;
 
