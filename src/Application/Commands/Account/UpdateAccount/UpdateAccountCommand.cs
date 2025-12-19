@@ -69,6 +69,15 @@ public class UpdateAccountCommandHandler(IApplicationDbContext context) : IReque
                 .Where(s => request.SchoolIds.Contains(s.Id))
                 .ToListAsync(cancellationToken);
             
+            // Verificar se todas as schools foram encontradas
+            if (schools.Count != request.SchoolIds.Count)
+            {
+                var foundSchoolIds = schools.Select(s => s.Id).ToList();
+                var missingSchoolIds = request.SchoolIds.Except(foundSchoolIds).ToList();
+                failures.Add(new ValidationFailure("SchoolIds",
+                    $"As seguintes escolas não foram encontradas: {string.Join(", ", missingSchoolIds)}"));
+            }
+            
             var invalidSchools = schools.Where(s => s.ClientId != clientIdToValidate.Value).ToList();
             if (invalidSchools.Any())
             {
@@ -81,23 +90,41 @@ public class UpdateAccountCommandHandler(IApplicationDbContext context) : IReque
         // Validar se as Classes pertencem às Schools informadas
         if (request.ClassIds != null && request.ClassIds.Any())
         {
-            var classes = await context.Classes
-                .Include(c => c.School)
-                .Where(c => request.ClassIds.Contains(c.Id))
-                .ToListAsync(cancellationToken);
-            
             // Se não há SchoolIds no request, usar as schools atuais da conta
             var schoolIdsToValidate = (request.SchoolIds != null && request.SchoolIds.Any()) 
                 ? request.SchoolIds 
                 : entity.AccountSchools.Where(asc => !asc.IsDeleted).Select(asc => asc.SchoolId).ToList();
             
-            var invalidClasses = classes.Where(c => !schoolIdsToValidate.Contains(c.SchoolId)).ToList();
-            if (invalidClasses.Any())
+            // Verificar se há escolas para validar
+            if (!schoolIdsToValidate.Any())
             {
-                var invalidClassDetails = string.Join(", ", 
-                    invalidClasses.Select(c => $"{c.Id} (School: {c.School.Name})"));
-                failures.Add(new ValidationFailure("ClassIds", 
-                    $"As seguintes turmas não pertencem às escolas especificadas: {invalidClassDetails}"));
+                failures.Add(new ValidationFailure("ClassIds",
+                    "Para associar turmas (ClassIds), é necessário informar as escolas (SchoolIds)."));
+            }
+            else
+            {
+                var classes = await context.Classes
+                    .Include(c => c.School)
+                    .Where(c => request.ClassIds.Contains(c.Id))
+                    .ToListAsync(cancellationToken);
+                
+                // Verificar se todas as classes foram encontradas
+                if (classes.Count != request.ClassIds.Count)
+                {
+                    var foundClassIds = classes.Select(c => c.Id).ToList();
+                    var missingClassIds = request.ClassIds.Except(foundClassIds).ToList();
+                    failures.Add(new ValidationFailure("ClassIds",
+                        $"As seguintes turmas não foram encontradas: {string.Join(", ", missingClassIds)}"));
+                }
+                
+                var invalidClasses = classes.Where(c => !schoolIdsToValidate.Contains(c.SchoolId)).ToList();
+                if (invalidClasses.Any())
+                {
+                    var invalidClassDetails = string.Join(", ", 
+                        invalidClasses.Select(c => $"{c.Id} (School: {c.School.Name})"));
+                    failures.Add(new ValidationFailure("ClassIds", 
+                        $"As seguintes turmas não pertencem às escolas especificadas: {invalidClassDetails}"));
+                }
             }
         }
         
