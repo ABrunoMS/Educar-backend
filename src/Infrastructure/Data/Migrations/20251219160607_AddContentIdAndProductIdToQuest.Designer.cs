@@ -3,6 +3,7 @@ using System;
 using Educar.Backend.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Educar.Backend.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251219160607_AddContentIdAndProductIdToQuest")]
+    partial class AddContentIdAndProductIdToQuest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1522,7 +1525,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("combat_difficulty");
 
-                    b.Property<Guid>("ContentId")
+                    b.Property<Guid?>("ContentId")
                         .HasColumnType("uuid")
                         .HasColumnName("content_id");
 
@@ -1573,7 +1576,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .HasColumnType("character varying(150)")
                         .HasColumnName("name");
 
-                    b.Property<Guid>("ProductId")
+                    b.Property<Guid?>("ProductId")
                         .HasColumnType("uuid")
                         .HasColumnName("product_id");
 
@@ -2568,9 +2571,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 {
                     b.HasOne("Educar.Backend.Domain.Entities.Content", "Content")
                         .WithMany()
-                        .HasForeignKey("ContentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ContentId");
 
                     b.HasOne("Educar.Backend.Domain.Entities.Game", "Game")
                         .WithMany("Quests")
@@ -2584,9 +2585,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasOne("Educar.Backend.Domain.Entities.Product", "Product")
                         .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ProductId");
 
                     b.HasOne("Educar.Backend.Domain.Entities.Quest", "QuestDependency")
                         .WithMany()

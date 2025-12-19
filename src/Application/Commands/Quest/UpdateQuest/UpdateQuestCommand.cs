@@ -23,7 +23,8 @@ public record UpdateQuestCommand : IRequest<Unit>
     public Guid? GradeId { get; set; }
     public Guid? SubjectId { get; set; }
     public Guid? QuestDependencyId { get; set; }
-    
+    public Guid? ContentId { get; set; }
+    public Guid? ProductId { get; set; }
     
     public IList<Guid>? BnccIds { get; set; } 
 }
@@ -32,10 +33,12 @@ public record UpdateQuestCommand : IRequest<Unit>
 public class UpdateQuestCommandHandler : IRequestHandler<UpdateQuestCommand, Unit>
 {
     private readonly IApplicationDbContext _context;
+    private readonly IUser _currentUser;
 
-    public UpdateQuestCommandHandler(IApplicationDbContext context)
+    public UpdateQuestCommandHandler(IApplicationDbContext context, IUser currentUser)
     {
         _context = context;
+        _currentUser = currentUser;
     }
 
     public async Task<Unit> Handle(UpdateQuestCommand request, CancellationToken cancellationToken)
@@ -46,6 +49,9 @@ public class UpdateQuestCommandHandler : IRequestHandler<UpdateQuestCommand, Uni
             .FirstOrDefaultAsync(q => q.Id == request.Id, cancellationToken);
             
         Guard.Against.NotFound(request.Id, entity);
+
+        // Validar Content e Product se foram informados
+        await ValidateClientOwnsContentAndProduct(_context, _currentUser, request.ContentId, request.ProductId, cancellationToken);
 
         UpdateQuestProperties(entity, request);
 
@@ -68,6 +74,8 @@ public class UpdateQuestCommandHandler : IRequestHandler<UpdateQuestCommand, Uni
         if (request.CombatDifficulty.HasValue) entity.CombatDifficulty = request.CombatDifficulty.Value;
         if (request.GradeId.HasValue) entity.GradeId = request.GradeId.Value;
         if (request.SubjectId.HasValue) entity.SubjectId = request.SubjectId.Value;
+        if (request.ContentId.HasValue) entity.ContentId = request.ContentId.Value;
+        if (request.ProductId.HasValue) entity.ProductId = request.ProductId.Value;
 
         if (request.QuestDependencyId.HasValue)
         {
@@ -152,4 +160,84 @@ public class UpdateQuestCommandHandler : IRequestHandler<UpdateQuestCommand, Uni
         rel.DeletedAt = DateTimeOffset.UtcNow; 
     }
 }
+
+    // Método para validar se o cliente possui o Content e Product especificados
+    // e se o Content pertence ao Product
+    private async Task ValidateClientOwnsContentAndProduct(
+        IApplicationDbContext context,
+        IUser currentUser,
+        Guid? contentId,
+        Guid? productId,
+        CancellationToken cancellationToken)
+    {
+        // Se não informou nem Content nem Product, não há validação a fazer
+        if (!contentId.HasValue && !productId.HasValue)
+            return;
+
+        // Se apenas um foi informado, exige que ambos sejam informados
+        if (!contentId.HasValue || !productId.HasValue)
+        {
+            var failures = new List<FluentValidation.Results.ValidationFailure>
+            {
+                new FluentValidation.Results.ValidationFailure("ContentId/ProductId", "ContentId e ProductId devem ser informados juntos.")
+            };
+            throw new Educar.Backend.Application.Common.Exceptions.ValidationException(failures);
+        }
+
+        // 1. Validar se o Content pertence ao Product
+        var productHasContent = await context.ProductContents
+            .AsNoTracking()
+            .AnyAsync(pc => pc.ProductId == productId.Value && pc.ContentId == contentId.Value, cancellationToken);
+
+        if (!productHasContent)
+        {
+            var failures = new List<FluentValidation.Results.ValidationFailure>
+            {
+                new FluentValidation.Results.ValidationFailure("ContentId", "O conteúdo especificado não pertence ao produto informado.")
+            };
+            throw new Educar.Backend.Application.Common.Exceptions.ValidationException(failures);
+        }
+
+        // 2. Obter o ClientId do usuário atual através da conta (Account)
+        var userId = currentUser.Id;
+        if (string.IsNullOrEmpty(userId))
+            throw new UnauthorizedAccessException("Usuário não autenticado.");
+
+        var account = await context.Accounts
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Id.ToString() == userId, cancellationToken);
+
+        if (account?.ClientId == null)
+            throw new UnauthorizedAccessException("Usuário não está associado a um cliente.");
+
+        var clientId = account.ClientId.Value;
+
+        // 3. Validar se o cliente possui o Content
+        var clientHasContent = await context.ClientContents
+            .AsNoTracking()
+            .AnyAsync(cc => cc.ClientId == clientId && cc.ContentId == contentId.Value, cancellationToken);
+
+        if (!clientHasContent)
+        {
+            var failures = new List<FluentValidation.Results.ValidationFailure>
+            {
+                new FluentValidation.Results.ValidationFailure("ContentId", "O cliente não possui acesso ao conteúdo especificado.")
+            };
+            throw new Educar.Backend.Application.Common.Exceptions.ValidationException(failures);
+        }
+
+        // 4. Validar se o cliente possui o Product
+        var clientHasProduct = await context.ClientProducts
+            .AsNoTracking()
+            .AnyAsync(cp => cp.ClientId == clientId && cp.ProductId == productId.Value, cancellationToken);
+
+        if (!clientHasProduct)
+        {
+            var failures = new List<FluentValidation.Results.ValidationFailure>
+            {
+                new FluentValidation.Results.ValidationFailure("ProductId", "O cliente não possui acesso ao produto especificado.")
+            };
+            throw new Educar.Backend.Application.Common.Exceptions.ValidationException(failures);
+        }
+    }
 }
