@@ -41,10 +41,24 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
     public async Task<PaginatedList<QuestCleanDto>> Handle(GetQuestsByGameGradeSubjectPaginatedQuery request,
         CancellationToken cancellationToken)
     {
+        // Obter o ClientId do usuário atual
+        var userId = _currentUser.Id;
+        Guid? clientId = null;
+        
+        if (!string.IsNullOrEmpty(userId))
+        {
+            var account = await _context.Accounts
+                .AsNoTracking()
+                .FirstOrDefaultAsync(a => a.Id.ToString() == userId, cancellationToken);
+            clientId = account?.ClientId;
+        }
+
         IQueryable<Domain.Entities.Quest> query = _context.Quests
           .AsNoTracking()
           .Include(q => q.Subject) 
-          .Include(q => q.Grade);
+          .Include(q => q.Grade)
+          .Include(q => q.Content)
+          .Include(q => q.Product);
 
         
         
@@ -77,6 +91,33 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
                     query = query.Where(q => q.CreatedBy == userIdString);
                 }
             }
+        }
+
+        // Filtrar por Content e Product que o cliente possui
+        if (clientId.HasValue)
+        {
+            var clientContentIds = await _context.ClientContents
+                .AsNoTracking()
+                .Where(cc => cc.ClientId == clientId.Value)
+                .Select(cc => cc.ContentId)
+                .ToListAsync(cancellationToken);
+
+            var clientProductIds = await _context.ClientProducts
+                .AsNoTracking()
+                .Where(cp => cp.ClientId == clientId.Value)
+                .Select(cp => cp.ProductId)
+                .ToListAsync(cancellationToken);
+
+            // Retorna apenas quests que o cliente possui tanto o Content quanto o Product
+            query = query.Where(q => 
+                clientContentIds.Contains(q.ContentId) &&
+                clientProductIds.Contains(q.ProductId)
+            );
+        }
+        else
+        {
+            // Se não há cliente, não retorna nenhuma quest
+            query = query.Where(q => false);
         }
 
         if (request.GameId is not null)

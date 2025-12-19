@@ -1,5 +1,7 @@
+using Educar.Backend.Application.Queries.Content;
 using Educar.Backend.Application.Queries.Game;
 using Educar.Backend.Application.Queries.Grade;
+using Educar.Backend.Application.Queries.Product;
 using Educar.Backend.Application.Queries.Subject;
 using Educar.Backend.Domain.Enums;
 
@@ -19,6 +21,8 @@ public class QuestCleanDto
     public GradeDto? Grade { get; set; }
     public SubjectDto? Subject { get; set; }
     public QuestCleanDto? QuestDependency { get; set; }
+    public ContentDto? Content { get; set; }
+    public ProductDto? Product { get; set; }
 
     private class Mapping : Profile
     {
