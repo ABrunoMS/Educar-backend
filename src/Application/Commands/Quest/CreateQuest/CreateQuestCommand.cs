@@ -169,6 +169,15 @@ public class CreateQuestCommandHandler(IApplicationDbContext context, IUser curr
             throw new Educar.Backend.Application.Common.Exceptions.ValidationException(failures);
         }
 
+        var userRoles = currentUser.Roles ?? new List<string>();
+        var adminRole = UserRole.Admin.ToString();
+        var teacherEducarRole = UserRole.TeacherEducar.ToString();
+
+        if (userRoles.Contains(adminRole) || userRoles.Contains(teacherEducarRole))
+        {
+            return; // Libera o acesso sem checar vínculo com cliente
+        }
+
         // 2. Obter o ClientId do usuário atual através da conta (Account)
         var userId = currentUser.Id;
         if (string.IsNullOrEmpty(userId))
