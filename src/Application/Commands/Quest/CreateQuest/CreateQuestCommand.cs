@@ -33,6 +33,9 @@ public class CreateQuestCommandHandler(IApplicationDbContext context, IUser curr
 {
     public async Task<IdResponseDto> Handle(CreateQuestCommand request, CancellationToken cancellationToken)
     {
+        // 0. Validar se o usuário pode criar aulas template
+        ValidateTemplatePermission(request.UsageTemplate);
+
         // 1. Validação de Dependência de Quest (Mantida)
         Domain.Entities.Quest? questDependency = null;
         if (request.QuestDependencyId.HasValue)
@@ -85,6 +88,27 @@ public class CreateQuestCommandHandler(IApplicationDbContext context, IUser curr
         await context.SaveChangesAsync(cancellationToken);
 
         return new IdResponseDto(quest.Id);
+    }
+
+    // Método para validar se o usuário pode criar aulas template
+    private void ValidateTemplatePermission(bool usageTemplate)
+    {
+        // Se não está criando template, não precisa validar
+        if (!usageTemplate) return;
+
+        var userRoles = currentUser.Roles ?? new List<string>();
+        var adminRoleName = UserRole.Admin.ToString();
+        var teacherEducarRoleName = UserRole.TeacherEducar.ToString();
+
+        // Apenas Admin e TeacherEducar podem criar aulas template
+        if (!userRoles.Contains(adminRoleName) && !userRoles.Contains(teacherEducarRoleName))
+        {
+            var failures = new List<FluentValidation.Results.ValidationFailure>
+            {
+                new FluentValidation.Results.ValidationFailure("UsageTemplate", "Apenas usuários com cargo Admin ou Professor Educar podem criar aulas template.")
+            };
+            throw new Educar.Backend.Application.Common.Exceptions.ValidationException(failures);
+        }
     }
 
     // Método Auxiliar Genérico (Mantido)

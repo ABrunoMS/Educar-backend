@@ -50,6 +50,9 @@ public class UpdateQuestCommandHandler : IRequestHandler<UpdateQuestCommand, Uni
             
         Guard.Against.NotFound(request.Id, entity);
 
+        // Validar se o usuário pode atualizar para aula template
+        ValidateTemplatePermission(request.UsageTemplate, entity.UsageTemplate);
+
         // Validar Content e Product se foram informados
         await ValidateClientOwnsContentAndProduct(_context, _currentUser, request.ContentId, request.ProductId, cancellationToken);
 
@@ -61,6 +64,30 @@ public class UpdateQuestCommandHandler : IRequestHandler<UpdateQuestCommand, Uni
         await _context.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
+    }
+
+    // Método para validar se o usuário pode criar/atualizar aulas template
+    private void ValidateTemplatePermission(bool? requestUsageTemplate, bool currentUsageTemplate)
+    {
+        // Se não está alterando UsageTemplate para true, não precisa validar
+        // Verifica se está tentando criar template (novo ou alterando para true)
+        var isCreatingTemplate = requestUsageTemplate == true || (requestUsageTemplate == null && currentUsageTemplate);
+        
+        if (!isCreatingTemplate) return;
+
+        var userRoles = _currentUser.Roles ?? new List<string>();
+        var adminRoleName = UserRole.Admin.ToString();
+        var teacherEducarRoleName = UserRole.TeacherEducar.ToString();
+
+        // Apenas Admin e TeacherEducar podem criar/manter aulas template
+        if (!userRoles.Contains(adminRoleName) && !userRoles.Contains(teacherEducarRoleName))
+        {
+            var failures = new List<FluentValidation.Results.ValidationFailure>
+            {
+                new FluentValidation.Results.ValidationFailure("UsageTemplate", "Apenas usuários com cargo Admin ou Professor Educar podem criar ou manter aulas template.")
+            };
+            throw new Educar.Backend.Application.Common.Exceptions.ValidationException(failures);
+        }
     }
 
     private void UpdateQuestProperties(Domain.Entities.Quest entity, UpdateQuestCommand request)
