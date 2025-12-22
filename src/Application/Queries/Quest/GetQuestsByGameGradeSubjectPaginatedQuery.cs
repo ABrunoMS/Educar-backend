@@ -17,6 +17,8 @@ public class GetQuestsByGameGradeSubjectPaginatedQuery : IRequest<PaginatedList<
     public Guid? GameId { get; init; }
     public Guid? GradeId { get; init; }
     public Guid? SubjectId { get; init; }
+    public Guid? ProductId { get; init; }
+    public Guid? ContentId { get; init; }
     public string? Search { get; init; }
     public bool UsageTemplate { get; init; }
 }
@@ -133,6 +135,16 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
         if (request.SubjectId is not null)
         {
             query = query.Where(q => q.SubjectId == request.SubjectId);
+        }
+
+        if (request.ProductId is not null)
+        {
+            query = query.Where(q => q.ProductId == request.ProductId);
+        }
+
+        if (request.ContentId is not null)
+        {
+            query = query.Where(q => q.ContentId == request.ContentId);
         }
 
         if (!string.IsNullOrWhiteSpace(request.Search))
