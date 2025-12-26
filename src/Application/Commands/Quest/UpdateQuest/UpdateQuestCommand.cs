@@ -16,7 +16,6 @@ public record UpdateQuestCommand : IRequest<Unit>
     public bool? UsageTemplate { get; set; }
     public QuestType? Type { get; set; }
     public int? MaxPlayers { get; set; }
-    public int? TotalQuestSteps { get; set; }
     public CombatDifficulty? CombatDifficulty { get; set; }
     
     // IDs de relacionamento
@@ -97,7 +96,6 @@ public class UpdateQuestCommandHandler : IRequestHandler<UpdateQuestCommand, Uni
         if (request.UsageTemplate.HasValue) entity.UsageTemplate = request.UsageTemplate.Value;
         if (request.Type.HasValue) entity.Type = request.Type.Value;
         if (request.MaxPlayers.HasValue) entity.MaxPlayers = request.MaxPlayers.Value;
-        if (request.TotalQuestSteps.HasValue) entity.TotalQuestSteps = request.TotalQuestSteps.Value;
         if (request.CombatDifficulty.HasValue) entity.CombatDifficulty = request.CombatDifficulty.Value;
         if (request.GradeId.HasValue) entity.GradeId = request.GradeId.Value;
         if (request.SubjectId.HasValue) entity.SubjectId = request.SubjectId.Value;

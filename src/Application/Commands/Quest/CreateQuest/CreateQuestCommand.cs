@@ -16,7 +16,6 @@ public record CreateQuestCommand(
     bool UsageTemplate,
     QuestType Type,
     int MaxPlayers,
-    int TotalQuestSteps,
     CombatDifficulty CombatDifficulty,
     Guid ContentId,
     Guid ProductId,
@@ -61,7 +60,7 @@ public class CreateQuestCommandHandler(IApplicationDbContext context, IUser curr
             request.UsageTemplate,
             request.Type,
             request.MaxPlayers,
-            request.TotalQuestSteps,
+            null,
             request.CombatDifficulty)
         {
             GradeId = request.GradeId,
