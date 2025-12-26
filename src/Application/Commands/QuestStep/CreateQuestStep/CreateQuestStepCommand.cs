@@ -8,18 +8,14 @@ namespace Educar.Backend.Application.Commands.QuestStep.CreateQuestStep;
 public record CreateQuestStepCommand(
     string Name,
     string Description,
-    int Order,
-    QuestStepNpcType NpcType,
-    QuestStepNpcBehaviour NpcBehaviour,
-    QuestStepType QuestStepType,
     Guid QuestId) : IRequest<IdResponseDto>
 {
     public string Name { get; set; } = Name;
     public string Description { get; set; } = Description;
-    public int Order { get; set; } = Order;
-    public QuestStepNpcType NpcType { get; set; } = NpcType;
-    public QuestStepNpcBehaviour NpcBehaviour { get; set; } = NpcBehaviour;
-    public QuestStepType Type { get; set; } = QuestStepType;
+    public int Order { get; set; } = 1;
+    public QuestStepNpcType NpcType { get; set; } = QuestStepNpcType.Passive;
+    public QuestStepNpcBehaviour NpcBehaviour { get; set; } = QuestStepNpcBehaviour.StandStill;
+    public QuestStepType Type { get; set; } = QuestStepType.Npc;
     public IList<Guid> ContentIds { get; set; } = new List<Guid>();
     public IList<Guid> NpcIds { get; set; } = new List<Guid>();
     public IList<Guid> MediaIds { get; set; } = new List<Guid>();
@@ -48,7 +44,7 @@ public class CreateQuestStepCommandHandler(IApplicationDbContext context)
             request.Order,
             request.NpcType,
             request.NpcBehaviour,
-            request.QuestStepType)
+            request.Type)
         {
             Contents = contentEntities.ToList(),
             Quest = quest

@@ -22,9 +22,6 @@ public class CreateQuestCommandValidator : AbstractValidator<CreateQuestCommand>
         RuleFor(v => v.MaxPlayers)
             .InclusiveBetween(2, 5).WithMessage("MaxPlayers should be between 2 and 5.");
 
-        RuleFor(v => v.TotalQuestSteps)
-            .InclusiveBetween(1, 10).WithMessage("TotalQuestSteps should be between 1 and 10.");
-
         RuleFor(v => v.CombatDifficulty)
             .IsInEnum().WithMessage("CombatDifficulty must be a valid CombatDifficulty.")
             .NotEqual(CombatDifficulty.None).WithMessage("CombatDifficulty is required.");
