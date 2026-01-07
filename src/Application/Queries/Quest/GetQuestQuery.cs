@@ -1,4 +1,5 @@
 using Educar.Backend.Application.Common.Interfaces;
+using System.Text.Json.Nodes;
 
 namespace Educar.Backend.Application.Queries.Quest;
 
@@ -33,9 +34,20 @@ public class GetQuestQueryHandler(IApplicationDbContext context, IMapper mapper,
             .Include(q => q.BnccQuests)
             .ThenInclude(bq => bq.Bncc)
             .Include(q => q.QuestSteps)
+            .ThenInclude(qs => qs.Contents) // Carrega os conteúdos (questões) de cada etapa
             .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
 
         Guard.Against.NotFound(request.Id, entity, nameof(Domain.Entities.Quest));
+
+        // DEBUG: Log dos QuestSteps
+        Console.WriteLine($"[DEBUG] Quest {entity.Name} tem {entity.QuestSteps?.Count ?? 0} QuestSteps");
+        if (entity.QuestSteps != null)
+        {
+            foreach (var step in entity.QuestSteps)
+            {
+                Console.WriteLine($"[DEBUG]   - Step: {step.Name} (ID: {step.Id}), Contents: {step.Contents?.Count ?? 0}");
+            }
+        }
 
         // Filtrar Content e Product: só retorna se o cliente possui acesso
         if (clientId.HasValue)
@@ -64,8 +76,34 @@ public class GetQuestQueryHandler(IApplicationDbContext context, IMapper mapper,
         }
 
         //order queststeps by order
-        entity.QuestSteps = entity.QuestSteps.OrderBy(qs => qs.Order).ToList();
+        entity.QuestSteps = entity.QuestSteps?.OrderBy(qs => qs.Order).ToList() ?? new List<Domain.Entities.QuestStep>();
+    
+    var dto = mapper.Map<QuestDto>(entity);
+    
+    // Fix: Mapear ExpectedAnswers manualmente para evitar erro "node already has a parent"
+    if (dto.QuestSteps != null)
+        {
+            foreach (var step in dto.QuestSteps)
+            {
+                if (step.Contents != null)
+                {
+                    foreach (var content in step.Contents)
+                    {
+                        var originalContent = entity.QuestSteps?
+                            .FirstOrDefault(qs => qs.Id == step.Id)?
+                            .Contents
+                            .FirstOrDefault(c => c.Id == content.Id);
+                            
+                        if (originalContent?.ExpectedAnswers != null)
+                        {
+                            var jsonString = originalContent.ExpectedAnswers.ToJsonString();
+                            content.ExpectedAnswers = JsonNode.Parse(jsonString)?.AsObject();
+                        }
+                    }
+                }
+            }
+        }
         
-        return mapper.Map<QuestDto>(entity);
+        return dto;
     }
 }

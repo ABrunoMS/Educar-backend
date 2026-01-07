@@ -11,12 +11,34 @@ public class QuestStepContentDto
     public JsonObject? ExpectedAnswers { get; set; }
     public decimal Weight { get; set; }
     public Guid QuestStepId { get; set; }
+    public string Description { get; set; } = string.Empty;
 
     public class Mapping : Profile
     {
         public Mapping()
         {
-            CreateMap<Domain.Entities.QuestStepContent, QuestStepContentDto>();
+            CreateMap<Domain.Entities.QuestStepContent, QuestStepContentDto>()
+                .ForMember(dest => dest.ExpectedAnswers, opt => opt.Ignore()); // Mapeamento manual na query
+        }
+    }
+}
+
+public class JsonObjectConverter : IValueConverter<JsonObject, JsonObject?>
+{
+    public JsonObject? Convert(JsonObject sourceMember, ResolutionContext context)
+    {
+        if (sourceMember == null) return null;
+        
+        try
+        {
+            // Cria uma cópia deep do JsonObject para evitar erro de "node already has a parent"
+            var jsonString = sourceMember.ToJsonString();
+            var parsed = JsonNode.Parse(jsonString);
+            return parsed as JsonObject;
+        }
+        catch
+        {
+            return null;
         }
     }
 }
