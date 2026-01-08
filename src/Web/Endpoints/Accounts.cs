@@ -3,6 +3,7 @@ using Educar.Backend.Application.Commands.Account.CreateAccount;
 using Educar.Backend.Application.Commands.Account.DeleteAccount;
 using Educar.Backend.Application.Commands.Account.ResetPassword;
 using Educar.Backend.Application.Commands.Account.UpdateAccount;
+using Educar.Backend.Application.Commands.BulkImport.ImportAccounts;
 using Educar.Backend.Application.Common.Models;
 using Educar.Backend.Application.Queries.Account;
 using Educar.Backend.Domain.Enums;
@@ -25,6 +26,12 @@ public class Accounts : EndpointGroupBase
             .MapPost(CreateAccount)
             .MapPut(UpdateAccount, "{id}")
             .MapDelete(DeleteAccount, "{id}");
+
+        // Endpoint separado para upload de arquivo com DisableAntiforgery
+        app.MapGroup(this)
+            .RequireAuthorization(UserRole.Admin.GetDisplayName())
+            .DisableAntiforgery()
+            .MapPost(ImportAccounts, "import");
 
         app.MapGroup(this)
             .RequireAuthorization()
@@ -128,5 +135,41 @@ public class Accounts : EndpointGroupBase
     public async Task<AccountDto> GetMyAccount(ISender sender)
     {
         return await sender.Send(new GetMyAccountQuery());
+    }
+
+    public async Task<IResult> ImportAccounts(ISender sender, HttpRequest request)
+    {
+        if (!request.HasFormContentType)
+        {
+            return Results.BadRequest(new { Success = false, ErrorMessage = "O request deve ser multipart/form-data." });
+        }
+
+        var form = await request.ReadFormAsync();
+        
+        // Tenta pegar o primeiro arquivo, independente do nome do campo
+        var file = form.Files.FirstOrDefault();
+
+        if (file == null || file.Length == 0)
+        {
+            // Debug: mostra quantos arquivos foram enviados
+            var fileCount = form.Files.Count;
+            var fieldNames = string.Join(", ", form.Files.Select(f => f.Name));
+            return Results.BadRequest(new 
+            { 
+                Success = false, 
+                ErrorMessage = $"Arquivo não fornecido ou vazio. Arquivos recebidos: {fileCount}. Campos: [{fieldNames}]" 
+            });
+        }
+
+        using var stream = file.OpenReadStream();
+        var command = new ImportAccountsCommand(stream, file.FileName);
+        var result = await sender.Send(command);
+
+        if (result.Success)
+        {
+            return Results.Ok(result);
+        }
+
+        return Results.BadRequest(result);
     }
 }
