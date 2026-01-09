@@ -8,10 +8,13 @@ public class QuestStepContentDto
     public Guid Id { get; set; }
     public QuestStepContentType? QuestStepContentType { get; set; }
     public QuestionType? QuestionType { get; set; }
+    public string? Title { get; set; }
+    public string Description { get; set; } = string.Empty;
     public JsonObject? ExpectedAnswers { get; set; }
     public decimal Weight { get; set; }
+    public bool IsActive { get; set; }
+    public int Sequence { get; set; }
     public Guid QuestStepId { get; set; }
-    public string Description { get; set; } = string.Empty;
 
     public class Mapping : Profile
     {

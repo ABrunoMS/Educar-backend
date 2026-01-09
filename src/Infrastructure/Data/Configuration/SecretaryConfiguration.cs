@@ -23,6 +23,7 @@ public class SecretaryConfiguration(DatabaseFacade database) : IEntityTypeConfig
 
         builder.Property(t => t.IsActive)
             .IsRequired()
-            .HasDefaultValue(true);
+            .HasDefaultValue(true)
+            .HasColumnName("is_active");
     }
 }
