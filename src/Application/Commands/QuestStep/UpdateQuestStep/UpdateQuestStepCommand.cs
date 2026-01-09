@@ -14,6 +14,7 @@ public record UpdateQuestStepCommand : IRequest<Unit>
     public QuestStepNpcType? NpcType { get; set; }
     public QuestStepNpcBehaviour? NpcBehaviour { get; set; }
     public QuestStepType? Type { get; set; }
+    public bool? IsActive { get; set; }
     public IList<Guid> ContentIds { get; set; } = new List<Guid>();
     public IList<Guid> NpcIds { get; set; } = new List<Guid>();
     public IList<Guid> MediaIds { get; set; } = new List<Guid>();
@@ -54,6 +55,7 @@ public class UpdateQuestStepCommandHandler(IApplicationDbContext context)
         if (request.NpcType.HasValue) entity.NpcType = request.NpcType.Value;
         if (request.NpcBehaviour.HasValue) entity.NpcBehaviour = request.NpcBehaviour.Value;
         if (request.Type.HasValue) entity.QuestStepType = request.Type.Value;
+        if (request.IsActive.HasValue) entity.IsActive = request.IsActive.Value;
     }
 
     private async Task UpdateQuestStepContents(IApplicationDbContext context, Domain.Entities.QuestStep entity,

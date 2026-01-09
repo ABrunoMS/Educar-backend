@@ -1,5 +1,6 @@
 using System.Reflection;
 using Educar.Backend.Application.Common.Behaviours;
+using Educar.Backend.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Educar.Backend.Application.Queries.Client;
 
@@ -21,6 +22,10 @@ public static class DependencyInjection
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
         });
+        
+        // Registrar serviço de sequenciamento
+        services.AddScoped<IQuestStepContentSequenceService, QuestStepContentSequenceService>();
+        
         return services;
     }
 }

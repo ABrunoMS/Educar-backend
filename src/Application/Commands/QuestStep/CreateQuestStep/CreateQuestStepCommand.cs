@@ -16,6 +16,7 @@ public record CreateQuestStepCommand(
     public QuestStepNpcType NpcType { get; set; } = QuestStepNpcType.Passive;
     public QuestStepNpcBehaviour NpcBehaviour { get; set; } = QuestStepNpcBehaviour.StandStill;
     public QuestStepType Type { get; set; } = QuestStepType.Npc;
+    public bool IsActive { get; set; } = true;
     public IList<Guid> ContentIds { get; set; } = new List<Guid>();
     public IList<Guid> NpcIds { get; set; } = new List<Guid>();
     public IList<Guid> MediaIds { get; set; } = new List<Guid>();
@@ -47,7 +48,8 @@ public class CreateQuestStepCommandHandler(IApplicationDbContext context)
             request.Type)
         {
             Contents = contentEntities.ToList(),
-            Quest = quest
+            Quest = quest,
+            IsActive = request.IsActive
         };
 
         // Associate NPCs with QuestStep

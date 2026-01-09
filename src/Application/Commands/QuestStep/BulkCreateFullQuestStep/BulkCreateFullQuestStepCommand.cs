@@ -16,6 +16,7 @@ public class FullQuestStepDto
     public QuestStepNpcType NpcType { get; set; }
     public QuestStepNpcBehaviour NpcBehaviour { get; set; }
     public QuestStepType Type { get; set; }
+    public bool IsActive { get; set; } = true;
     public IList<CreateFullQuestStepContentDto> Contents { get; set; } = new List<CreateFullQuestStepContentDto>();
     public IList<Guid> NpcIds { get; set; } = new List<Guid>();
     public IList<Guid> MediaIds { get; set; } = new List<Guid>();
@@ -64,14 +65,18 @@ public class BulkCreateFullQuestStepCommandHandler : IRequestHandler<BulkCreateF
                 stepDto.Type)
             {
                 Quest = quest,
-                QuestId = quest.Id // Garantir que o QuestId está definido
+                QuestId = quest.Id, // Garantir que o QuestId está definido
+                IsActive = stepDto.IsActive
             };
 
             Console.WriteLine($"[DEBUG BULK] QuestStep criado com QuestId: {questStep.QuestId}");
 
             if (stepDto.Contents != null)
             {
-                foreach (var content in stepDto.Contents)
+                // Ordenar contents por Sequence antes de adicionar
+                var orderedContents = stepDto.Contents.OrderBy(c => c.Sequence).ToList();
+                
+                foreach (var content in orderedContents)
                 {
                     if (content.ExpectedAnswers == null) continue; // Pula se não houver respostas esperadas
                     
@@ -82,6 +87,9 @@ public class BulkCreateFullQuestStepCommandHandler : IRequestHandler<BulkCreateF
                         content.ExpectedAnswers.ToJsonObject(),
                         content.Weight)
                 {
+                    Title = content.Title,
+                    IsActive = content.IsActive,
+                    Sequence = content.Sequence > 0 ? content.Sequence : (questStep.Contents.Count + 1),
                     QuestStep = questStep
                 };
 
