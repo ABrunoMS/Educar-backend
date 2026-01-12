@@ -80,64 +80,55 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
     _logger.LogWarning("UsageTemplate: {UsageTemplate}", request.UsageTemplate);
     _logger.LogWarning("Cargos vindos do Token (IUser.Roles): {ActualRoles}", string.Join(", ", userRoles));
     _logger.LogWarning("UserID vindo do Token (IUser.Id): {UserId}", userIdString);
-    _logger.LogWarning("ClientId: {ClientId}", clientId?.ToString() ?? "NULL");
-    _logger.LogWarning("====================================================");
-
-    // Se o usuário for um "Teacher" E NÃO for um "Admin"
-    if (userRoles.Contains(teacherRoleName) && !userRoles.Contains(adminRoleName))
+    _logger.LogWarning("--------------------------------------------------");
+    if (!userRoles.Contains(adminRoleName))
         {
-            
             bool isSearchingTemplates = request.UsageTemplate == true;
 
-            if (!isSearchingTemplates) 
+            if (isSearchingTemplates)
             {
-                // Só aplica o filtro de dono se NÃO for uma busca por templates
+                // === CENÁRIO A: PROFESSOR VENDO TEMPLATES ===
+                // Não aplicamos filtro de 'CreatedBy' (para ver templates de outros)
+                // Não aplicamos filtro de 'ClientProduct' (para ver catálogo completo)
+                // O professor vê TODOS os templates marcados como UsageTemplate = true
+            }
+            else
+            {
+                // === CENÁRIO B: PROFESSOR VENDO "MINHAS AULAS" ===
+                
+                // B1. Filtro de Dono: Só vê o que ele mesmo criou
                 if (!string.IsNullOrEmpty(userIdString))
                 {
                     query = query.Where(q => q.CreatedBy == userIdString);
                 }
+
+                // B2. Filtro de Produtos do Cliente: Só vê o que a escola comprou/tem acesso
+                if (clientId.HasValue)
+                {
+                    var clientContentIds = await _context.ClientContents
+                        .AsNoTracking()
+                        .Where(cc => cc.ClientId == clientId.Value)
+                        .Select(cc => cc.ContentId)
+                        .ToListAsync(cancellationToken);
+
+                    var clientProductIds = await _context.ClientProducts
+                        .AsNoTracking()
+                        .Where(cp => cp.ClientId == clientId.Value)
+                        .Select(cp => cp.ProductId)
+                        .ToListAsync(cancellationToken);
+
+                    query = query.Where(q => 
+                        clientContentIds.Contains(q.ContentId) &&
+                        clientProductIds.Contains(q.ProductId)
+                    );
+                }
+                else
+                {
+                    // Professor sem escola/cliente não vê aulas normais
+                    query = query.Where(q => false);
+                }
             }
         }
-
-        // Filtrar por Content e Product que o cliente possui
-        // IMPORTANTE: NÃO aplicar este filtro quando buscar templates (UsageTemplate = true)
-        // Templates devem estar disponíveis para todos os usuários
-        if (!request.UsageTemplate && clientId.HasValue)
-        {
-            _logger.LogWarning("Aplicando filtro de Content/Product do cliente");
-            var clientContentIds = await _context.ClientContents
-                .AsNoTracking()
-                .Where(cc => cc.ClientId == clientId.Value)
-                .Select(cc => cc.ContentId)
-                .ToListAsync(cancellationToken);
-
-            var clientProductIds = await _context.ClientProducts
-                .AsNoTracking()
-                .Where(cp => cp.ClientId == clientId.Value)
-                .Select(cp => cp.ProductId)
-                .ToListAsync(cancellationToken);
-
-            _logger.LogWarning("ClientContentIds: {ContentIds}", string.Join(", ", clientContentIds));
-            _logger.LogWarning("ClientProductIds: {ProductIds}", string.Join(", ", clientProductIds));
-
-            // Retorna apenas quests que o cliente possui tanto o Content quanto o Product
-            query = query.Where(q => 
-                clientContentIds.Contains(q.ContentId) &&
-                clientProductIds.Contains(q.ProductId)
-            );
-        }
-        else if (!request.UsageTemplate && !clientId.HasValue)
-        {
-            _logger.LogWarning("Sem cliente e não é template - retornando vazio");
-            // Se não há cliente E não está buscando templates, não retorna nenhuma quest
-            query = query.Where(q => false);
-        }
-        else if (request.UsageTemplate)
-        {
-            _logger.LogWarning("UsageTemplate=true - SEM filtro de Content/Product (mostrando TODOS os templates)");
-        }
-        // Se UsageTemplate = true, não aplica filtro de cliente (todos veem os templates)
-
         if (request.GameId is not null)
         {
             query = query.Where(q => q.GameId == request.GameId);

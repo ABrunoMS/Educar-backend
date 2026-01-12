@@ -22,6 +22,10 @@ public static class DependencyInjection
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
         });
+
+        // Serviços de aplicação
+        services.AddScoped<ISpreadsheetService, ExcelSpreadsheetService>();
+
         
         // Registrar serviço de sequenciamento
         services.AddScoped<IQuestStepContentSequenceService, QuestStepContentSequenceService>();
