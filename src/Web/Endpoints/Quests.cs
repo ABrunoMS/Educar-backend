@@ -24,9 +24,10 @@ public class Quests : EndpointGroupBase
             .MapGet(GetAllQuestsByGameGradeSubject)
             .MapPut(UpdateQuest, "{id}")
             .MapDelete(DeleteQuest, "{id}");
+            
 
         app.MapGroup(this)
-            .RequireAuthorization(UserRole.Student.GetDisplayName())
+            .RequireAuthorization()
             .MapGet(GetQuest, "{id}");
     }
 
