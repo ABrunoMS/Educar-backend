@@ -26,7 +26,9 @@ public class GetAccountsPaginatedQueryHandler : IRequestHandler<GetAccountsPagin
     public async Task<PaginatedList<CleanAccountDto>> Handle(GetAccountsPaginatedQuery request,
         CancellationToken cancellationToken)
     {
-        var query = _context.Accounts.AsQueryable();
+        var query = _context.Accounts
+            .Include(a => a.Client)
+            .AsQueryable();
 
         // Filtro por Role
         if (!string.IsNullOrEmpty(request.Role) && Enum.TryParse<UserRole>(request.Role, true, out var roleEnum))
