@@ -57,10 +57,12 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
 
         IQueryable<Domain.Entities.Quest> query = _context.Quests
           .AsNoTracking()
+          .Include(q => q.Game)
           .Include(q => q.Subject) 
           .Include(q => q.Grade)
           .Include(q => q.Content)
-          .Include(q => q.Product);
+          .Include(q => q.Product)
+          .Include(q => q.QuestDependency);
 
         
         
@@ -74,10 +76,12 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
         var teacherRoleName = UserRole.Teacher.ToString(); 
         var adminRoleName = UserRole.Admin.ToString();
 
-        _logger.LogWarning("--- INICIANDO DEPURAÇÃO DE FILTRO DE QUESTS ---");
+        _logger.LogWarning("=== INICIANDO DEPURAÇÃO DE FILTRO DE QUESTS ===");
+    _logger.LogWarning("UsageTemplate: {UsageTemplate}", request.UsageTemplate);
     _logger.LogWarning("Cargos vindos do Token (IUser.Roles): {ActualRoles}", string.Join(", ", userRoles));
     _logger.LogWarning("UserID vindo do Token (IUser.Id): {UserId}", userIdString);
-    _logger.LogWarning("--------------------------------------------------");
+    _logger.LogWarning("ClientId: {ClientId}", clientId?.ToString() ?? "NULL");
+    _logger.LogWarning("====================================================");
 
     // Se o usuário for um "Teacher" E NÃO for um "Admin"
     if (userRoles.Contains(teacherRoleName) && !userRoles.Contains(adminRoleName))
@@ -96,8 +100,11 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
         }
 
         // Filtrar por Content e Product que o cliente possui
-        if (clientId.HasValue)
+        // IMPORTANTE: NÃO aplicar este filtro quando buscar templates (UsageTemplate = true)
+        // Templates devem estar disponíveis para todos os usuários
+        if (!request.UsageTemplate && clientId.HasValue)
         {
+            _logger.LogWarning("Aplicando filtro de Content/Product do cliente");
             var clientContentIds = await _context.ClientContents
                 .AsNoTracking()
                 .Where(cc => cc.ClientId == clientId.Value)
@@ -110,17 +117,26 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
                 .Select(cp => cp.ProductId)
                 .ToListAsync(cancellationToken);
 
+            _logger.LogWarning("ClientContentIds: {ContentIds}", string.Join(", ", clientContentIds));
+            _logger.LogWarning("ClientProductIds: {ProductIds}", string.Join(", ", clientProductIds));
+
             // Retorna apenas quests que o cliente possui tanto o Content quanto o Product
             query = query.Where(q => 
                 clientContentIds.Contains(q.ContentId) &&
                 clientProductIds.Contains(q.ProductId)
             );
         }
-        else
+        else if (!request.UsageTemplate && !clientId.HasValue)
         {
-            // Se não há cliente, não retorna nenhuma quest
+            _logger.LogWarning("Sem cliente e não é template - retornando vazio");
+            // Se não há cliente E não está buscando templates, não retorna nenhuma quest
             query = query.Where(q => false);
         }
+        else if (request.UsageTemplate)
+        {
+            _logger.LogWarning("UsageTemplate=true - SEM filtro de Content/Product (mostrando TODOS os templates)");
+        }
+        // Se UsageTemplate = true, não aplica filtro de cliente (todos veem os templates)
 
         if (request.GameId is not null)
         {
@@ -144,6 +160,10 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
 
         if (request.ContentId is not null)
         {
+        var totalQuests = await query.CountAsync(cancellationToken);
+        _logger.LogWarning("Total de quests após todos os filtros: {Total}", totalQuests);
+        _logger.LogWarning("=== FIM DEPURAÇÃO DE FILTRO DE QUESTS ===\n");
+
             query = query.Where(q => q.ContentId == request.ContentId);
         }
 

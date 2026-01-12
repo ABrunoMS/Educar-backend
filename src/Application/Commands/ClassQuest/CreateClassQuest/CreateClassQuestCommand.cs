@@ -27,32 +27,34 @@ public class CreateClassQuestCommandHandler(IApplicationDbContext context)
         if (quest == null)
             throw new Application.Common.Exceptions.NotFoundException(nameof(Quest), request.QuestId.ToString());
 
-        // Verificar se o relacionamento já existe
-        var existingClassQuest = await context.ClassQuests
-            .FirstOrDefaultAsync(cq => cq.ClassId == request.ClassId && cq.QuestId == request.QuestId, cancellationToken);
+        // Parse da data em formato ISO ou DD/MM/YYYY
+        DateTimeOffset expirationDateOffset;
         
-        if (existingClassQuest != null)
-            throw new BadRequestException("Esta quest já está associada a esta turma.");
-
-        // Parse da data no formato DD/MM/YYYY
-        if (!DateTime.TryParseExact(
+        if (DateTimeOffset.TryParse(request.ExpirationDate, out var parsedDateOffset))
+        {
+            // Formato ISO
+            expirationDateOffset = parsedDateOffset;
+        }
+        else if (DateTime.TryParseExact(
             request.ExpirationDate,
             "dd/MM/yyyy",
             CultureInfo.InvariantCulture,
             DateTimeStyles.None,
             out var expirationDate))
         {
-            throw new BadRequestException("Formato de data inválido. Use o formato DD/MM/YYYY.");
+            // Formato DD/MM/YYYY
+            expirationDateOffset = new DateTimeOffset(expirationDate, TimeSpan.Zero);
         }
-
-        // Converter para UTC para PostgreSQL
-        var expirationDateUtc = DateTime.SpecifyKind(expirationDate, DateTimeKind.Utc);
+        else
+        {
+            throw new BadRequestException("Formato de data inválido. Use o formato ISO (YYYY-MM-DDTHH:mm:ssZ) ou DD/MM/YYYY.");
+        }
 
         var entity = new Domain.Entities.ClassQuest
         {
             ClassId = request.ClassId,
             QuestId = request.QuestId,
-            ExpirationDate = expirationDateUtc
+            ExpirationDate = expirationDateOffset
         };
 
         context.ClassQuests.Add(entity);
