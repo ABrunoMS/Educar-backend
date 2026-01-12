@@ -1,7 +1,9 @@
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Educar.Backend.Application.Common.Interfaces;
 using Educar.Backend.Application.Common.Mappings;
 using Educar.Backend.Application.Common.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Educar.Backend.Application.Queries.Client;
 
@@ -31,34 +33,103 @@ public class GetClientsPaginatedQueryHandler : IRequestHandler<GetClientsPaginat
     public async Task<PaginatedList<ClientDto>> Handle(GetClientsPaginatedQuery request,
         CancellationToken cancellationToken)
     {
-        IQueryable<Domain.Entities.Client> query = _context.Clients.AsNoTracking();
+        // Buscar todos os clientes primeiro
+        IQueryable<Domain.Entities.Client> clientQuery = _context.Clients
+            .Include(c => c.ClientProducts)
+                .ThenInclude(cp => cp.Product)
+            .Include(c => c.ClientContents)
+                .ThenInclude(cc => cc.Content)
+            .Include(c => c.Subsecretarias)
+            .Include(c => c.Accounts)
+            .AsNoTracking();
 
         // LÓGICA DE PESQUISA (SEARCH) ADICIONADA
         if (!string.IsNullOrEmpty(request.Search))
         {
-            // Busca pelo nome, ignorando maiúsculas/minúsculas
-            query = query.Where(c => c.Name.ToLower().Contains(request.Search.ToLower()));
+            clientQuery = clientQuery.Where(c => c.Name.ToLower().Contains(request.Search.ToLower()));
         }
 
         // LÓGICA DE ORDENAÇÃO (SORTING) ADICIONADA
-        // Nota: Isso é um exemplo simples. Uma implementação robusta usaria Expressions.
         if (!string.IsNullOrEmpty(request.SortBy))
         {
             bool isDescending = request.SortOrder?.ToLower() == "desc";
-            query = request.SortBy.ToLower() switch
+            clientQuery = request.SortBy.ToLower() switch
             {
-                "name" => isDescending ? query.OrderByDescending(x => x.Name) : query.OrderBy(x => x.Name),
-                "totalaccounts" => isDescending ? query.OrderByDescending(x => x.TotalAccounts) : query.OrderBy(x => x.TotalAccounts),
-                _ => query.OrderBy(x => x.Name) // Ordenação padrão
+                "name" => isDescending ? clientQuery.OrderByDescending(x => x.Name) : clientQuery.OrderBy(x => x.Name),
+                "totalaccounts" => isDescending ? clientQuery.OrderByDescending(x => x.TotalAccounts) : clientQuery.OrderBy(x => x.TotalAccounts),
+                _ => clientQuery.OrderBy(x => x.Name)
             };
         }
         else
         {
-            query = query.OrderBy(x => x.Name); // Ordenação padrão
+            clientQuery = clientQuery.OrderBy(x => x.Name);
         }
 
-        return await query
-            .ProjectTo<ClientDto>(_mapper.ConfigurationProvider)
-            .PaginatedListAsync(request.PageNumber, request.PageSize);
+        var totalCount = await clientQuery.CountAsync(cancellationToken);
+
+        // Aplicar paginação
+        var clients = await clientQuery
+            .Skip((request.PageNumber - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .ToListAsync(cancellationToken);
+
+        // Buscar os IDs dos parceiros e contatos que são GUIDs válidos
+        var accountIds = new List<Guid>();
+        
+        foreach (var client in clients)
+        {
+            if (!string.IsNullOrEmpty(client.Partner) && Guid.TryParse(client.Partner, out var partnerId))
+            {
+                accountIds.Add(partnerId);
+            }
+            if (!string.IsNullOrEmpty(client.Contacts) && Guid.TryParse(client.Contacts, out var contactId))
+            {
+                accountIds.Add(contactId);
+            }
+        }
+
+        // Buscar os nomes das contas em uma única query
+        var accounts = await _context.Accounts
+            .AsNoTracking()
+            .Where(a => accountIds.Contains(a.Id))
+            .Select(a => new { a.Id, a.Name, a.LastName })
+            .ToDictionaryAsync(a => a.Id.ToString(), a => $"{a.Name} {a.LastName}", cancellationToken);
+
+        // Mapear para DTOs e adicionar os nomes
+        var clientDtos = clients.Select(client =>
+        {
+            var dto = _mapper.Map<ClientDto>(client);
+            
+            // Buscar o nome do parceiro
+            if (!string.IsNullOrEmpty(client.Partner) && accounts.TryGetValue(client.Partner, out var partnerName))
+            {
+                dto.PartnerName = partnerName;
+            }
+            else if (!string.IsNullOrEmpty(client.Partner) && !Guid.TryParse(client.Partner, out _))
+            {
+                // Se não for GUID, pode ser um texto direto
+                dto.PartnerName = client.Partner;
+            }
+            
+            // Buscar o nome do contato
+            if (!string.IsNullOrEmpty(client.Contacts) && accounts.TryGetValue(client.Contacts, out var contactName))
+            {
+                dto.Contacts = contactName;
+            }
+            else if (!string.IsNullOrEmpty(client.Contacts) && !Guid.TryParse(client.Contacts, out _))
+            {
+                // Se não for GUID, manter o texto original
+                // dto.Contacts já está mapeado pelo AutoMapper
+            }
+            
+            return dto;
+        }).ToList();
+
+        return new PaginatedList<ClientDto>(
+            clientDtos,
+            totalCount,
+            request.PageNumber,
+            request.PageSize
+        );
     }
 }
