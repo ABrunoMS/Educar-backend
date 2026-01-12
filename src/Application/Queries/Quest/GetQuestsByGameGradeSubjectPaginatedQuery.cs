@@ -57,10 +57,12 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
 
         IQueryable<Domain.Entities.Quest> query = _context.Quests
           .AsNoTracking()
+          .Include(q => q.Game)
           .Include(q => q.Subject) 
           .Include(q => q.Grade)
           .Include(q => q.Content)
-          .Include(q => q.Product);
+          .Include(q => q.Product)
+          .Include(q => q.QuestDependency);
 
         
         
@@ -74,7 +76,8 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
         var teacherRoleName = UserRole.Teacher.ToString(); 
         var adminRoleName = UserRole.Admin.ToString();
 
-        _logger.LogWarning("--- INICIANDO DEPURAÇÃO DE FILTRO DE QUESTS ---");
+        _logger.LogWarning("=== INICIANDO DEPURAÇÃO DE FILTRO DE QUESTS ===");
+    _logger.LogWarning("UsageTemplate: {UsageTemplate}", request.UsageTemplate);
     _logger.LogWarning("Cargos vindos do Token (IUser.Roles): {ActualRoles}", string.Join(", ", userRoles));
     _logger.LogWarning("UserID vindo do Token (IUser.Id): {UserId}", userIdString);
     _logger.LogWarning("--------------------------------------------------");
@@ -148,6 +151,10 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
 
         if (request.ContentId is not null)
         {
+        var totalQuests = await query.CountAsync(cancellationToken);
+        _logger.LogWarning("Total de quests após todos os filtros: {Total}", totalQuests);
+        _logger.LogWarning("=== FIM DEPURAÇÃO DE FILTRO DE QUESTS ===\n");
+
             query = query.Where(q => q.ContentId == request.ContentId);
         }
 

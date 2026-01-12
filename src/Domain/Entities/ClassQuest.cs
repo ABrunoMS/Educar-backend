@@ -10,8 +10,8 @@ public class ClassQuest : BaseAuditableEntity
     public Guid QuestId { get; set; }
     public Quest Quest { get; set; } = null!;
     
-    public DateTime ExpirationDate { get; set; }
+    public DateTimeOffset ExpirationDate { get; set; }
     
     [NotMapped]
-    public bool IsExpired => DateTime.UtcNow > ExpirationDate;
+    public bool IsExpired => DateTimeOffset.UtcNow > ExpirationDate;
 }

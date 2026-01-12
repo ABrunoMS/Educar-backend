@@ -18,19 +18,30 @@ public class UpdateClassQuestCommandHandler(IApplicationDbContext context)
         if (entity == null)
             throw new Application.Common.Exceptions.NotFoundException(nameof(Domain.Entities.ClassQuest), request.Id.ToString());
 
-        // Parse da data no formato DD/MM/YYYY
-        if (!DateTime.TryParseExact(
+        // Parse da data em formato ISO ou DD/MM/YYYY
+        DateTimeOffset expirationDateOffset;
+        
+        if (DateTimeOffset.TryParse(request.ExpirationDate, out var parsedDateOffset))
+        {
+            // Formato ISO
+            expirationDateOffset = parsedDateOffset;
+        }
+        else if (DateTime.TryParseExact(
             request.ExpirationDate,
             "dd/MM/yyyy",
             CultureInfo.InvariantCulture,
             DateTimeStyles.None,
             out var expirationDate))
         {
-            throw new BadRequestException("Formato de data inválido. Use o formato DD/MM/YYYY.");
+            // Formato DD/MM/YYYY
+            expirationDateOffset = new DateTimeOffset(expirationDate, TimeSpan.Zero);
+        }
+        else
+        {
+            throw new BadRequestException("Formato de data inválido. Use o formato ISO (YYYY-MM-DDTHH:mm:ssZ) ou DD/MM/YYYY.");
         }
 
-        // Converter para UTC para PostgreSQL
-        entity.ExpirationDate = DateTime.SpecifyKind(expirationDate, DateTimeKind.Utc);
+        entity.ExpirationDate = expirationDateOffset;
 
         await context.SaveChangesAsync(cancellationToken);
     }

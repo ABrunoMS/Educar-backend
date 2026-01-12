@@ -53,7 +53,14 @@ public class GetClassesPaginatedQueryHandler : IRequestHandler<GetClassesPaginat
         if (_currentUserService.Roles != null && _currentUserService.Roles.Contains(UserRole.Admin.ToString()))
         {
             // SE FOR ADMIN: Busca todas as turmas
-            query = _context.Classes.AsQueryable();
+            query = _context.Classes
+                .Include(c => c.ClassProducts)
+                    .ThenInclude(cp => cp.Product)
+                .Include(c => c.ClassContents)
+                    .ThenInclude(cc => cc.Content)
+                .Include(c => c.AccountClasses)
+                    .ThenInclude(ac => ac.Account)
+                .AsQueryable();
         }
         else // PARA TEACHER, STUDENT, ETC.
         {
@@ -65,6 +72,12 @@ public class GetClassesPaginatedQueryHandler : IRequestHandler<GetClassesPaginat
                 .Select(asc => asc.SchoolId);
             
             query = _context.Classes
+                .Include(c => c.ClassProducts)
+                    .ThenInclude(cp => cp.Product)
+                .Include(c => c.ClassContents)
+                    .ThenInclude(cc => cc.Content)
+                .Include(c => c.AccountClasses)
+                    .ThenInclude(ac => ac.Account)
                 .Where(c => userSchoolIdsQuery.Contains(c.SchoolId));
         }
 
