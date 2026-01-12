@@ -40,6 +40,7 @@ public class GetClientsPaginatedQueryHandler : IRequestHandler<GetClientsPaginat
             .Include(c => c.ClientContents)
                 .ThenInclude(cc => cc.Content)
             .Include(c => c.Subsecretarias)
+                .ThenInclude(s => s.Regionais)
             .Include(c => c.Accounts)
             .AsNoTracking();
 
