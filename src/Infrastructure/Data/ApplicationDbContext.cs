@@ -57,6 +57,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<ClientContent> ClientContents => Set<ClientContent>();
     public DbSet<ClassProduct> ClassProducts => Set<ClassProduct>();
     public DbSet<ClassContent> ClassContents => Set<ClassContent>();
+    public DbSet<ClassQuest> ClassQuests => Set<ClassQuest>();
 
     public DbSet<Bncc> Bnccs => Set<Bncc>();
     public DbSet<BnccQuest> BnccQuests => Set<BnccQuest>();

@@ -16,14 +16,14 @@ public record UpdateQuestCommand : IRequest<Unit>
     public bool? UsageTemplate { get; set; }
     public QuestType? Type { get; set; }
     public int? MaxPlayers { get; set; }
-    public int? TotalQuestSteps { get; set; }
     public CombatDifficulty? CombatDifficulty { get; set; }
     
     // IDs de relacionamento
     public Guid? GradeId { get; set; }
     public Guid? SubjectId { get; set; }
     public Guid? QuestDependencyId { get; set; }
-    
+    public Guid? ContentId { get; set; }
+    public Guid? ProductId { get; set; }
     
     public IList<Guid>? BnccIds { get; set; } 
 }
@@ -32,10 +32,12 @@ public record UpdateQuestCommand : IRequest<Unit>
 public class UpdateQuestCommandHandler : IRequestHandler<UpdateQuestCommand, Unit>
 {
     private readonly IApplicationDbContext _context;
+    private readonly IUser _currentUser;
 
-    public UpdateQuestCommandHandler(IApplicationDbContext context)
+    public UpdateQuestCommandHandler(IApplicationDbContext context, IUser currentUser)
     {
         _context = context;
+        _currentUser = currentUser;
     }
 
     public async Task<Unit> Handle(UpdateQuestCommand request, CancellationToken cancellationToken)
@@ -47,6 +49,12 @@ public class UpdateQuestCommandHandler : IRequestHandler<UpdateQuestCommand, Uni
             
         Guard.Against.NotFound(request.Id, entity);
 
+        // Validar se o usuário pode atualizar para aula template
+        ValidateTemplatePermission(request.UsageTemplate, entity.UsageTemplate);
+
+        // Validar Content e Product se foram informados
+        await ValidateClientOwnsContentAndProduct(_context, _currentUser, request.ContentId, request.ProductId, cancellationToken);
+
         UpdateQuestProperties(entity, request);
 
         
@@ -57,6 +65,30 @@ public class UpdateQuestCommandHandler : IRequestHandler<UpdateQuestCommand, Uni
         return Unit.Value;
     }
 
+    // Método para validar se o usuário pode criar/atualizar aulas template
+    private void ValidateTemplatePermission(bool? requestUsageTemplate, bool currentUsageTemplate)
+    {
+        // Se não está alterando UsageTemplate para true, não precisa validar
+        // Verifica se está tentando criar template (novo ou alterando para true)
+        var isCreatingTemplate = requestUsageTemplate == true || (requestUsageTemplate == null && currentUsageTemplate);
+        
+        if (!isCreatingTemplate) return;
+
+        var userRoles = _currentUser.Roles ?? new List<string>();
+        var adminRoleName = UserRole.Admin.ToString();
+        var teacherEducarRoleName = UserRole.TeacherEducar.ToString();
+
+        // Apenas Admin e TeacherEducar podem criar/manter aulas template
+        if (!userRoles.Contains(adminRoleName) && !userRoles.Contains(teacherEducarRoleName))
+        {
+            var failures = new List<FluentValidation.Results.ValidationFailure>
+            {
+                new FluentValidation.Results.ValidationFailure("UsageTemplate", "Apenas usuários com cargo Admin ou Professor Educar podem criar ou manter aulas template.")
+            };
+            throw new Educar.Backend.Application.Common.Exceptions.ValidationException(failures);
+        }
+    }
+
     private void UpdateQuestProperties(Domain.Entities.Quest entity, UpdateQuestCommand request)
     {
         if (request.Name != null) entity.Name = request.Name;
@@ -64,10 +96,11 @@ public class UpdateQuestCommandHandler : IRequestHandler<UpdateQuestCommand, Uni
         if (request.UsageTemplate.HasValue) entity.UsageTemplate = request.UsageTemplate.Value;
         if (request.Type.HasValue) entity.Type = request.Type.Value;
         if (request.MaxPlayers.HasValue) entity.MaxPlayers = request.MaxPlayers.Value;
-        if (request.TotalQuestSteps.HasValue) entity.TotalQuestSteps = request.TotalQuestSteps.Value;
         if (request.CombatDifficulty.HasValue) entity.CombatDifficulty = request.CombatDifficulty.Value;
         if (request.GradeId.HasValue) entity.GradeId = request.GradeId.Value;
         if (request.SubjectId.HasValue) entity.SubjectId = request.SubjectId.Value;
+        if (request.ContentId.HasValue) entity.ContentId = request.ContentId.Value;
+        if (request.ProductId.HasValue) entity.ProductId = request.ProductId.Value;
 
         if (request.QuestDependencyId.HasValue)
         {
@@ -152,4 +185,84 @@ public class UpdateQuestCommandHandler : IRequestHandler<UpdateQuestCommand, Uni
         rel.DeletedAt = DateTimeOffset.UtcNow; 
     }
 }
+
+    // Método para validar se o cliente possui o Content e Product especificados
+    // e se o Content pertence ao Product
+    private async Task ValidateClientOwnsContentAndProduct(
+        IApplicationDbContext context,
+        IUser currentUser,
+        Guid? contentId,
+        Guid? productId,
+        CancellationToken cancellationToken)
+    {
+        // Se não informou nem Content nem Product, não há validação a fazer
+        if (!contentId.HasValue && !productId.HasValue)
+            return;
+
+        // Se apenas um foi informado, exige que ambos sejam informados
+        if (!contentId.HasValue || !productId.HasValue)
+        {
+            var failures = new List<FluentValidation.Results.ValidationFailure>
+            {
+                new FluentValidation.Results.ValidationFailure("ContentId/ProductId", "ContentId e ProductId devem ser informados juntos.")
+            };
+            throw new Educar.Backend.Application.Common.Exceptions.ValidationException(failures);
+        }
+
+        // 1. Validar se o Content pertence ao Product
+        var productHasContent = await context.ProductContents
+            .AsNoTracking()
+            .AnyAsync(pc => pc.ProductId == productId.Value && pc.ContentId == contentId.Value, cancellationToken);
+
+        if (!productHasContent)
+        {
+            var failures = new List<FluentValidation.Results.ValidationFailure>
+            {
+                new FluentValidation.Results.ValidationFailure("ContentId", "O conteúdo especificado não pertence ao produto informado.")
+            };
+            throw new Educar.Backend.Application.Common.Exceptions.ValidationException(failures);
+        }
+
+        // 2. Obter o ClientId do usuário atual através da conta (Account)
+        var userId = currentUser.Id;
+        if (string.IsNullOrEmpty(userId))
+            throw new UnauthorizedAccessException("Usuário não autenticado.");
+
+        var account = await context.Accounts
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Id.ToString() == userId, cancellationToken);
+
+        if (account?.ClientId == null)
+            throw new UnauthorizedAccessException("Usuário não está associado a um cliente.");
+
+        var clientId = account.ClientId.Value;
+
+        // 3. Validar se o cliente possui o Content
+        var clientHasContent = await context.ClientContents
+            .AsNoTracking()
+            .AnyAsync(cc => cc.ClientId == clientId && cc.ContentId == contentId.Value, cancellationToken);
+
+        if (!clientHasContent)
+        {
+            var failures = new List<FluentValidation.Results.ValidationFailure>
+            {
+                new FluentValidation.Results.ValidationFailure("ContentId", "O cliente não possui acesso ao conteúdo especificado.")
+            };
+            throw new Educar.Backend.Application.Common.Exceptions.ValidationException(failures);
+        }
+
+        // 4. Validar se o cliente possui o Product
+        var clientHasProduct = await context.ClientProducts
+            .AsNoTracking()
+            .AnyAsync(cp => cp.ClientId == clientId && cp.ProductId == productId.Value, cancellationToken);
+
+        if (!clientHasProduct)
+        {
+            var failures = new List<FluentValidation.Results.ValidationFailure>
+            {
+                new FluentValidation.Results.ValidationFailure("ProductId", "O cliente não possui acesso ao produto especificado.")
+            };
+            throw new Educar.Backend.Application.Common.Exceptions.ValidationException(failures);
+        }
+    }
 }

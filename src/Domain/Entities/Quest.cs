@@ -28,7 +28,12 @@ public class Quest(
     public Subject? Subject { get; set; }
     public Guid? QuestDependencyId { get; set; }
     public Quest? QuestDependency { get; set; }
+    public Guid ContentId { get; set; }
+    public Content? Content { get; set; }
+    public Guid ProductId { get; set; }
+    public Product? Product { get; set; }
     public IList<QuestStep> QuestSteps { get; set; } = new List<QuestStep>();
     public IList<QuestProficiency> QuestProficiencies { get; set; } = new List<QuestProficiency>();
     public IList<BnccQuest> BnccQuests { get; set; } = new List<BnccQuest>();
+    public IList<ClassQuest> ClassQuests { get; set; } = new List<ClassQuest>();
 }

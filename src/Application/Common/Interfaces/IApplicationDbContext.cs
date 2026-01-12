@@ -50,6 +50,7 @@ public interface IApplicationDbContext
     DbSet<ContractContent> ContractContents { get; }
     DbSet<ClassProduct> ClassProducts { get; }
     DbSet<ClassContent> ClassContents { get; }
+    DbSet<ClassQuest> ClassQuests { get; }
 
     DbSet<Bncc> Bnccs { get; }
     DbSet<BnccQuest> BnccQuests { get; }

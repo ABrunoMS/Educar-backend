@@ -17,6 +17,8 @@ public class GetQuestsByGameGradeSubjectPaginatedQuery : IRequest<PaginatedList<
     public Guid? GameId { get; init; }
     public Guid? GradeId { get; init; }
     public Guid? SubjectId { get; init; }
+    public Guid? ProductId { get; init; }
+    public Guid? ContentId { get; init; }
     public string? Search { get; init; }
     public bool UsageTemplate { get; init; }
 }
@@ -41,10 +43,26 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
     public async Task<PaginatedList<QuestCleanDto>> Handle(GetQuestsByGameGradeSubjectPaginatedQuery request,
         CancellationToken cancellationToken)
     {
+        // Obter o ClientId do usuário atual
+        var userId = _currentUser.Id;
+        Guid? clientId = null;
+        
+        if (!string.IsNullOrEmpty(userId))
+        {
+            var account = await _context.Accounts
+                .AsNoTracking()
+                .FirstOrDefaultAsync(a => a.Id.ToString() == userId, cancellationToken);
+            clientId = account?.ClientId;
+        }
+
         IQueryable<Domain.Entities.Quest> query = _context.Quests
           .AsNoTracking()
+          .Include(q => q.Game)
           .Include(q => q.Subject) 
-          .Include(q => q.Grade);
+          .Include(q => q.Grade)
+          .Include(q => q.Content)
+          .Include(q => q.Product)
+          .Include(q => q.QuestDependency);
 
         
         
@@ -58,27 +76,59 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
         var teacherRoleName = UserRole.Teacher.ToString(); 
         var adminRoleName = UserRole.Admin.ToString();
 
-        _logger.LogWarning("--- INICIANDO DEPURAÇÃO DE FILTRO DE QUESTS ---");
+        _logger.LogWarning("=== INICIANDO DEPURAÇÃO DE FILTRO DE QUESTS ===");
+    _logger.LogWarning("UsageTemplate: {UsageTemplate}", request.UsageTemplate);
     _logger.LogWarning("Cargos vindos do Token (IUser.Roles): {ActualRoles}", string.Join(", ", userRoles));
     _logger.LogWarning("UserID vindo do Token (IUser.Id): {UserId}", userIdString);
     _logger.LogWarning("--------------------------------------------------");
-
-    // Se o usuário for um "Teacher" E NÃO for um "Admin"
-    if (userRoles.Contains(teacherRoleName) && !userRoles.Contains(adminRoleName))
+    if (!userRoles.Contains(adminRoleName))
         {
-            
             bool isSearchingTemplates = request.UsageTemplate == true;
 
-            if (!isSearchingTemplates) 
+            if (isSearchingTemplates)
             {
-                // Só aplica o filtro de dono se NÃO for uma busca por templates
+                // === CENÁRIO A: PROFESSOR VENDO TEMPLATES ===
+                // Não aplicamos filtro de 'CreatedBy' (para ver templates de outros)
+                // Não aplicamos filtro de 'ClientProduct' (para ver catálogo completo)
+                // O professor vê TODOS os templates marcados como UsageTemplate = true
+            }
+            else
+            {
+                // === CENÁRIO B: PROFESSOR VENDO "MINHAS AULAS" ===
+                
+                // B1. Filtro de Dono: Só vê o que ele mesmo criou
                 if (!string.IsNullOrEmpty(userIdString))
                 {
                     query = query.Where(q => q.CreatedBy == userIdString);
                 }
+
+                // B2. Filtro de Produtos do Cliente: Só vê o que a escola comprou/tem acesso
+                if (clientId.HasValue)
+                {
+                    var clientContentIds = await _context.ClientContents
+                        .AsNoTracking()
+                        .Where(cc => cc.ClientId == clientId.Value)
+                        .Select(cc => cc.ContentId)
+                        .ToListAsync(cancellationToken);
+
+                    var clientProductIds = await _context.ClientProducts
+                        .AsNoTracking()
+                        .Where(cp => cp.ClientId == clientId.Value)
+                        .Select(cp => cp.ProductId)
+                        .ToListAsync(cancellationToken);
+
+                    query = query.Where(q => 
+                        clientContentIds.Contains(q.ContentId) &&
+                        clientProductIds.Contains(q.ProductId)
+                    );
+                }
+                else
+                {
+                    // Professor sem escola/cliente não vê aulas normais
+                    query = query.Where(q => false);
+                }
             }
         }
-
         if (request.GameId is not null)
         {
             query = query.Where(q => q.GameId == request.GameId);
@@ -92,6 +142,20 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
         if (request.SubjectId is not null)
         {
             query = query.Where(q => q.SubjectId == request.SubjectId);
+        }
+
+        if (request.ProductId is not null)
+        {
+            query = query.Where(q => q.ProductId == request.ProductId);
+        }
+
+        if (request.ContentId is not null)
+        {
+        var totalQuests = await query.CountAsync(cancellationToken);
+        _logger.LogWarning("Total de quests após todos os filtros: {Total}", totalQuests);
+        _logger.LogWarning("=== FIM DEPURAÇÃO DE FILTRO DE QUESTS ===\n");
+
+            query = query.Where(q => q.ContentId == request.ContentId);
         }
 
         if (!string.IsNullOrWhiteSpace(request.Search))

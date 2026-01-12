@@ -17,6 +17,7 @@ public class QuestStep(
     public QuestStepNpcType? NpcType { get; set; } = npcType;
     public QuestStepNpcBehaviour? NpcBehaviour { get; set; } = npcBehaviour;
     public QuestStepType? QuestStepType { get; set; } = questStepType;
+    public bool IsActive { get; set; } = true;
     public IList<QuestStepContent> Contents { get; set; } = new List<QuestStepContent>();
     public IList<QuestStepNpc> QuestStepNpcs { get; set; } = new List<QuestStepNpc>();
     public IList<QuestStepMedia> QuestStepMedias { get; set; } = new List<QuestStepMedia>();

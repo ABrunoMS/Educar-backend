@@ -26,6 +26,10 @@ public static class DependencyInjection
         // Serviços de aplicação
         services.AddScoped<ISpreadsheetService, ExcelSpreadsheetService>();
 
+        
+        // Registrar serviço de sequenciamento
+        services.AddScoped<IQuestStepContentSequenceService, QuestStepContentSequenceService>();
+        
         return services;
     }
 }

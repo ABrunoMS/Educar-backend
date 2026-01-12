@@ -14,6 +14,8 @@ public class CreateFullQuestStepContentDto
     public string Description { get; set; } = string.Empty;
     public IAnswer ExpectedAnswer { get; set; } = null!;
     public decimal Weight { get; set; }
+    public bool IsActive { get; set; } = true;
+    public int Sequence { get; set; }
 }
 
 public class CreateFullQuestStepDto
@@ -50,6 +52,8 @@ public record CreateFullQuestCommand(
     public Guid? GradeId { get; set; }
     public Guid? SubjectId { get; set; }
     public Guid? QuestDependencyId { get; set; }
+    public Guid ContentId { get; set; }
+    public Guid ProductId { get; set; }
     public IList<Guid> BnccIds { get; set; } = new List<Guid>();
     public IList<CreateFullQuestStepDto> Steps { get; set; } = new List<CreateFullQuestStepDto>();
 }
@@ -57,10 +61,12 @@ public record CreateFullQuestCommand(
 public class CreateFullQuestCommandHandler : IRequestHandler<CreateFullQuestCommand, IdResponseDto>
 {
     private readonly IApplicationDbContext _context;
+    private readonly IUser _currentUser;
 
-    public CreateFullQuestCommandHandler(IApplicationDbContext context)
+    public CreateFullQuestCommandHandler(IApplicationDbContext context, IUser currentUser)
     {
         _context = context;
+        _currentUser = currentUser;
     }
 
     public async Task<IdResponseDto> Handle(CreateFullQuestCommand request, CancellationToken cancellationToken)
@@ -74,10 +80,13 @@ public class CreateFullQuestCommandHandler : IRequestHandler<CreateFullQuestComm
             Guard.Against.NotFound(request.QuestDependencyId.Value, questDependency, nameof(Domain.Entities.Quest));
         }
 
-        // 2. Buscar as entidades BNCC
+        // 2. Validar se o cliente possui o Content e Product especificados
+        await ValidateClientOwnsContentAndProduct(_context, _currentUser, request.ContentId, request.ProductId, cancellationToken);
+
+        // 3. Buscar as entidades BNCC
         var bnccEntities = await GetBnccsByIdsAsync(request.BnccIds, cancellationToken);
 
-        // 3. Criar a Quest
+        // 4. Criar a Quest
         var quest = new Domain.Entities.Quest(
             request.Name,
             request.Description,
@@ -90,10 +99,12 @@ public class CreateFullQuestCommandHandler : IRequestHandler<CreateFullQuestComm
             GameId = request.GameId,
             GradeId = request.GradeId,
             SubjectId = request.SubjectId,
-            QuestDependency = questDependency
+            QuestDependency = questDependency,
+            ContentId = request.ContentId,
+            ProductId = request.ProductId
         };
 
-        // 4. Associar BNCCs à Quest
+        // 5. Associar BNCCs à Quest
         foreach (var bnccEntity in bnccEntities)
         {
             quest.BnccQuests.Add(new BnccQuest
@@ -123,8 +134,8 @@ public class CreateFullQuestCommandHandler : IRequestHandler<CreateFullQuestComm
                 Quest = quest
             };
 
-            // Criar os Contents para este Step
-            foreach (var contentDto in stepDto.Contents)
+            // Criar os Contents para este Step (ordenados por Sequence)
+            foreach (var contentDto in stepDto.Contents.OrderBy(c => c.Sequence))
             {
                 var questStepContent = new Domain.Entities.QuestStepContent(
                     contentDto.QuestStepContentType,
@@ -133,6 +144,8 @@ public class CreateFullQuestCommandHandler : IRequestHandler<CreateFullQuestComm
                     contentDto.ExpectedAnswer.ToJsonObject(),
                     contentDto.Weight)
                 {
+                    IsActive = contentDto.IsActive,
+                    Sequence = contentDto.Sequence > 0 ? contentDto.Sequence : (questStep.Contents.Count + 1),
                     QuestStep = questStep
                 };
 
@@ -230,6 +243,72 @@ public class CreateFullQuestCommandHandler : IRequestHandler<CreateFullQuestComm
             throw new NotFoundException(typeof(TEntity).Name, string.Join(", ", missingIds));
 
         return entities;
+    }
+
+    // Método para validar se o cliente possui o Content e Product especificados
+    // e se o Content pertence ao Product
+    private async Task ValidateClientOwnsContentAndProduct(
+        IApplicationDbContext context,
+        IUser currentUser,
+        Guid contentId,
+        Guid productId,
+        CancellationToken cancellationToken)
+    {
+        // 1. Validar se o Content pertence ao Product
+        var productHasContent = await context.ProductContents
+            .AsNoTracking()
+            .AnyAsync(pc => pc.ProductId == productId && pc.ContentId == contentId, cancellationToken);
+
+        if (!productHasContent)
+        {
+            var failures = new List<FluentValidation.Results.ValidationFailure>
+            {
+                new FluentValidation.Results.ValidationFailure("ContentId", "O conteúdo especificado não pertence ao produto informado.")
+            };
+            throw new Educar.Backend.Application.Common.Exceptions.ValidationException(failures);
+        }
+
+        // 2. Obter o ClientId do usuário atual através da conta (Account)
+        var userId = currentUser.Id;
+        if (string.IsNullOrEmpty(userId))
+            throw new UnauthorizedAccessException("Usuário não autenticado.");
+
+        var account = await context.Accounts
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Id.ToString() == userId, cancellationToken);
+
+        if (account?.ClientId == null)
+            throw new UnauthorizedAccessException("Usuário não está associado a um cliente.");
+
+        var clientId = account.ClientId.Value;
+
+        // 3. Validar se o cliente possui o Content
+        var clientHasContent = await context.ClientContents
+            .AsNoTracking()
+            .AnyAsync(cc => cc.ClientId == clientId && cc.ContentId == contentId, cancellationToken);
+
+        if (!clientHasContent)
+        {
+            var failures = new List<FluentValidation.Results.ValidationFailure>
+            {
+                new FluentValidation.Results.ValidationFailure("ContentId", "O cliente não possui acesso ao conteúdo especificado.")
+            };
+            throw new Educar.Backend.Application.Common.Exceptions.ValidationException(failures);
+        }
+
+        // 4. Validar se o cliente possui o Product
+        var clientHasProduct = await context.ClientProducts
+            .AsNoTracking()
+            .AnyAsync(cp => cp.ClientId == clientId && cp.ProductId == productId, cancellationToken);
+
+        if (!clientHasProduct)
+        {
+            var failures = new List<FluentValidation.Results.ValidationFailure>
+            {
+                new FluentValidation.Results.ValidationFailure("ProductId", "O cliente não possui acesso ao produto especificado.")
+            };
+            throw new Educar.Backend.Application.Common.Exceptions.ValidationException(failures);
+        }
     }
 
     #endregion

@@ -33,7 +33,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .HasColumnType("decimal(5,2)")
                         .HasColumnName("average_score");
 
-                    b.Property<Guid>("ClientId")
+                    b.Property<Guid?>("ClientId")
                         .HasColumnType("uuid")
                         .HasColumnName("client_id");
 
@@ -482,6 +482,59 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("class_products");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.ClassQuest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("ClassId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("class_id");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<DateTimeOffset>("ExpirationDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expiration_date");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<Guid>("QuestId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("quest_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestId");
+
+                    b.HasIndex("ClassId", "QuestId")
+                        .IsUnique();
+
+                    b.ToTable("class_quests");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Client", b =>
@@ -1522,6 +1575,10 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("combat_difficulty");
 
+                    b.Property<Guid>("ContentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("content_id");
+
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created");
@@ -1569,6 +1626,10 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .HasColumnType("character varying(150)")
                         .HasColumnName("name");
 
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("product_id");
+
                     b.Property<Guid?>("QuestDependencyId")
                         .HasColumnType("uuid")
                         .HasColumnName("quest_dependency_id");
@@ -1591,9 +1652,13 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ContentId");
+
                     b.HasIndex("GameId");
 
                     b.HasIndex("GradeId");
+
+                    b.HasIndex("ProductId");
 
                     b.HasIndex("QuestDependencyId");
 
@@ -1650,6 +1715,10 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("description");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
@@ -1724,6 +1793,10 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .HasColumnType("jsonb")
                         .HasColumnName("expected_answers");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
@@ -1747,6 +1820,14 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Property<string>("QuestionType")
                         .HasColumnType("text")
                         .HasColumnName("question_type");
+
+                    b.Property<int>("Sequence")
+                        .HasColumnType("integer")
+                        .HasColumnName("sequence");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text")
+                        .HasColumnName("title");
 
                     b.Property<decimal?>("Weight")
                         .HasColumnType("decimal(5,2)")
@@ -2173,9 +2254,7 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                 {
                     b.HasOne("Educar.Backend.Domain.Entities.Client", "Client")
                         .WithMany("Accounts")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ClientId");
 
                     b.Navigation("Client");
                 });
@@ -2303,6 +2382,25 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("Class");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Educar.Backend.Domain.Entities.ClassQuest", b =>
+                {
+                    b.HasOne("Educar.Backend.Domain.Entities.Class", "Class")
+                        .WithMany("ClassQuests")
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Educar.Backend.Domain.Entities.Quest", "Quest")
+                        .WithMany("ClassQuests")
+                        .HasForeignKey("QuestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Class");
+
+                    b.Navigation("Quest");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.ClientContent", b =>
@@ -2556,6 +2654,12 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Quest", b =>
                 {
+                    b.HasOne("Educar.Backend.Domain.Entities.Content", "Content")
+                        .WithMany()
+                        .HasForeignKey("ContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Educar.Backend.Domain.Entities.Game", "Game")
                         .WithMany("Quests")
                         .HasForeignKey("GameId")
@@ -2566,6 +2670,12 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .HasForeignKey("GradeId")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.HasOne("Educar.Backend.Domain.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Educar.Backend.Domain.Entities.Quest", "QuestDependency")
                         .WithMany()
                         .HasForeignKey("QuestDependencyId");
@@ -2575,9 +2685,13 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.Navigation("Content");
+
                     b.Navigation("Game");
 
                     b.Navigation("Grade");
+
+                    b.Navigation("Product");
 
                     b.Navigation("QuestDependency");
 
@@ -2765,6 +2879,8 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
                     b.Navigation("ClassContents");
 
                     b.Navigation("ClassProducts");
+
+                    b.Navigation("ClassQuests");
                 });
 
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Client", b =>
@@ -2870,6 +2986,8 @@ namespace Educar.Backend.Infrastructure.Data.Migrations
             modelBuilder.Entity("Educar.Backend.Domain.Entities.Quest", b =>
                 {
                     b.Navigation("BnccQuests");
+
+                    b.Navigation("ClassQuests");
 
                     b.Navigation("QuestProficiencies");
 

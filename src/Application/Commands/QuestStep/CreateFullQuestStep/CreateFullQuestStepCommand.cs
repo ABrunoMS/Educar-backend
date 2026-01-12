@@ -11,9 +11,12 @@ public class CreateFullQuestStepContentDto
 {
     public QuestStepContentType QuestStepContentType { get; set; }
     public QuestionType QuestionType { get; set; }
+    public string? Title { get; set; }
     public string Description { get; set; } = string.Empty;
     public IAnswer ExpectedAnswers { get; set; } = null!;
     public decimal Weight { get; set; }
+    public bool IsActive { get; set; } = true;
+    public int Sequence { get; set; }
 }
 
 public record CreateFullQuestStepCommand(
@@ -67,7 +70,7 @@ public class CreateFullQuestStepCommandHandler : IRequestHandler<CreateFullQuest
             Quest = quest
         };
 
-        foreach (var content in request.Contents)
+        foreach (var content in request.Contents.OrderBy(c => c.Sequence))
         {
             var questStepContent = new Domain.Entities.QuestStepContent(
                 content.QuestStepContentType,
@@ -76,6 +79,9 @@ public class CreateFullQuestStepCommandHandler : IRequestHandler<CreateFullQuest
                 content.ExpectedAnswers.ToJsonObject(),
                 content.Weight)
             {
+                Title = content.Title,
+                IsActive = content.IsActive,
+                Sequence = content.Sequence > 0 ? content.Sequence : (questStep.Contents.Count + 1),
                 QuestStep = questStep
             };
 

@@ -12,7 +12,7 @@ public class BnccConfiguration(DatabaseFacade database) : IEntityTypeConfigurati
     public void Configure(EntityTypeBuilder<Bncc> builder)
     {
         builder.Property(t => t.Description).IsRequired().HasMaxLength(2000); 
-        builder.Property(t => t.IsActive).IsRequired();
+        builder.Property(t => t.IsActive).IsRequired().HasColumnName("is_active");
 
         builder
             .HasMany(b => b.BnccQuests)

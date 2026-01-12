@@ -1,6 +1,8 @@
+using Educar.Backend.Application.Queries.Content;
 using Educar.Backend.Application.Queries.Game;
 using Educar.Backend.Application.Queries.Grade;
 using Educar.Backend.Application.Queries.Proficiency;
+using Educar.Backend.Application.Queries.Product;
 using Educar.Backend.Application.Queries.QuestStep;
 using Educar.Backend.Application.Queries.Subject;
 using Educar.Backend.Domain.Entities;
@@ -22,6 +24,8 @@ public class QuestDto
     public GradeDto? Grade { get; set; }
     public SubjectDto? Subject { get; set; }
     public QuestCleanDto? QuestDependency { get; set; }
+    public ContentDto? Content { get; set; }
+    public ProductDto? Product { get; set; }
     public IList<QuestStepDto> QuestSteps { get; set; } = new List<QuestStepDto>();
     public IList<ProficiencyCleanDto> Proficiencies { get; set; } = new List<ProficiencyCleanDto>();
 

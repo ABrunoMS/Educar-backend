@@ -16,6 +16,7 @@ public class FullQuestStepDto
     public QuestStepNpcType NpcType { get; set; }
     public QuestStepNpcBehaviour NpcBehaviour { get; set; }
     public QuestStepType Type { get; set; }
+    public bool IsActive { get; set; } = true;
     public IList<CreateFullQuestStepContentDto> Contents { get; set; } = new List<CreateFullQuestStepContentDto>();
     public IList<Guid> NpcIds { get; set; } = new List<Guid>();
     public IList<Guid> MediaIds { get; set; } = new List<Guid>();
@@ -37,16 +38,23 @@ public class BulkCreateFullQuestStepCommandHandler : IRequestHandler<BulkCreateF
 
     public async Task<IEnumerable<IdResponseDto>> Handle(BulkCreateFullQuestStepCommand request, CancellationToken cancellationToken)
     {
+        Console.WriteLine($"[DEBUG BULK] Criando etapas para Quest ID: {request.QuestId}");
+        Console.WriteLine($"[DEBUG BULK] Total de etapas a criar: {request.Steps?.Count ?? 0}");
+        
         var quest = await _context.Quests.FirstOrDefaultAsync(e => e.Id == request.QuestId, cancellationToken);
         Guard.Against.NotFound(request.QuestId, quest, nameof(Quest));
 
         var createdStepIds = new List<IdResponseDto>();
 
-        foreach (var stepDto in request.Steps)
+        if (request.Steps != null)
         {
-            var npcEntities = await GetNpcsByIdsAsync(stepDto.NpcIds, cancellationToken);
-            var mediaEntities = await GetMediasByIdsAsync(stepDto.MediaIds, cancellationToken);
-            var itemEntities = await GetItemsByIdsAsync(stepDto.ItemIds, cancellationToken);
+            foreach (var stepDto in request.Steps)
+            {
+                Console.WriteLine($"[DEBUG BULK] Criando etapa: {stepDto.Name}, Order: {stepDto.Order}, Contents: {stepDto.Contents?.Count ?? 0}");
+            
+            var npcEntities = await GetNpcsByIdsAsync(stepDto.NpcIds ?? new List<Guid>(), cancellationToken);
+            var mediaEntities = await GetMediasByIdsAsync(stepDto.MediaIds ?? new List<Guid>(), cancellationToken);
+            var itemEntities = await GetItemsByIdsAsync(stepDto.ItemIds ?? new List<Guid>(), cancellationToken);
 
             var questStep = new Domain.Entities.QuestStep(
                 stepDto.Name,
@@ -56,22 +64,37 @@ public class BulkCreateFullQuestStepCommandHandler : IRequestHandler<BulkCreateF
                 stepDto.NpcBehaviour,
                 stepDto.Type)
             {
-                Quest = quest
+                Quest = quest,
+                QuestId = quest.Id, // Garantir que o QuestId está definido
+                IsActive = stepDto.IsActive
             };
 
-            foreach (var content in stepDto.Contents)
+            Console.WriteLine($"[DEBUG BULK] QuestStep criado com QuestId: {questStep.QuestId}");
+
+            if (stepDto.Contents != null)
             {
-                var questStepContent = new Domain.Entities.QuestStepContent(
-                    content.QuestStepContentType,
-                    content.QuestionType,
-                    content.Description,
-                    content.ExpectedAnswers.ToJsonObject(),
-                    content.Weight)
+                // Ordenar contents por Sequence antes de adicionar
+                var orderedContents = stepDto.Contents.OrderBy(c => c.Sequence).ToList();
+                
+                foreach (var content in orderedContents)
                 {
+                    if (content.ExpectedAnswers == null) continue; // Pula se não houver respostas esperadas
+                    
+                    var questStepContent = new Domain.Entities.QuestStepContent(
+                        content.QuestStepContentType,
+                        content.QuestionType,
+                        content.Description,
+                        content.ExpectedAnswers.ToJsonObject(),
+                        content.Weight)
+                {
+                    Title = content.Title,
+                    IsActive = content.IsActive,
+                    Sequence = content.Sequence > 0 ? content.Sequence : (questStep.Contents.Count + 1),
                     QuestStep = questStep
                 };
 
                 questStep.Contents.Add(questStepContent);
+                }
             }
 
             foreach (var npcEntity in npcEntities)
@@ -92,10 +115,14 @@ public class BulkCreateFullQuestStepCommandHandler : IRequestHandler<BulkCreateF
             _context.QuestSteps.Add(questStep);
             
             createdStepIds.Add(new IdResponseDto(questStep.Id));
+            Console.WriteLine($"[DEBUG BULK] Etapa {questStep.Name} adicionada ao contexto com ID: {questStep.Id}");
+            }
         }
 
         // Salva TUDO em uma única transação atômica
+        Console.WriteLine($"[DEBUG BULK] Salvando {createdStepIds.Count} etapas no banco...");
         await _context.SaveChangesAsync(cancellationToken);
+        Console.WriteLine($"[DEBUG BULK] Salvo com sucesso!");
 
         return createdStepIds;
     }

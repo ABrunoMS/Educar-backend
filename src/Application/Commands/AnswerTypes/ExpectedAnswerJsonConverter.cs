@@ -25,6 +25,7 @@ public class ExpectedAnswerJsonConverter : JsonConverter<IAnswer>
             QuestionType.Dissertative => JsonSerializer.Deserialize<Dissertative>(json, options),
             QuestionType.ColumnFill => JsonSerializer.Deserialize<ColumnFill>(json, options),
             QuestionType.AlwaysCorrect => JsonSerializer.Deserialize<AlwaysCorrect>(json, options),
+            QuestionType.None => JsonSerializer.Deserialize<AlwaysCorrect>(json, options), // Treat None as AlwaysCorrect
             _ => throw new JsonException("Unknown question type")
         };
     }

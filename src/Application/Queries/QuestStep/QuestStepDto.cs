@@ -15,6 +15,7 @@ public class QuestStepDto
     public QuestStepNpcType? NpcType { get; set; }
     public QuestStepNpcBehaviour? NpcBehaviour { get; set; }
     public QuestStepType? QuestStepType { get; set; }
+    public bool IsActive { get; set; }
     public IList<NpcCleanDto> Npcs { get; set; } = new List<NpcCleanDto>();
     public IList<MediaDto> Medias { get; set; } = new List<MediaDto>();
     public IList<ItemDto> Items { get; set; } = new List<ItemDto>();
