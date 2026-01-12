@@ -16,6 +16,7 @@ public class ClientDto
     public string? Name { get; set; }
     public string? Description { get; set; }
     public string? Partner { get; set; }
+    public string? PartnerName { get; set; }
     public string? Contacts { get; set; }
     public string? Contract { get; set; }
     public string? Validity { get; set; }
@@ -44,7 +45,9 @@ public class ClientDto
                 
                 
                 .ForMember(dest => dest.Contents,
-                           opt => opt.MapFrom(src => src.ClientContents.Select(cc => cc.Content)));
+                           opt => opt.MapFrom(src => src.ClientContents.Select(cc => cc.Content)))
+                
+                .ForMember(dest => dest.PartnerName, opt => opt.Ignore());
         
         }
     }
