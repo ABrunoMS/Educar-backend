@@ -8,10 +8,23 @@ using System.Linq;
 
 namespace Educar.Backend.Application.Commands.Client.UpdateClient;
 
+public record UpdateRegionalDto
+{
+    public Guid? Id { get; init; } // Se null/vazio, é uma nova regional
+    public string Name { get; init; } = string.Empty;
+}
+
+// DTO para Subsecretaria no Update
+public record UpdateSubsecretariaDto
+{
+    public Guid? Id { get; init; } // Se null/vazio, é uma nova subsecretaria
+    public string Name { get; init; } = string.Empty;
+    public List<UpdateRegionalDto>? Regionais { get; init; }
+}
+
 public record UpdateClientCommand : IRequest<Unit>
 {
-    
-    public Guid Id { get; set; } 
+    public Guid Id { get; set; }
     public string? Name { get; init; }
     public string? Description { get; init; }
     public string? Partner { get; init; }
@@ -21,7 +34,10 @@ public record UpdateClientCommand : IRequest<Unit>
     public string? SignatureDate { get; init; }
     public string? ImplantationDate { get; init; }
     public int? TotalAccounts { get; init; }
-    public List<Guid>? SubsecretariaIds { get; init; }
+
+    // MUDANÇA AQUI: Em vez de List<Guid>, usamos a estrutura completa
+    public List<UpdateSubsecretariaDto>? Subsecretarias { get; init; } 
+    
     public List<Guid>? ProductIds { get; init; }
     public List<Guid>? ContentIds { get; init; }
 }
@@ -30,16 +46,17 @@ public class UpdateClientCommandHandler(IApplicationDbContext context) : IReques
 {
     public async Task<Unit> Handle(UpdateClientCommand request, CancellationToken cancellationToken)
     {
-        // 1. Busca a entidade principal E suas listas de ligação atuais
+        // 1. Busca a entidade incluindo a hierarquia completa (Client -> Sub -> Regional)
         var entity = await context.Clients
             .Include(c => c.ClientProducts)
             .Include(c => c.ClientContents)
             .Include(c => c.Subsecretarias)
+                .ThenInclude(s => s.Regionais) // Importante incluir Regionais
             .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
 
         Guard.Against.NotFound(request.Id, entity);
 
-        // 2. Atualiza as propriedades simples (usando ?? para manter o valor antigo se o novo for nulo)
+        // 2. Atualiza propriedades simples do Cliente
         entity.Name = request.Name ?? entity.Name;
         entity.Description = request.Description ?? entity.Description;
         entity.Partner = request.Partner ?? entity.Partner;
@@ -49,72 +66,133 @@ public class UpdateClientCommandHandler(IApplicationDbContext context) : IReques
         entity.SignatureDate = request.SignatureDate ?? entity.SignatureDate;
         entity.ImplantationDate = request.ImplantationDate ?? entity.ImplantationDate;
         entity.TotalAccounts = request.TotalAccounts ?? entity.TotalAccounts;
-        
-        // Atualiza Subsecretarias
-        if (request.SubsecretariaIds != null)
-        {
-            // Remove antigas
-            var currentSubsecretariaIds = entity.Subsecretarias.Select(s => s.Id).ToList();
-            var idsToRemove = currentSubsecretariaIds.Except(request.SubsecretariaIds).ToList();
-            var subsecretariasToRemove = entity.Subsecretarias.Where(s => idsToRemove.Contains(s.Id)).ToList();
-            foreach (var subsecretaria in subsecretariasToRemove)
-            {
-                subsecretaria.ClientId = Guid.Empty; // Remove associação
-                entity.Subsecretarias.Remove(subsecretaria);
-            }
 
-            // Adiciona novas
-            var idsToAdd = request.SubsecretariaIds.Except(currentSubsecretariaIds).ToList();
-            if (idsToAdd.Any())
-            {
-                var subsecretariasToAdd = await context.Subsecretarias
-                    .Where(s => idsToAdd.Contains(s.Id))
-                    .ToListAsync(cancellationToken);
-                
-                foreach (var subsecretaria in subsecretariasToAdd)
-                {
-                    subsecretaria.ClientId = entity.Id;
-                    entity.Subsecretarias.Add(subsecretaria);
-                }
-            }
+        // 3. Atualiza Subsecretarias e Regionais (Lógica complexa de sincronização)
+        if (request.Subsecretarias != null)
+        {
+            UpdateSubsecretarias(entity, request.Subsecretarias);
         }
 
-        // 3. Atualiza as tabelas de ligação (Products)
+        // 4. Atualiza Products (Mantém sua lógica original que estava correta para N-N)
         if (request.ProductIds != null)
         {
             UpdateJunctionTable(entity.ClientProducts, request.ProductIds, cp => cp.ProductId, id => new ClientProduct { ProductId = id });
         }
 
-        // 4. Atualiza as tabelas de ligação (Contents)
+        // 5. Atualiza Contents
         if (request.ContentIds != null)
         {
             UpdateJunctionTable(entity.ClientContents, request.ContentIds, cc => cc.ContentId, id => new ClientContent { ContentId = id });
         }
 
         await context.SaveChangesAsync(cancellationToken);
-
         return Unit.Value;
     }
 
-    // Método genérico para atualizar tabelas de ligação (N-N)
+    private void UpdateSubsecretarias(Domain.Entities.Client client, List<UpdateSubsecretariaDto> dtos)
+    {
+        var currentSubs = client.Subsecretarias.ToList();
+
+        // A. REMOVER: Subsecretarias que estão no banco mas não vieram no request
+        // Consideramos que o DTO tem ID. Se o ID não veio na lista, deleta.
+        var dtoIds = dtos.Where(d => d.Id.HasValue).Select(d => d.Id!.Value).ToList();
+        var subsToRemove = currentSubs.Where(s => !dtoIds.Contains(s.Id)).ToList();
+
+        foreach (var sub in subsToRemove)
+        {
+            // Opcional: Se houver escolas vinculadas, isso pode dar erro de FK. 
+            // O ideal seria verificar antes ou usar Cascade Delete no banco.
+            client.Subsecretarias.Remove(sub);
+            // context.Subsecretarias.Remove(sub); // Força a deleção se necessário
+        }
+
+        // B. ADICIONAR ou ATUALIZAR
+        foreach (var dto in dtos)
+        {
+            if (dto.Id.HasValue && dto.Id != Guid.Empty)
+            {
+                // -- ATUALIZAR EXISTENTE --
+                var existingSub = currentSubs.FirstOrDefault(s => s.Id == dto.Id.Value);
+                if (existingSub != null)
+                {
+                    existingSub.Name = dto.Name;
+                    // Sincronizar as Regionais desta subsecretaria
+                    UpdateRegionais(existingSub, dto.Regionais);
+                }
+            }
+            else
+            {
+                // -- ADICIONAR NOVO --
+                var newSub = new Domain.Entities.Subsecretaria
+                {
+                    Name = dto.Name,
+                    // IDs são gerados automaticamente pelo Guid se configurado, ou pelo banco
+                };
+                
+                // Adiciona as regionais da nova subsecretaria
+                if (dto.Regionais != null)
+                {
+                    foreach(var regDto in dto.Regionais)
+                    {
+                        newSub.Regionais.Add(new Domain.Entities.Regional { Name = regDto.Name });
+                    }
+                }
+
+                client.Subsecretarias.Add(newSub);
+            }
+        }
+    }
+
+    private void UpdateRegionais(Domain.Entities.Subsecretaria sub, List<UpdateRegionalDto>? regionalDtos)
+    {
+        if (regionalDtos == null) return;
+
+        var currentRegionais = sub.Regionais.ToList();
+        var dtoIds = regionalDtos.Where(r => r.Id.HasValue).Select(r => r.Id!.Value).ToList();
+
+        // 1. Remover Regionais
+        var regionaisToRemove = currentRegionais.Where(r => !dtoIds.Contains(r.Id)).ToList();
+        foreach (var reg in regionaisToRemove)
+        {
+            sub.Regionais.Remove(reg);
+        }
+
+        // 2. Adicionar ou Atualizar Regionais
+        foreach (var dto in regionalDtos)
+        {
+            if (dto.Id.HasValue && dto.Id != Guid.Empty)
+            {
+                // Editar
+                var existingReg = currentRegionais.FirstOrDefault(r => r.Id == dto.Id.Value);
+                if (existingReg != null)
+                {
+                    existingReg.Name = dto.Name;
+                }
+            }
+            else
+            {
+                // Novo
+                sub.Regionais.Add(new Domain.Entities.Regional { Name = dto.Name });
+            }
+        }
+    }
+
+    // Seu método genérico original (mantido para Products e Contents)
     private void UpdateJunctionTable<TEntity, TKey>(
-        ICollection<TEntity> currentItems, 
-        ICollection<TKey> newItemIds, 
-        Func<TEntity, TKey> keySelector, 
-        Func<TKey, TEntity> createFactory) 
-        where TEntity : class 
+        ICollection<TEntity> currentItems,
+        ICollection<TKey> newItemIds,
+        Func<TEntity, TKey> keySelector,
+        Func<TKey, TEntity> createFactory)
+        where TEntity : class
         where TKey : IEquatable<TKey>
     {
         var currentIds = currentItems.Select(keySelector).ToList();
-        
-        // 1. Adicionar novos
         var idsToAdd = newItemIds.Except(currentIds).ToList();
         foreach (var id in idsToAdd)
         {
             currentItems.Add(createFactory(id));
         }
 
-        // 2. Remover antigos
         var idsToRemove = currentIds.Except(newItemIds).ToList();
         var itemsToRemove = currentItems.Where(item => idsToRemove.Contains(keySelector(item))).ToList();
         foreach (var item in itemsToRemove)
