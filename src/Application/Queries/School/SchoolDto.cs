@@ -12,6 +12,7 @@ public class SchoolDto
     public string? Description { get; set; }
     public AddressDto? Address { get; set; }
     public ClientCleanDto? Client { get; set; }
+    public Guid ClientId { get; set; }
     public Guid RegionalId { get; set; }
     public RegionalDto? Regional { get; set; }
 
