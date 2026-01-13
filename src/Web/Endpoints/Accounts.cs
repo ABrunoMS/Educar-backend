@@ -9,6 +9,7 @@ using Educar.Backend.Application.Common.Models;
 using Educar.Backend.Application.Queries.Account;
 using Educar.Backend.Domain.Enums;
 using Microsoft.OpenApi.Extensions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Educar.Backend.Web.Endpoints;
 
@@ -20,13 +21,16 @@ public class Accounts : EndpointGroupBase
             .RequireAuthorization(UserRole.Admin.GetDisplayName())
             .MapGet(GetAccount, "{id}")
             .MapGet(GetAccountsByRole, "role/{role}")
-            .MapGet(GetAllAccountsBySchool, "school/{schoolId}")
-            .MapGet(GetAllAccountsByClass, "class/{classId}")
             .MapGet(GetAllAccountsByClient, "client/{clientId}")
             .MapGet(GetAllAccounts)
             .MapPost(CreateAccount)
             .MapPut(UpdateAccount, "{id}")
             .MapDelete(DeleteAccount, "{id}");
+
+        app.MapGroup(this)
+            .RequireAuthorization(new AuthorizeAttribute { Roles = "Admin,Teacher" }) 
+            .MapGet(GetAllAccountsBySchool, "school/{schoolId}")
+            .MapGet(GetAllAccountsByClass, "class/{classId}");
 
         // Endpoint separado para upload de arquivo com DisableAntiforgery
         app.MapGroup(this)
