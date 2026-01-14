@@ -17,6 +17,7 @@ public class QuestCleanDto
     public int? MaxPlayers { get; set; }
     public int? TotalQuestSteps { get; set; }
     public CombatDifficulty? CombatDifficulty { get; set; }
+    public Guid? CreatedBy { get; set; }
     public GameCleanDto? Game { get; set; }
     public GradeDto? Grade { get; set; }
     public SubjectDto? Subject { get; set; }
