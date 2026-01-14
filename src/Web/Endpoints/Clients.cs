@@ -7,6 +7,7 @@ using Educar.Backend.Application.Queries.Client;
 using Educar.Backend.Domain.Enums;
 using Microsoft.OpenApi.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Educar.Backend.Web.Endpoints;
 
@@ -16,11 +17,13 @@ public class Clients : EndpointGroupBase
     {
         app.MapGroup(this)
             .RequireAuthorization(UserRole.Admin.GetDisplayName())
-            .MapPost(CreateClient)
-            .MapGet(GetClient, "{id}")
+            .MapPost(CreateClient) 
             .MapGet(GetAllClients)
             .MapPut(UpdateClient, "{id}")
             .MapDelete(DeleteClient, "{id}");
+        app.MapGroup(this)
+            .RequireAuthorization(new AuthorizeAttribute { Roles = "Admin,Teacher" })
+            .MapGet(GetClient, "{id}");
     }
 
     public Task<IdResponseDto> CreateClient(ISender sender, CreateClientCommand command)
