@@ -29,7 +29,7 @@ public class CreateMediaCommandHandler(IApplicationDbContext context, IUser curr
 
         if (currentUser.Id == null) throw new Exception("Couldn't get current user Id");
 
-        entity.AddDomainEvent(new MediaCreatedEvent(entity, Guid.Parse(currentUser.Id)));
+        entity.AddDomainEvent(new MediaCreatedEvent(entity, currentUser.Id.Value));
         context.Medias.Add(entity);
         await context.SaveChangesAsync(cancellationToken);
 

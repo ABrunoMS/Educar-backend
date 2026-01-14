@@ -49,7 +49,9 @@ public class UpdateMediaCommandHandler(IApplicationDbContext context, IObjectSto
         entity.Url = request.Url ?? entity.Url;
         entity.ObjectName = request.ObjectName ?? entity.ObjectName;
 
-        entity.AddDomainEvent(new MediaUpdatedEvent(entity, Guid.Parse(currentUser.Id), previousState));
+        if (currentUser.Id == null) throw new Exception("Couldn't get current user Id");
+        
+        entity.AddDomainEvent(new MediaUpdatedEvent(entity, currentUser.Id.Value, previousState));
         await context.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;

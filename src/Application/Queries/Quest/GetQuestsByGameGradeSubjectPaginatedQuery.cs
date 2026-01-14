@@ -47,11 +47,11 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
         var userId = _currentUser.Id;
         Guid? clientId = null;
         
-        if (!string.IsNullOrEmpty(userId))
+        if (userId.HasValue)
         {
             var account = await _context.Accounts
                 .AsNoTracking()
-                .FirstOrDefaultAsync(a => a.Id.ToString() == userId, cancellationToken);
+                .FirstOrDefaultAsync(a => a.Id == userId.Value, cancellationToken);
             clientId = account?.ClientId;
         }
 
@@ -97,9 +97,9 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
                 // === CENÁRIO B: PROFESSOR VENDO "MINHAS AULAS" ===
                 
                 // B1. Filtro de Dono: Só vê o que ele mesmo criou
-                if (!string.IsNullOrEmpty(userIdString))
+                if (userId.HasValue)
                 {
-                    query = query.Where(q => q.CreatedBy == userIdString);
+                    query = query.Where(q => q.CreatedBy == userId.Value);
                 }
 
                 // B2. Filtro de Produtos do Cliente: Só vê o que a escola comprou/tem acesso

@@ -17,11 +17,11 @@ public class GetQuestQueryHandler(IApplicationDbContext context, IMapper mapper,
         var userId = currentUser.Id;
         Guid? clientId = null;
         
-        if (!string.IsNullOrEmpty(userId))
+        if (userId.HasValue)
         {
             var account = await context.Accounts
                 .AsNoTracking()
-                .FirstOrDefaultAsync(a => a.Id.ToString() == userId, cancellationToken);
+                .FirstOrDefaultAsync(a => a.Id == userId.Value, cancellationToken);
             clientId = account?.ClientId;
         }
 

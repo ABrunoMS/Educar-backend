@@ -20,25 +20,22 @@ public class GetMyAccountQueryHandler : IRequestHandler<GetMyAccountQuery, Accou
 
     public async Task<AccountDto> Handle(GetMyAccountQuery request, CancellationToken cancellationToken)
     {
-        // Pega o ID do usuário logado (que é uma string)
-        var userIdString = _currentUserService.Id;
-        if (string.IsNullOrEmpty(userIdString))
+        // Pega o ID do usuário logado (que agora é um Guid?)
+        var userId = _currentUserService.Id;
+        if (userId == null)
         {
             throw new UnauthorizedAccessException();
         }
-
-        // CORREÇÃO: Convertemos a string para Guid antes de comparar
-        var userIdGuid = Guid.Parse(userIdString);
 
         var entity = await _context.Accounts
             .Include(a => a.AccountSchools)
                 .ThenInclude(asc => asc.School)
             .Include(a => a.AccountClasses)
                 .ThenInclude(ac => ac.Class)
-            // Usamos o Guid convertido na comparação
-            .FirstOrDefaultAsync(e => e.Id == userIdGuid, cancellationToken);
+            // Usamos o Guid diretamente na comparação
+            .FirstOrDefaultAsync(e => e.Id == userId.Value, cancellationToken);
 
-        Guard.Against.NotFound(userIdGuid, entity);
+        Guard.Against.NotFound(userId.Value, entity);
 
         return _mapper.Map<AccountDto>(entity);
     }

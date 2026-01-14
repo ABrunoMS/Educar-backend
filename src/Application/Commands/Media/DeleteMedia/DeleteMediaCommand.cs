@@ -22,7 +22,9 @@ public class DeleteMediaCommandHandler(IApplicationDbContext context, IObjectSto
             throw new Exception("Failed to delete media object from bucket");
         }
 
-        entity.AddDomainEvent(new MediaDeletedEvent(entity, Guid.Parse(currentUser.Id)));
+        if (currentUser.Id == null) throw new Exception("Couldn't get current user Id");
+        
+        entity.AddDomainEvent(new MediaDeletedEvent(entity, currentUser.Id.Value));
         context.Medias.Remove(entity);
         await context.SaveChangesAsync(cancellationToken);
 

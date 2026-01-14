@@ -47,11 +47,11 @@ public class GetProductsPaginatedQueryHandler : IRequestHandler<GetProductsPagin
         var userId = _currentUser.Id;
         Guid? clientId = null;
         
-        if (!string.IsNullOrEmpty(userId))
+        if (userId.HasValue)
         {
             var account = await _context.Accounts
                 .AsNoTracking()
-                .FirstOrDefaultAsync(a => a.Id.ToString() == userId, cancellationToken);
+                .FirstOrDefaultAsync(a => a.Id == userId.Value, cancellationToken);
             clientId = account?.ClientId;
         }
         

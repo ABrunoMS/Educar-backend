@@ -12,7 +12,7 @@ public class LoggingBehaviour<TRequest>(ILogger<TRequest> logger, IUser user) : 
     public Task Process(TRequest request, CancellationToken cancellationToken)
     {
         var requestName = typeof(TRequest).Name;
-        var userId = user.Id ?? string.Empty;
+        var userId = user.Id?.ToString() ?? string.Empty;
         var userName = string.Empty;
 
         _logger.LogInformation("Educar.Backend Request: {Name} {@UserId} {@Request}",
