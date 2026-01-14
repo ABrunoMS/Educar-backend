@@ -179,12 +179,12 @@ public class CreateQuestCommandHandler(IApplicationDbContext context, IUser curr
 
         // 2. Obter o ClientId do usuário atual através da conta (Account)
         var userId = currentUser.Id;
-        if (string.IsNullOrEmpty(userId))
+        if (userId == null)
             throw new UnauthorizedAccessException("Usuário não autenticado.");
 
         var account = await context.Accounts
             .AsNoTracking()
-            .FirstOrDefaultAsync(a => a.Id.ToString() == userId, cancellationToken);
+            .FirstOrDefaultAsync(a => a.Id == userId.Value, cancellationToken);
 
         if (account?.ClientId == null)
             throw new UnauthorizedAccessException("Usuário não está associado a um cliente.");

@@ -34,8 +34,8 @@ public class GetClassesPaginatedQueryHandler : IRequestHandler<GetClassesPaginat
 
     public async Task<PaginatedList<ClassDto>> Handle(GetClassesPaginatedQuery request, CancellationToken cancellationToken)
     {
-        var currentUserIdString = _currentUserService.Id;
-        if (string.IsNullOrEmpty(currentUserIdString))
+        var currentUserId = _currentUserService.Id;
+        if (currentUserId == null)
         {
             // Usa o novo método Create para retornar uma lista vazia
             return PaginatedList<ClassDto>.Create(new List<ClassDto>(), 0, request.PageNumber, request.PageSize);
@@ -64,11 +64,8 @@ public class GetClassesPaginatedQueryHandler : IRequestHandler<GetClassesPaginat
         }
         else // PARA TEACHER, STUDENT, ETC.
         {
-            // CORREÇÃO 3: Convertendo a string do ID para Guid
-            var currentUserId = Guid.Parse(currentUserIdString);
-
             var userSchoolIdsQuery = _context.AccountSchools
-                .Where(asc => asc.AccountId == currentUserId)
+                .Where(asc => asc.AccountId == currentUserId.Value)
                 .Select(asc => asc.SchoolId);
             
             query = _context.Classes
