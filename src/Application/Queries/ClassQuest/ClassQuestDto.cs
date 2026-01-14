@@ -7,6 +7,7 @@ public class ClassQuestDto
     public Guid Id { get; set; }
     public Guid ClassId { get; set; }
     public Guid QuestId { get; set; }
+    public DateTimeOffset StartDate { get; set; }
     public DateTimeOffset ExpirationDate { get; set; }
     public bool IsExpired { get; set; }
     

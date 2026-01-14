@@ -10,6 +10,7 @@ public class ClassQuest : BaseAuditableEntity
     public Guid QuestId { get; set; }
     public Quest Quest { get; set; } = null!;
     
+    public DateTimeOffset StartDate { get; set; }
     public DateTimeOffset ExpirationDate { get; set; }
     
     [NotMapped]

@@ -10,6 +10,7 @@ public class School(string name) : BaseAuditableEntity
     public Guid ClientId { get; set; }
     public Regional? Regional { get; set; }
     public Guid RegionalId { get; set; }
+    public DateTime? ContractStartDate { get; set; }
     //public List<Account> Accounts { get; set; } = [];
     public IList<AccountSchool> AccountSchools { get; set; } = new List<AccountSchool>();
 }

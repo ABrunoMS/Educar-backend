@@ -7,7 +7,7 @@ using Educar.Backend.Domain.Enums;
 
 namespace Educar.Backend.Web.Endpoints;
 
-public record UpdateClassQuestRequest(string ExpirationDate);
+public record UpdateClassQuestRequest(string? StartDate, string ExpirationDate);
 
 public class ClassQuests : EndpointGroupBase
 {
@@ -29,7 +29,7 @@ public class ClassQuests : EndpointGroupBase
 
     public async Task<IResult> UpdateClassQuest(ISender sender, Guid id, UpdateClassQuestRequest request)
     {
-        var command = new UpdateClassQuestCommand(id, request.ExpirationDate);
+        var command = new UpdateClassQuestCommand(id, request.StartDate, request.ExpirationDate);
         await sender.Send(command);
         return Results.NoContent();
     }
