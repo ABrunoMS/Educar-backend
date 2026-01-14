@@ -11,6 +11,7 @@ public record UpdateSchoolCommand : IRequest<Unit>
     public Guid? AddressId { get; set; }
     public Guid? ClientId { get; set; }
     public Guid? RegionalId { get; set; }
+    public DateTime? ContractStartDate { get; set; }
 }
 
 public class UpdateSchoolCommandHandler(IApplicationDbContext context)
@@ -25,6 +26,7 @@ public class UpdateSchoolCommandHandler(IApplicationDbContext context)
 
         if (request.Name != null) entity.Name = request.Name;
         if (request.Description != null) entity.Description = request.Description;
+        if (request.ContractStartDate.HasValue) entity.ContractStartDate = request.ContractStartDate;
         
         if (request.AddressId.HasValue)
         {

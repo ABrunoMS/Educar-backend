@@ -12,6 +12,7 @@ public record CreateSchoolCommand(string Name, Guid ClientId, Guid RegionalId) :
     public Guid? AddressId { get; set; }
     public Guid ClientId { get; set; } = ClientId;
     public Guid RegionalId { get; set; } = RegionalId;
+    public DateTime? ContractStartDate { get; set; }
 }
 
 public class CreateSchoolCommandHandler(IApplicationDbContext context)
@@ -45,7 +46,8 @@ public class CreateSchoolCommandHandler(IApplicationDbContext context)
             Description = request.Description,
             AddressId = addressId,
             Client = client,
-            Regional = regional
+            Regional = regional,
+            ContractStartDate = request.ContractStartDate
         };
 
         context.Schools.Add(entity);

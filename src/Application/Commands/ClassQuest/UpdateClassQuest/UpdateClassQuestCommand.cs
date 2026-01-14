@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace Educar.Backend.Application.Commands.ClassQuest.UpdateClassQuest;
 
-public record UpdateClassQuestCommand(Guid Id, string ExpirationDate) : IRequest;
+public record UpdateClassQuestCommand(Guid Id, string? StartDate, string ExpirationDate) : IRequest;
 
 public class UpdateClassQuestCommandHandler(IApplicationDbContext context)
     : IRequestHandler<UpdateClassQuestCommand>
@@ -39,6 +39,32 @@ public class UpdateClassQuestCommandHandler(IApplicationDbContext context)
         else
         {
             throw new BadRequestException("Formato de data inválido. Use o formato ISO (YYYY-MM-DDTHH:mm:ssZ) ou DD/MM/YYYY.");
+        }
+
+        // Atualizar StartDate se fornecido
+        if (!string.IsNullOrEmpty(request.StartDate))
+        {
+            DateTimeOffset startDateOffset;
+            
+            if (DateTimeOffset.TryParse(request.StartDate, out var parsedStartDateOffset))
+            {
+                startDateOffset = parsedStartDateOffset;
+            }
+            else if (DateTime.TryParseExact(
+                request.StartDate,
+                "dd/MM/yyyy",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var startDate))
+            {
+                startDateOffset = new DateTimeOffset(startDate, TimeSpan.Zero);
+            }
+            else
+            {
+                throw new BadRequestException("Formato de data de início inválido. Use o formato ISO (YYYY-MM-DDTHH:mm:ssZ) ou DD/MM/YYYY.");
+            }
+            
+            entity.StartDate = startDateOffset;
         }
 
         entity.ExpirationDate = expirationDateOffset;

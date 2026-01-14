@@ -9,6 +9,7 @@ public record CreateClassQuestCommand : IRequest<IdResponseDto>
 {
     public Guid ClassId { get; init; }
     public Guid QuestId { get; init; }
+    public string StartDate { get; init; } = string.Empty;
     public string ExpirationDate { get; init; } = string.Empty;
 }
 
@@ -26,6 +27,29 @@ public class CreateClassQuestCommandHandler(IApplicationDbContext context)
         var quest = await context.Quests.FindAsync([request.QuestId], cancellationToken: cancellationToken);
         if (quest == null)
             throw new Application.Common.Exceptions.NotFoundException(nameof(Quest), request.QuestId.ToString());
+
+        // Parse da data de início em formato ISO ou DD/MM/YYYY
+        DateTimeOffset startDateOffset;
+        
+        if (DateTimeOffset.TryParse(request.StartDate, out var parsedStartDateOffset))
+        {
+            // Formato ISO
+            startDateOffset = parsedStartDateOffset;
+        }
+        else if (DateTime.TryParseExact(
+            request.StartDate,
+            "dd/MM/yyyy",
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None,
+            out var startDate))
+        {
+            // Formato DD/MM/YYYY
+            startDateOffset = new DateTimeOffset(startDate, TimeSpan.Zero);
+        }
+        else
+        {
+            throw new BadRequestException("Formato de data de início inválido. Use o formato ISO (YYYY-MM-DDTHH:mm:ssZ) ou DD/MM/YYYY.");
+        }
 
         // Parse da data em formato ISO ou DD/MM/YYYY
         DateTimeOffset expirationDateOffset;
@@ -54,6 +78,7 @@ public class CreateClassQuestCommandHandler(IApplicationDbContext context)
         {
             ClassId = request.ClassId,
             QuestId = request.QuestId,
+            StartDate = startDateOffset,
             ExpirationDate = expirationDateOffset
         };
 
