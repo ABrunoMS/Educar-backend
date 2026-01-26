@@ -1,4 +1,5 @@
 using Educar.Backend.Application.Common.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Educar.Backend.Application.Queries.School;
 
@@ -21,7 +22,8 @@ public class GetSchoolQueryHandler : IRequestHandler<GetSchoolQuery, SchoolDto>
     public async Task<SchoolDto> Handle(GetSchoolQuery request, CancellationToken cancellationToken)
     {
         var entity = await _context.Schools
-            .ProjectTo<SchoolDto>(_mapper.ConfigurationProvider)
+            .Include(s => s.AccountSchools)
+                .ThenInclude(acs => acs.Account)
             .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
 
         if (entity == null) throw new NotFoundException(nameof(Domain.Entities.School), request.Id.ToString());

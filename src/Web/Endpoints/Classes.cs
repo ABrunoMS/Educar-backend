@@ -35,8 +35,22 @@ public class Classes : EndpointGroupBase
             .MapGet(GetAllClasses);            
     }
 
-    public Task<PaginatedList<ClassDto>> GetAllClasses(ISender sender, [AsParameters] GetClassesPaginatedQuery query)
+    public Task<PaginatedList<ClassDto>> GetAllClasses(
+        ISender sender,
+        [FromQuery(Name = "PageNumber")] int PageNumber,
+        [FromQuery(Name = "PageSize")] int PageSize,
+        [FromQuery(Name = "search")] string? Search,
+        [FromQuery(Name = "ClientId")] Guid? ClientId,
+        [FromQuery(Name = "SchoolId")] Guid? SchoolId)
     {
+        var query = new GetClassesPaginatedQuery
+        {
+            PageNumber = PageNumber,
+            PageSize = PageSize,
+            Search = Search,
+            ClientId = ClientId,
+            SchoolId = SchoolId
+        };
         return sender.Send(query);
     }
 

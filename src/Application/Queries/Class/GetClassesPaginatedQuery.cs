@@ -14,6 +14,9 @@ public record GetClassesPaginatedQuery : IRequest<PaginatedList<ClassDto>>
 {
     public int PageNumber { get; init; } = 1;
     public int PageSize { get; init; } = 10;
+    public string? Search { get; init; }
+    public Guid? ClientId { get; init; }
+    public Guid? SchoolId { get; init; }
 }
 
 
@@ -76,6 +79,28 @@ public class GetClassesPaginatedQueryHandler : IRequestHandler<GetClassesPaginat
                 .Include(c => c.AccountClasses)
                     .ThenInclude(ac => ac.Account)
                 .Where(c => userSchoolIdsQuery.Contains(c.SchoolId));
+        }
+
+        // Aplicar filtro por Cliente
+        if (request.ClientId.HasValue)
+        {
+            var schoolIdsForClient = _context.Schools
+                .Where(s => s.ClientId == request.ClientId.Value)
+                .Select(s => s.Id);
+            query = query.Where(c => schoolIdsForClient.Contains(c.SchoolId));
+        }
+
+        // Aplicar filtro por Escola
+        if (request.SchoolId.HasValue)
+        {
+            query = query.Where(c => c.SchoolId == request.SchoolId.Value);
+        }
+
+        // Aplicar busca por nome
+        if (!string.IsNullOrWhiteSpace(request.Search))
+        {
+            var searchLower = request.Search.ToLower();
+            query = query.Where(c => c.Name.ToLower().Contains(searchLower));
         }
 
         return await query

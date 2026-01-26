@@ -39,14 +39,15 @@ public class Clients : EndpointGroupBase
     public Task<PaginatedList<ClientDto>> GetAllClients(
         ISender sender,
         [FromQuery(Name = "PageNumber")] int PageNumber,
-        [FromQuery(Name = "PageSize")] int PageSize)
+        [FromQuery(Name = "PageSize")] int PageSize,
+        [FromQuery(Name = "search")] string? Search)
     {
         var query = new GetClientsPaginatedQuery
         {
             PageNumber = PageNumber,
-            PageSize = PageSize
+            PageSize = PageSize,
+            Search = Search
         };
-
         return sender.Send(query);
     }
 

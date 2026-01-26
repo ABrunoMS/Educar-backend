@@ -46,14 +46,17 @@ public class Schools : EndpointGroupBase
     public Task<PaginatedList<SchoolDto>> GetAllSchools(
         ISender sender,
         [FromQuery(Name = "PageNumber")] int PageNumber,
-        [FromQuery(Name = "PageSize")] int PageSize)
+        [FromQuery(Name = "PageSize")] int PageSize,
+        [FromQuery(Name = "search")] string? Search,
+        [FromQuery(Name = "ClientId")] Guid? ClientId)
     {
         var query = new GetSchoolsPaginatedQuery
         {
             PageNumber = PageNumber,
-            PageSize = PageSize
+            PageSize = PageSize,
+            Search = Search,
+            ClientId = ClientId
         };
-
         return sender.Send(query);
     }
 
