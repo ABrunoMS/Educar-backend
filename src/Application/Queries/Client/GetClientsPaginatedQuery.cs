@@ -33,6 +33,9 @@ public class GetClientsPaginatedQueryHandler : IRequestHandler<GetClientsPaginat
     public async Task<PaginatedList<ClientDto>> Handle(GetClientsPaginatedQuery request,
         CancellationToken cancellationToken)
     {
+        Console.WriteLine($"🔍 Backend - Search parameter: '{request.Search}'");
+        Console.WriteLine($"📄 Backend - PageNumber: {request.PageNumber}, PageSize: {request.PageSize}");
+        
         // Buscar todos os clientes primeiro
         IQueryable<Domain.Entities.Client> clientQuery = _context.Clients
             .Include(c => c.ClientProducts)
@@ -47,6 +50,7 @@ public class GetClientsPaginatedQueryHandler : IRequestHandler<GetClientsPaginat
         // LÓGICA DE PESQUISA (SEARCH) ADICIONADA
         if (!string.IsNullOrEmpty(request.Search))
         {
+            Console.WriteLine($"✅ Backend - Applying search filter for: '{request.Search}'");
             clientQuery = clientQuery.Where(c => c.Name.ToLower().Contains(request.Search.ToLower()));
         }
 

@@ -72,12 +72,19 @@ public class Accounts : EndpointGroupBase
 
 
     public Task<PaginatedList<CleanAccountDto>> GetAllAccounts(ISender sender,
-        [AsParameters] PaginatedQuery paginatedQuery)
+        [FromQuery(Name = "PageNumber")] int PageNumber,
+        [FromQuery(Name = "PageSize")] int PageSize,
+        [FromQuery(Name = "search")] string? search = null,
+        [FromQuery(Name = "ClientId")] Guid? ClientId = null,
+        [FromQuery(Name = "Role")] string? Role = null)
     {
         var query = new GetAccountsPaginatedQuery
         {
-            PageNumber = paginatedQuery.PageNumber,
-            PageSize = paginatedQuery.PageSize
+            PageNumber = PageNumber,
+            PageSize = PageSize,
+            Search = search,
+            ClientId = ClientId,
+            Role = Role
         };
 
         return sender.Send(query);

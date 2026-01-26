@@ -10,6 +10,8 @@ public record GetAccountsPaginatedQuery : IRequest<PaginatedList<CleanAccountDto
     public int PageNumber { get; init; } = 1;
     public int PageSize { get; init; } = 10;
     public string? Role { get; init; }
+    public string? Search { get; init; }
+    public Guid? ClientId { get; init; }
 }
 
 public class GetAccountsPaginatedQueryHandler : IRequestHandler<GetAccountsPaginatedQuery, PaginatedList<CleanAccountDto>>
@@ -30,10 +32,23 @@ public class GetAccountsPaginatedQueryHandler : IRequestHandler<GetAccountsPagin
             .Include(a => a.Client)
             .AsQueryable();
 
+        // Filtro por Cliente
+        if (request.ClientId.HasValue)
+        {
+            query = query.Where(a => a.ClientId == request.ClientId.Value);
+        }
+
         // Filtro por Role
         if (!string.IsNullOrEmpty(request.Role) && Enum.TryParse<UserRole>(request.Role, true, out var roleEnum))
         {
             query = query.Where(a => a.Role == roleEnum);
+        }
+
+        // Busca por nome ou email
+        if (!string.IsNullOrEmpty(request.Search))
+        {
+            query = query.Where(a => a.Name.ToLower().Contains(request.Search.ToLower()) || 
+                                    a.Email.ToLower().Contains(request.Search.ToLower()));
         }
 
         return await query

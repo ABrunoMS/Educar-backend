@@ -151,10 +151,6 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
 
         if (request.ContentId is not null)
         {
-        var totalQuests = await query.CountAsync(cancellationToken);
-        _logger.LogWarning("Total de quests após todos os filtros: {Total}", totalQuests);
-        _logger.LogWarning("=== FIM DEPURAÇÃO DE FILTRO DE QUESTS ===\n");
-
             query = query.Where(q => q.ContentId == request.ContentId);
         }
 
@@ -163,6 +159,10 @@ public class GetQuestsByGameGradeSubjectPaginatedQueryHandler : IRequestHandler<
             var searchLower = request.Search.ToLower();
             query = query.Where(q => q.Name.ToLower().Contains(searchLower));
         }
+
+        var totalQuests = await query.CountAsync(cancellationToken);
+        _logger.LogWarning("Total de quests após todos os filtros: {Total}", totalQuests);
+        _logger.LogWarning("=== FIM DEPURAÇÃO DE FILTRO DE QUESTS ===\n");
 
         return await query
             .OrderBy(q => q.Name)

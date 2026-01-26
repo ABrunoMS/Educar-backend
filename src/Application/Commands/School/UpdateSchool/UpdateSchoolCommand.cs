@@ -1,4 +1,5 @@
 using Educar.Backend.Application.Common.Interfaces;
+using Educar.Backend.Domain.Entities;
 using FluentValidation.Results;
 
 namespace Educar.Backend.Application.Commands.School.UpdateSchool;
@@ -12,6 +13,8 @@ public record UpdateSchoolCommand : IRequest<Unit>
     public Guid? ClientId { get; set; }
     public Guid? RegionalId { get; set; }
     public DateTime? ContractStartDate { get; set; }
+    public List<Guid>? TeacherIds { get; init; }
+    public List<Guid>? StudentIds { get; init; }
 }
 
 public class UpdateSchoolCommandHandler(IApplicationDbContext context)
@@ -21,6 +24,7 @@ public class UpdateSchoolCommandHandler(IApplicationDbContext context)
     {
         var entity = await context.Schools
             .Include(s => s.Client)
+            .Include(s => s.AccountSchools)
             .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
         Guard.Against.NotFound(request.Id, entity);
 
@@ -72,8 +76,45 @@ public class UpdateSchoolCommandHandler(IApplicationDbContext context)
             entity.RegionalId = request.RegionalId.Value;
         }
 
+        // Atualização de Professores e Alunos
+        if (request.TeacherIds != null || request.StudentIds != null)
+        {
+            var newAccountIds = (request.TeacherIds ?? new List<Guid>())
+                .Concat(request.StudentIds ?? new List<Guid>())
+                .Distinct().ToList();
+            
+            UpdateJunctionTable(entity.AccountSchools, newAccountIds, acs => acs.AccountId, id => new AccountSchool { AccountId = id });
+        }
+
         await context.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
+    }
+
+    // Método genérico para atualizar tabelas de ligação (Junction Tables)
+    private void UpdateJunctionTable<TEntity, TKey>(
+        ICollection<TEntity> currentItems, 
+        ICollection<TKey> newItemIds, 
+        Func<TEntity, TKey> keySelector, 
+        Func<TKey, TEntity> createFactory) 
+        where TEntity : class 
+        where TKey : IEquatable<TKey>
+    {
+        var currentIds = currentItems.Select(keySelector).ToList();
+        
+        // 1. Adicionar novos
+        var idsToAdd = newItemIds.Except(currentIds).ToList();
+        foreach (var id in idsToAdd)
+        {
+            currentItems.Add(createFactory(id));
+        }
+
+        // 2. Remover antigos
+        var idsToRemove = currentIds.Except(newItemIds).ToList();
+        var itemsToRemove = currentItems.Where(item => idsToRemove.Contains(keySelector(item))).ToList();
+        foreach (var item in itemsToRemove)
+        {
+            currentItems.Remove(item);
+        }
     }
 }
