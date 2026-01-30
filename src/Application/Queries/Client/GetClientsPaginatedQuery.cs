@@ -16,6 +16,9 @@ public class GetClientsPaginatedQuery : IRequest<PaginatedList<ClientDto>>
     public string? Filter { get; init; }
     public string? SortBy { get; init; }
     public string? SortOrder { get; init; }
+    public Guid? MacroRegionId { get; init; }
+    public string? Partner { get; init; }
+    public string? Contact { get; init; }
 }
 
 // CORRIGIDO: Typo no nome da classe e implementação da lógica
@@ -44,6 +47,7 @@ public class GetClientsPaginatedQueryHandler : IRequestHandler<GetClientsPaginat
                 .ThenInclude(cc => cc.Content)
             .Include(c => c.Subsecretarias)
                 .ThenInclude(s => s.Regionais)
+            .Include(c => c.MacroRegion)
             .Include(c => c.Accounts)
             .AsNoTracking();
 
@@ -52,6 +56,26 @@ public class GetClientsPaginatedQueryHandler : IRequestHandler<GetClientsPaginat
         {
             Console.WriteLine($"✅ Backend - Applying search filter for: '{request.Search}'");
             clientQuery = clientQuery.Where(c => c.Name.ToLower().Contains(request.Search.ToLower()));
+        }
+
+        // FILTRO POR MACRORREGIÃO
+        if (request.MacroRegionId.HasValue)
+        {
+            clientQuery = clientQuery.Where(c => c.MacroRegionId == request.MacroRegionId.Value);
+        }
+
+        // FILTRO POR PARCEIRO (pode ser texto ou guid)
+        if (!string.IsNullOrEmpty(request.Partner))
+        {
+            var partnerFilter = request.Partner.Trim();
+            clientQuery = clientQuery.Where(c => c.Partner != null && c.Partner.Contains(partnerFilter));
+        }
+
+        // FILTRO POR CONTATO (pode ser texto ou guid)
+        if (!string.IsNullOrEmpty(request.Contact))
+        {
+            var contactFilter = request.Contact.Trim();
+            clientQuery = clientQuery.Where(c => c.Contacts != null && c.Contacts.Contains(contactFilter));
         }
 
         // LÓGICA DE ORDENAÇÃO (SORTING) ADICIONADA

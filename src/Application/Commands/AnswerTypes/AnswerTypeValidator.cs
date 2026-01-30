@@ -15,6 +15,8 @@ public static class AnswerTypeValidator
             QuestionType.SingleChoice => ValidateSingleChoice(expectedAnswer as SingleChoice),
             QuestionType.Dissertative => ValidateDissertative(expectedAnswer as Dissertative),
             QuestionType.ColumnFill => ValidateColumnFill(expectedAnswer as ColumnFill),
+            QuestionType.Ordering => ValidateOrdering(expectedAnswer as Ordering),
+            QuestionType.MatchTwoRows => ValidateMatchTwoRows(expectedAnswer as MatchTwoRows),
             QuestionType.AlwaysCorrect => ValidateAlwaysCorrect(expectedAnswer as AlwaysCorrect),
             _ => false,
         };
@@ -56,6 +58,47 @@ public static class AnswerTypeValidator
 
         // Ensure all keys and values in the dictionary are non-empty
         return columnFill.Matches.All(kv => !string.IsNullOrWhiteSpace(kv.Key) && !string.IsNullOrWhiteSpace(kv.Value));
+    }
+
+    private static bool ValidateOrdering(Ordering? ordering)
+    {
+        if (ordering == null) return false;
+        var items = ordering.Items ?? new List<string>();
+        var order = ordering.CorrectOrder ?? new List<int>();
+
+        if (items.Count < 2) return false;
+
+        if (order.Count != items.Count) return false;
+
+        // Ensure correctOrder contains a permutation of 0..n-1
+        var expected = Enumerable.Range(0, items.Count).ToList();
+        var sorted = order.OrderBy(i => i).ToList();
+        return sorted.SequenceEqual(expected);
+    }
+
+    private static bool ValidateMatchTwoRows(MatchTwoRows? match)
+    {
+        if (match == null) return false;
+        var left = match.Left ?? new List<string>();
+        var right = match.Right ?? new List<string>();
+        var matches = match.Matches ?? new Dictionary<int, int>();
+
+        if (left.Count == 0 || right.Count == 0) return false;
+
+        // Each left item should have a mapping
+        if (matches.Count != left.Count) return false;
+
+        // Keys and values should be within bounds and values should be unique
+        var rightValues = new HashSet<int>();
+        foreach (var kv in matches)
+        {
+            if (kv.Key < 0 || kv.Key >= left.Count) return false;
+            if (kv.Value < 0 || kv.Value >= right.Count) return false;
+            rightValues.Add(kv.Value);
+        }
+
+        // Optionally enforce one-to-one mapping
+        return rightValues.Count == matches.Count;
     }
 
     private static bool ValidateAlwaysCorrect(AlwaysCorrect? alwaysCorrect)

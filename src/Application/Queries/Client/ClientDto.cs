@@ -27,6 +27,8 @@ public class ClientDto
     public IList<SubsecretariaDto> Subsecretarias { get; set; } = new List<SubsecretariaDto>();
     public IList<ProductDto> Products { get; set; } = new List<ProductDto>();
     public IList<ContentDto> Contents { get; set; } = new List<ContentDto>();
+    public Guid? MacroRegionId { get; set; }
+    public string? MacroRegionName { get; set; }
     
     // Se você tiver uma lista de contratos associada, pode manter.
     // public List<ContractDto>? Contracts { get; set; }
@@ -43,11 +45,12 @@ public class ClientDto
                 .ForMember(dest => dest.Products,
                            opt => opt.MapFrom(src => src.ClientProducts.Select(cp => cp.Product)))
                 
-                
                 .ForMember(dest => dest.Contents,
                            opt => opt.MapFrom(src => src.ClientContents.Select(cc => cc.Content)))
-                
-                .ForMember(dest => dest.PartnerName, opt => opt.Ignore());
+
+                .ForMember(dest => dest.PartnerName, opt => opt.Ignore())
+                .ForMember(dest => dest.MacroRegionId, opt => opt.MapFrom(src => src.MacroRegionId))
+                .ForMember(dest => dest.MacroRegionName, opt => opt.MapFrom(src => src.MacroRegion != null ? src.MacroRegion.Name : null));
         
         }
     }

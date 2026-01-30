@@ -40,13 +40,19 @@ public class Clients : EndpointGroupBase
         ISender sender,
         [FromQuery(Name = "PageNumber")] int PageNumber,
         [FromQuery(Name = "PageSize")] int PageSize,
-        [FromQuery(Name = "search")] string? Search)
+        [FromQuery(Name = "search")] string? Search,
+        [FromQuery(Name = "macroRegionId")] Guid? MacroRegionId,
+        [FromQuery(Name = "partner")] string? Partner,
+        [FromQuery(Name = "contact")] string? Contact)
     {
         var query = new GetClientsPaginatedQuery
         {
             PageNumber = PageNumber,
             PageSize = PageSize,
             Search = Search
+            , MacroRegionId = MacroRegionId
+            , Partner = Partner
+            , Contact = Contact
         };
         return sender.Send(query);
     }
