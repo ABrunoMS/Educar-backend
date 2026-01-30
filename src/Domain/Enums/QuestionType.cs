@@ -8,5 +8,7 @@ public enum QuestionType
     SingleChoice,
     Dissertative,
     ColumnFill,
-    AlwaysCorrect
+    AlwaysCorrect,
+    Ordering,
+    MatchTwoRows
 }

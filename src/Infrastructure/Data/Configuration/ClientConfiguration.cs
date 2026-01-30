@@ -24,5 +24,10 @@ public class ClientConfiguration(DatabaseFacade database) : IEntityTypeConfigura
             .WithOne(s => s.Client)
             .HasForeignKey(s => s.ClientId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(c => c.MacroRegion)
+            .WithMany(m => m.Clients)
+            .HasForeignKey(c => c.MacroRegionId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

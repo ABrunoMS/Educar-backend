@@ -76,6 +76,10 @@ public class ApplicationDbContextInitialiser
         // 0. Seed de BNCC a partir do CSV
         await SeedBnccAsync();
 
+        // Seed das MacroRegiões (regiões macro do Brasil)
+        var macroRegionSeeder = new MacroRegionSeeder(_context, _logger);
+        await macroRegionSeeder.SeedAsync();
+
         // 1. Seed de Produtos e Conteúdos 
         await SeedProductsAndContentsAsync();
 

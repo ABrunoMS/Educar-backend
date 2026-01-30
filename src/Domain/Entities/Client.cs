@@ -14,6 +14,8 @@ public class Client : BaseEntity // <-- A herança correta para o seu projeto
     public string? Description { get; set; }
     public string? Partner { get; set; }
     public string? Contacts { get; set; }
+    public Guid? MacroRegionId { get; set; }
+    public MacroRegion? MacroRegion { get; set; }
     public string? Contract { get; set; }
     public string? Validity { get; set; }
     public string? SignatureDate { get; set; }

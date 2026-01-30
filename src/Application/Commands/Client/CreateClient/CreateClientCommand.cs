@@ -60,6 +60,9 @@ public record CreateClientCommand : IRequest<IdResponseDto>
 
     [JsonPropertyName("selectedContents")]
     public List<Guid>? ContentIds { get; init; }
+
+    [JsonPropertyName("macroRegionId")]
+    public Guid? MacroRegionId { get; init; }
 }
 
 // Nenhuma mudança aqui
@@ -78,6 +81,7 @@ public class CreateClientCommandHandler(IApplicationDbContext context)
             SignatureDate = request.SignatureDate,
             ImplantationDate = request.ImplantationDate,
             TotalAccounts = request.TotalAccounts,
+            MacroRegionId = request.MacroRegionId,
         };
 
         // Cria as Subsecretarias e Regionais

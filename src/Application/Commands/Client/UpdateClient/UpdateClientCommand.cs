@@ -40,6 +40,7 @@ public record UpdateClientCommand : IRequest<Unit>
     
     public List<Guid>? ProductIds { get; init; }
     public List<Guid>? ContentIds { get; init; }
+    public Guid? MacroRegionId { get; init; }
 }
 
 public class UpdateClientCommandHandler(IApplicationDbContext context) : IRequestHandler<UpdateClientCommand, Unit>
@@ -66,6 +67,7 @@ public class UpdateClientCommandHandler(IApplicationDbContext context) : IReques
         entity.SignatureDate = request.SignatureDate ?? entity.SignatureDate;
         entity.ImplantationDate = request.ImplantationDate ?? entity.ImplantationDate;
         entity.TotalAccounts = request.TotalAccounts ?? entity.TotalAccounts;
+        entity.MacroRegionId = request.MacroRegionId ?? entity.MacroRegionId;
 
         // 3. Atualiza Subsecretarias e Regionais (Lógica complexa de sincronização)
         if (request.Subsecretarias != null)
